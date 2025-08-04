@@ -1,0 +1,61 @@
+﻿<UserControl x:Class="FanShop.View.CalendarDayControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:FanShop.View"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="500">
+    <Border BorderBrush="#CDCDCD"
+            BorderThickness="0.2"
+            Padding="8"
+            Background="White">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="{Binding Date.Day}"
+                       FontSize="12"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Left"
+                       Margin="0,0,0,0">
+                <TextBlock.Foreground>
+                    <SolidColorBrush Color="{Binding IsCurrentMonth, Converter={StaticResource BoolToColorConverter}}"></SolidColorBrush>
+                </TextBlock.Foreground>
+            </TextBlock>
+
+            <ItemsControl Grid.Row="1" ItemsSource="{Binding Employees}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="#D9F1FB"
+                                Margin="0,2,0,0"
+                                Padding="2"
+                                CornerRadius="3">
+                            <TextBlock Text="{Binding}"
+                                       FontSize="8"
+                                       FontWeight="SemiBold">
+                            </TextBlock>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal"
+                        Margin="0,8,0,0"
+                        Visibility="{Binding HasMatch, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Image Source="{Binding Match.Logo}"
+                       Width="48"
+                       Height="Auto">
+                </Image>
+                <TextBlock Text="{Binding Match.Time}"
+                           FontWeight="Bold"
+                           Margin="5,0,0,0"
+                           VerticalAlignment="Center">
+                </TextBlock>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

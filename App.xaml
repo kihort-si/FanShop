@@ -1,0 +1,12 @@
+﻿<Application x:Class="FanShop.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:FanShop"
+             xmlns:converters="clr-namespace:FanShop.Converters"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"></converters:BoolToVisibilityConverter>
+        <converters:BoolToColorConverter x:Key="BoolToColorConverter"></converters:BoolToColorConverter>
+        <converters:ZeroToVisibilityConverter x:Key="ZeroToVisibilityConverter"></converters:ZeroToVisibilityConverter>
+    </Application.Resources>
+</Application>

@@ -1,0 +1,70 @@
+﻿<Window x:Class="FanShop.Windows.EmployeeWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Сотрудники" Height="400" Width="600" WindowStyle="None" ResizeMode="NoResize" Background="White">
+    <Window.Resources>
+        <Style TargetType="TextBox">
+            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Grid>
+                            <ScrollViewer x:Name="PART_ContentHost" />
+                            <TextBlock Text="{TemplateBinding Tag}"
+                                       Foreground="Gray"
+                                       Margin="5,0,0,0"
+                                       IsHitTestVisible="False"
+                                       Visibility="{Binding Text.Length, 
+                                                RelativeSource={RelativeSource TemplatedParent}, 
+                                                Converter={StaticResource ZeroToVisibilityConverter}}" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <ListBox ItemsSource="{Binding Employees}"
+                 SelectedItem="{Binding SelectedEmployee}" 
+                 Margin="10">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock>
+                        <Run Text="{Binding FirstName}" />
+                        <Run Text="{Binding Surname}" />
+                    </TextBlock>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+            <Button Content="Добавить" Command="{Binding AddEmployeeCommand}" Width="100" Margin="5"/>
+            <Button Content="Изменить" Command="{Binding EditEmployeeCommand}" Width="100" Margin="5"/>
+            <Button Content="Удалить" Command="{Binding RemoveEmployeeCommand}" Width="100" Margin="5"/>
+            <Button Content="Закрыть" Command="{Binding CloseWindowCommand}" Width="100" Margin="5"/>
+        </StackPanel>
+        
+        <Border Background="LightGray" Visibility="{Binding IsEditOverlayVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+                HorizontalAlignment="Center" VerticalAlignment="Center">
+            <StackPanel Background="White" Margin="1" Width="300">
+                <StackPanel>
+                    <TextBox Text="{Binding EditableEmployee.Surname}" Tag="Введите фамилию" Margin="5" />
+                    <TextBox Text="{Binding EditableEmployee.FirstName}" Tag="Введите имя" Margin="5" />
+                    <TextBox Text="{Binding EditableEmployee.LastName}" Tag="Введите отчество" Margin="5" />
+                    <TextBox Text="{Binding EditableEmployee.DateOfBirth}" Tag="Введите дату рождения" Margin="5" />
+                    <TextBox Text="{Binding EditableEmployee.PlaceOfBirth}" Tag="Введите место рождения" Margin="5" />
+                    <TextBox Text="{Binding EditableEmployee.Passport}" Tag="Введите паспортные данные" Margin="5" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+                    <Button Content="Сохранить" Command="{Binding SaveEditedEmployeeCommand}" Width="100" Margin="5" />
+                    <Button Content="Отмена" Command="{Binding CancelEditCommand}" Width="100" Margin="5" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
