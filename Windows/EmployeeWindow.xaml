@@ -61,7 +61,8 @@
                     <TextBox Text="{Binding EditableEmployee.Passport}" Tag="Введите паспортные данные" Margin="5" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
-                    <Button Content="Сохранить" Command="{Binding SaveEditedEmployeeCommand}" Width="100" Margin="5" />
+                    <Button Content="Сохранить" Command="{Binding SaveEditedEmployeeCommand}" 
+                            IsEnabled="{Binding CanSaveEmployee}" Width="100" Margin="5" />
                     <Button Content="Отмена" Command="{Binding CancelEditCommand}" Width="100" Margin="5" />
                 </StackPanel>
             </StackPanel>

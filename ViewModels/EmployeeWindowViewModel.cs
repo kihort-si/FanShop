@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Input;
 using FanShop.Models;
+using FanShop.Services;
 
 namespace FanShop.ViewModels
 {
@@ -10,13 +11,14 @@ namespace FanShop.ViewModels
         public ObservableCollection<Employee> Employees { get; set; } = new();
 
         public ICommand AddEmployeeCommand { get; }
-        public ICommand EditEmployeeCommand { get; } 
+        public ICommand EditEmployeeCommand { get; }
         public ICommand RemoveEmployeeCommand { get; }
         public ICommand CloseWindowCommand { get; }
         public ICommand SaveEditedEmployeeCommand { get; }
         public ICommand CancelEditCommand { get; }
 
         private bool _isEditOverlayVisible;
+
         public bool IsEditOverlayVisible
         {
             get => _isEditOverlayVisible;
@@ -28,6 +30,7 @@ namespace FanShop.ViewModels
         }
 
         private Employee? _editableEmployee;
+
         public Employee? EditableEmployee
         {
             get => _editableEmployee;
@@ -37,9 +40,12 @@ namespace FanShop.ViewModels
                 OnPropertyChanged(nameof(EditableEmployee));
             }
         }
-        
+
         public EmployeeWindowViewModel()
         {
+            using var context = new AppDbContext();
+            Employees = new ObservableCollection<Employee>(context.Employees.ToList());
+
             AddEmployeeCommand = new RelayCommand(AddEmployee);
             EditEmployeeCommand = new RelayCommand(EditEmployee, CanEditEmployee);
             RemoveEmployeeCommand = new RelayCommand(RemoveEmployee, CanEditEmployee);
@@ -47,8 +53,9 @@ namespace FanShop.ViewModels
             SaveEditedEmployeeCommand = new RelayCommand(SaveEditedEmployee);
             CancelEditCommand = new RelayCommand(CancelEdit);
         }
-        
+
         private Employee? _selectedEmployee;
+
         public Employee? SelectedEmployee
         {
             get => _selectedEmployee;
@@ -57,12 +64,13 @@ namespace FanShop.ViewModels
                 _selectedEmployee = value;
                 OnPropertyChanged(nameof(SelectedEmployee));
                 (RemoveEmployeeCommand as RelayCommand)?.RaiseCanExecuteChanged();
-                (EditEmployeeCommand as RelayCommand)?.RaiseCanExecuteChanged(); // Добавлено
+                (EditEmployeeCommand as RelayCommand)?.RaiseCanExecuteChanged();
             }
         }
 
         private void AddEmployee(object? parameter)
         {
+            SelectedEmployee = null;
             EditableEmployee = new Employee
             {
                 FirstName = string.Empty,
@@ -89,49 +97,52 @@ namespace FanShop.ViewModels
                     PlaceOfBirth = SelectedEmployee.PlaceOfBirth,
                     Passport = SelectedEmployee.Passport
                 };
+                
                 IsEditOverlayVisible = true;
             }
         }
-        
+
         private void SaveEditedEmployee(object? parameter)
         {
+            using var context = new AppDbContext();
             if (EditableEmployee != null)
             {
                 if (SelectedEmployee == null)
                 {
-                    Employees.Add(new Employee
-                    {
-                        FirstName = EditableEmployee.FirstName,
-                        LastName = EditableEmployee.LastName,
-                        Surname = EditableEmployee.Surname,
-                        DateOfBirth = EditableEmployee.DateOfBirth,
-                        PlaceOfBirth = EditableEmployee.PlaceOfBirth,
-                        Passport = EditableEmployee.Passport
-                    });
+                    context.Employees.Add(EditableEmployee);
+                    context.SaveChanges();
+                    Employees.Add(EditableEmployee);
                 }
                 else
                 {
-                    var index = Employees.IndexOf(SelectedEmployee);
-                    if (index >= 0)
+                    var employee = context.Employees.Find(SelectedEmployee.EmployeeID);
+                    if (employee != null)
                     {
-                        Employees[index] = new Employee
-                        {
-                            FirstName = EditableEmployee.FirstName,
-                            LastName = EditableEmployee.LastName,
-                            Surname = EditableEmployee.Surname,
-                            DateOfBirth = EditableEmployee.DateOfBirth,
-                            PlaceOfBirth = EditableEmployee.PlaceOfBirth,
-                            Passport = EditableEmployee.Passport
-                        };
-                    }
+                        employee.FirstName = EditableEmployee.FirstName;
+                        employee.LastName = EditableEmployee.LastName;
+                        employee.Surname = EditableEmployee.Surname;
+                        employee.DateOfBirth = EditableEmployee.DateOfBirth;
+                        employee.PlaceOfBirth = EditableEmployee.PlaceOfBirth;
+                        employee.Passport = EditableEmployee.Passport;
+                        context.Employees.Update(employee);
+                        context.SaveChanges();
 
-                    SelectedEmployee = Employees[index];
+                        var index = Employees.IndexOf(SelectedEmployee);
+                        if (index >= 0)
+                        {
+                            Employees[index] = employee;
+                        }
+
+                        SelectedEmployee = employee;
+                        SelectedEmployee = null;
+                    }
                 }
 
+                context.SaveChanges();
                 IsEditOverlayVisible = false;
             }
         }
-        
+
         private void CancelEdit(object? parameter)
         {
             IsEditOverlayVisible = false;
@@ -139,9 +150,16 @@ namespace FanShop.ViewModels
 
         private void RemoveEmployee(object? parameter)
         {
+            using var context = new AppDbContext();
             if (SelectedEmployee != null)
             {
-                Employees.Remove(SelectedEmployee);
+                var employee = context.Employees.Find(SelectedEmployee.EmployeeID);
+                if (employee != null)
+                {
+                    context.Employees.Remove(employee);
+                    context.SaveChanges();
+                    Employees.Remove(SelectedEmployee);
+                }
             }
         }
 
