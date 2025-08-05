@@ -50,7 +50,7 @@
                        Height="44"
                        Width="Auto">
                 </Image>
-                <TextBlock Text="{Binding Match.Time}"
+                <TextBlock Text="{Binding Match.SartTime}"
                            FontWeight="Bold"
                            Margin="0,0,0,0"
                            HorizontalAlignment="Center">

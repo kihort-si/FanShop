@@ -16,6 +16,9 @@ namespace FanShop.ViewModels
 
         private readonly FirebaseService _firebaseService;
         public ObservableCollection<CalendarDayViewModel> CalendarDays { get; set; } = new();
+        
+        public ObservableCollection<MatchInfo> AllMatches { get; set; } = new ObservableCollection<MatchInfo>();
+        
 
         public string CurrentMonthName => new DateTime(_currentYear, _currentMonth, 1)
             .ToString("MMMM yyyy", new CultureInfo("ru-RU")).ToUpper();
@@ -73,11 +76,10 @@ namespace FanShop.ViewModels
             
             ToggleMenuCommand = new RelayCommand(_ => IsMenuOpen = !IsMenuOpen);
             CloseMenuCommand = new RelayCommand(_ => IsMenuOpen = false);
+            LoadMatchesFromFirebase();
             GenerateCalendar(_currentYear, _currentMonth);
             
             OpenEmployeeWindowCommand = new RelayCommand(OpenEmployeeWindow);
-            
-            LoadMatchesFromFirebase();
         }
 
         private async void GoToPreviousMonth(object? parameter)
@@ -89,30 +91,6 @@ namespace FanShop.ViewModels
             OnPropertyChanged(nameof(CurrentMonthName));
             OnPropertyChanged(nameof(PreviousMonthName));
             OnPropertyChanged(nameof(NextMonthName));
-            await LoadMatchesFromFirebase();
-        }
-        
-        private async void LoadMatchesFromFirebase()
-        {
-            var matches = await _firebaseService.GetMatchesAsync();
-
-            foreach (var match in matches)
-            {
-                var matchDate = DateTime.Parse(match.Time);
-                var calendarDay = CalendarDays.FirstOrDefault(cd => cd.Date.Date == matchDate.Date);
-
-                if (calendarDay != null)
-                {
-                    calendarDay.Match = new MatchInfo
-                    {
-                        TeamName = match.TeamName,
-                        Time = match.Time.Split('T')[1].Substring(0, 5),
-                        Logo = new BitmapImage(new Uri(match.Logo))
-                    };
-                }
-            }
-
-            OnPropertyChanged(nameof(CalendarDays));
         }
 
         private async void GoToNextMonth(object? parameter)
@@ -124,43 +102,35 @@ namespace FanShop.ViewModels
             OnPropertyChanged(nameof(CurrentMonthName));
             OnPropertyChanged(nameof(PreviousMonthName));
             OnPropertyChanged(nameof(NextMonthName));
-            await LoadMatchesFromFirebase();
         }
         
         private async Task LoadMatchesFromFirebase()
         {
             var matches = await _firebaseService.GetMatchesAsync();
-            
-            foreach (var calendarDay in CalendarDays)
-            {
-                calendarDay.Match = null;
-            }
+    
+            AllMatches.Clear();
 
             foreach (var match in matches)
             {
-                var matchDate = DateTime.Parse(match.Time);
-                var calendarDay = CalendarDays.FirstOrDefault(cd => cd.Date.Date == matchDate.Date);
-
-                if (calendarDay != null)
+                AllMatches.Add(new MatchInfo
                 {
-                    calendarDay.Match = new MatchInfo
-                    {
-                        TeamName = match.TeamName,
-                        Time = match.Time.Split('T')[1].Substring(0, 5),
-                        Logo = new BitmapImage(new Uri(match.Logo))
-                    };
-                }
+                    TeamName = match.TeamName,
+                    Time = match.Time,
+                    SartTime = match.Time.Split('T')[1].Substring(0, 5),
+                    Logo = new BitmapImage(new Uri(match.Logo))
+                });
             }
 
-            OnPropertyChanged(nameof(CalendarDays));
+            GenerateCalendar(_currentYear, _currentMonth);
+
+            OnPropertyChanged(nameof(AllMatches));
         }
+
 
         private async Task GenerateCalendar(int year, int month)
         {
             CalendarDays.Clear();
             
-            var matches = await _firebaseService.GetMatchesAsync();
-
             DateTime firstDayOfMonth = new DateTime(year, month, 1);
             int offset = (int)firstDayOfMonth.DayOfWeek;
             offset = offset == 0 ? 6 : offset - 1;
@@ -170,6 +140,12 @@ namespace FanShop.ViewModels
             int endOffset = 7 - ((int)lastDayOfMonth.DayOfWeek == 0 ? 7 : (int)lastDayOfMonth.DayOfWeek);
 
             int totalDays = daysInMonth + offset + endOffset;
+            
+            var matchesForMonth = AllMatches.Where(m =>
+            {
+                DateTime matchDate = DateTime.Parse(m.Time);
+                return matchDate >= firstDayOfMonth.AddDays(-offset) && matchDate <= lastDayOfMonth.AddDays(endOffset + 1);
+            }).ToList();
 
             for (int i = 0; i < totalDays; i++)
             {
@@ -187,6 +163,12 @@ namespace FanShop.ViewModels
                     calendarDay.Employees.Add("Евгений");
                     calendarDay.Employees.Add("Артём");
                     calendarDay.Employees.Add("Алексей");
+                }
+                
+                var matchForThisDay = matchesForMonth.FirstOrDefault(m => DateTime.Parse(m.Time).Date == date.Date);
+                if (matchForThisDay != null)
+                {
+                    calendarDay.Match = matchForThisDay;
                 }
 
                 CalendarDays.Add(calendarDay);

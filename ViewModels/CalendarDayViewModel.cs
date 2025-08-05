@@ -65,6 +65,7 @@ namespace FanShop.ViewModels
     {
         public string TeamName { get; set; }
         public string Time { get; set; }
+        public string SartTime { get; set; }
         public BitmapImage Logo { get; set; }
     }
 }
