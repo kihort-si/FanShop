@@ -18,4 +18,6 @@ public class Employee
     public string PlaceOfBirth { get; set; }
     [Required]
     public string Passport { get; set; }
+    
+    public ICollection<WorkDay> WorkDays { get; set; } = new List<WorkDay>();
 }

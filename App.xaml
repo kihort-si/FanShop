@@ -8,5 +8,6 @@
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"></converters:BoolToVisibilityConverter>
         <converters:BoolToColorConverter x:Key="BoolToColorConverter"></converters:BoolToColorConverter>
         <converters:ZeroToVisibilityConverter x:Key="ZeroToVisibilityConverter"></converters:ZeroToVisibilityConverter>
+        <converters:BoolToBackgroundConverter x:Key="BoolToBackgroundConverter"></converters:BoolToBackgroundConverter>
     </Application.Resources>
 </Application>

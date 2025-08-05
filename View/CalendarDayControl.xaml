@@ -4,13 +4,19 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:FanShop.View"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d"
              d:DesignHeight="700" d:DesignWidth="500">
     <Border BorderBrush="#CDCDCD"
             BorderThickness="0.2"
             Padding="8"
-            Background="White">
-        <Grid>
+            Background="{Binding HasMatch, Converter={StaticResource BoolToBackgroundConverter}}">
+        <b:Interaction.Triggers>
+            <b:EventTrigger EventName="MouseLeftButtonUp">
+                <b:InvokeCommandAction Command="{Binding ShowDayDetailsCommand}" />
+            </b:EventTrigger>
+        </b:Interaction.Triggers>
+        <Grid Background="{Binding HasMatch, Converter={StaticResource BoolToBackgroundConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
@@ -27,21 +33,29 @@
                 </TextBlock.Foreground>
             </TextBlock>
 
-            <ItemsControl Grid.Row="1" ItemsSource="{Binding Employees}">
+            <ItemsControl Grid.Row="1" ItemsSource="{Binding DisplayedEmployees}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Border Background="#D9F1FB"
                                 Margin="0,2,0,0"
                                 Padding="2"
                                 CornerRadius="3">
-                            <TextBlock Text="{Binding}"
-                                       FontSize="8"
-                                       FontWeight="SemiBold">
-                            </TextBlock>
+                            <TextBlock FontSize="8"
+                                       FontWeight="SemiBold"
+                                       Text="{Binding}" />
                         </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+            
+            <TextBlock Grid.Row="2" 
+                       Text="{Binding AdditionalEmployeesText}"
+                       Background="Transparent"
+                       Foreground="#009EE1"
+                       HorizontalAlignment="Center"
+                       Visibility="{Binding IsAdditionalEmployeesTextVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+                       FontWeight="SemiBold"
+                       FontSize="8"></TextBlock>
 
             <StackPanel Grid.Row="2" Orientation="Vertical"
                         Margin="0,8,0,0"

@@ -155,15 +155,6 @@ namespace FanShop.ViewModels
                     Date = date,
                     IsCurrentMonth = date.Month == _currentMonth && date.Year == _currentYear
                 };
-
-                if (date.Month == month && (date.Day == 1 || date.Day == 11))
-                {
-                    calendarDay.Employees.Add("Никита");
-                    calendarDay.Employees.Add("Александр");
-                    calendarDay.Employees.Add("Евгений");
-                    calendarDay.Employees.Add("Артём");
-                    calendarDay.Employees.Add("Алексей");
-                }
                 
                 var matchForThisDay = matchesForMonth.FirstOrDefault(m => DateTime.Parse(m.Time).Date == date.Date);
                 if (matchForThisDay != null)

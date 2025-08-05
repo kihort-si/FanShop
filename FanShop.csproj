@@ -12,6 +12,7 @@
       <PackageReference Include="Dapper" Version="2.1.66" />
       <PackageReference Include="Firebase.Database" Version="1.0.0" />
       <PackageReference Include="HtmlAgilityPack" Version="1.12.2" />
+      <PackageReference Include="iExt.Microsoft.Xaml.Behaviors.Wpf" Version="2023.1228.1812-preview" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.10" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.10">
         <PrivateAssets>all</PrivateAssets>

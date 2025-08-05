@@ -1,0 +1,23 @@
+﻿<Window x:Class="FanShop.Windows.SelectEmployeeWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:FanShop.Windows"
+        mc:Ignorable="d"
+        Title="Выбор сотрудника" Height="400" Width="300" WindowStartupLocation="CenterOwner">
+    <Grid>
+        <ListBox ItemsSource="{Binding Employees}"
+                 SelectedItem="{Binding SelectedEmployee}" 
+                 MouseDoubleClick="ListBox_MouseDoubleClick">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock>
+                        <Run Text="{Binding FirstName}" />
+                        <Run Text="{Binding Surname}" />
+                    </TextBlock>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</Window>
