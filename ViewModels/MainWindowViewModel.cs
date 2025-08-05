@@ -2,6 +2,8 @@
 using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
+using FanShop.Services;
 using FanShop.Windows;
 
 namespace FanShop.ViewModels
@@ -12,6 +14,7 @@ namespace FanShop.ViewModels
         public int _currentYear;
         public int _currentMonth;
 
+        private readonly FirebaseService _firebaseService;
         public ObservableCollection<CalendarDayViewModel> CalendarDays { get; set; } = new();
 
         public string CurrentMonthName => new DateTime(_currentYear, _currentMonth, 1)
@@ -60,6 +63,8 @@ namespace FanShop.ViewModels
 
         public MainWindowViewModel()
         {
+            _firebaseService = new FirebaseService("https://fanshop-11123-default-rtdb.europe-west1.firebasedatabase.app/");
+            
             _currentYear = DateTime.Now.Year;
             _currentMonth = DateTime.Now.Month;
 
@@ -71,33 +76,67 @@ namespace FanShop.ViewModels
             GenerateCalendar(_currentYear, _currentMonth);
             
             OpenEmployeeWindowCommand = new RelayCommand(OpenEmployeeWindow);
+            
+            LoadMatchesFromFirebase();
         }
 
-        private void GoToPreviousMonth(object? parameter)
+        private async void GoToPreviousMonth(object? parameter)
         {
             var previousMonth = new DateTime(_currentYear, _currentMonth, 1).AddMonths(-1);
             _currentYear = previousMonth.Year;
             _currentMonth = previousMonth.Month;
-            GenerateCalendar(_currentYear, _currentMonth);
+            await GenerateCalendar(_currentYear, _currentMonth);
             OnPropertyChanged(nameof(CurrentMonthName));
             OnPropertyChanged(nameof(PreviousMonthName));
             OnPropertyChanged(nameof(NextMonthName));
+            await LoadMatchesFromFirebase();
         }
 
-        private void GoToNextMonth(object? parameter)
+        private async void GoToNextMonth(object? parameter)
         {
             var nextMonth = new DateTime(_currentYear, _currentMonth, 1).AddMonths(1);
             _currentYear = nextMonth.Year;
             _currentMonth = nextMonth.Month;
-            GenerateCalendar(_currentYear, _currentMonth);
+            await GenerateCalendar(_currentYear, _currentMonth);
             OnPropertyChanged(nameof(CurrentMonthName));
             OnPropertyChanged(nameof(PreviousMonthName));
             OnPropertyChanged(nameof(NextMonthName));
+            await LoadMatchesFromFirebase();
+        }
+        
+        private async Task LoadMatchesFromFirebase()
+        {
+            var matches = await _firebaseService.GetMatchesAsync();
+            
+            foreach (var calendarDay in CalendarDays)
+            {
+                calendarDay.Match = null;
+            }
+
+            foreach (var match in matches)
+            {
+                var matchDate = DateTime.Parse(match.Time);
+                var calendarDay = CalendarDays.FirstOrDefault(cd => cd.Date.Date == matchDate.Date);
+
+                if (calendarDay != null)
+                {
+                    calendarDay.Match = new MatchInfo
+                    {
+                        TeamName = match.TeamName,
+                        Time = match.Time.Split('T')[1].Substring(0, 5),
+                        Logo = new BitmapImage(new Uri(match.Logo))
+                    };
+                }
+            }
+
+            OnPropertyChanged(nameof(CalendarDays));
         }
 
-        private void GenerateCalendar(int year, int month)
+        private async Task GenerateCalendar(int year, int month)
         {
             CalendarDays.Clear();
+            
+            var matches = await _firebaseService.GetMatchesAsync();
 
             DateTime firstDayOfMonth = new DateTime(year, month, 1);
             int offset = (int)firstDayOfMonth.DayOfWeek;
@@ -125,16 +164,6 @@ namespace FanShop.ViewModels
                     calendarDay.Employees.Add("Евгений");
                     calendarDay.Employees.Add("Артём");
                     calendarDay.Employees.Add("Алексей");
-                }
-
-                if (date == new DateTime(2025, 8, 3))
-                {
-                    calendarDay.Match = new MatchInfo
-                    {
-                        TeamName = "ЦСКА",
-                        MatchTime = "18:00",
-                        // Time = new BitmapImage(new Uri("pack://application:,,,/Resources/clock.png"))
-                    };
                 }
 
                 CalendarDays.Add(calendarDay);
