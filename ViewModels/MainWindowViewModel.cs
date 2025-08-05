@@ -91,6 +91,29 @@ namespace FanShop.ViewModels
             OnPropertyChanged(nameof(NextMonthName));
             await LoadMatchesFromFirebase();
         }
+        
+        private async void LoadMatchesFromFirebase()
+        {
+            var matches = await _firebaseService.GetMatchesAsync();
+
+            foreach (var match in matches)
+            {
+                var matchDate = DateTime.Parse(match.Time);
+                var calendarDay = CalendarDays.FirstOrDefault(cd => cd.Date.Date == matchDate.Date);
+
+                if (calendarDay != null)
+                {
+                    calendarDay.Match = new MatchInfo
+                    {
+                        TeamName = match.TeamName,
+                        Time = match.Time.Split('T')[1].Substring(0, 5),
+                        Logo = new BitmapImage(new Uri(match.Logo))
+                    };
+                }
+            }
+
+            OnPropertyChanged(nameof(CalendarDays));
+        }
 
         private async void GoToNextMonth(object? parameter)
         {
