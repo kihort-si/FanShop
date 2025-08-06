@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:FanShop.View"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d"
-             d:DesignHeight="700" d:DesignWidth="500">
+             d:DesignHeight="500" d:DesignWidth="500">
     <Border BorderBrush="#CDCDCD"
             BorderThickness="0.2"
             Padding="8"
@@ -57,15 +57,20 @@
                        FontWeight="SemiBold"
                        FontSize="8"></TextBlock>
 
-            <StackPanel Grid.Row="2" Orientation="Vertical"
+            <StackPanel Grid.Row="1" Orientation="Vertical"
                         Margin="0,8,0,0"
                         Visibility="{Binding HasMatch, Converter={StaticResource BoolToVisibilityConverter}}">
                 <Image Source="{Binding Match.Logo}"
                        Height="44"
                        Width="Auto">
                 </Image>
-                <TextBlock Text="{Binding Match.SartTime}"
+                <TextBlock Text="{Binding Match.TeamName}"
                            FontWeight="Bold"
+                           Margin="0,0,0,0"
+                           HorizontalAlignment="Center">
+                </TextBlock>
+                <TextBlock Text="{Binding Match.SartTime}"
+                           FontWeight="SemiBold"
                            Margin="0,0,0,0"
                            HorizontalAlignment="Center">
                 </TextBlock>

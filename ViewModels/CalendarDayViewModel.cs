@@ -147,7 +147,7 @@ namespace FanShop.ViewModels
             if (selectEmployeeWindow.ShowDialog() == true && selectEmployeeWindow.SelectedEmployee != null)
             {
                 var selectedEmployee = selectEmployeeWindow.SelectedEmployee;
-                var selectedWorkDuration = selectEmployeeWindow.SelectedWorkDuration; // "FullDay" или "HalfDay"
+                var selectedWorkDuration = selectEmployeeWindow.SelectedWorkDuration;
         
                 var workDay = context.WorkDays
                     .Include(w => w.WorkDayEmployees)
@@ -170,6 +170,8 @@ namespace FanShop.ViewModels
                 context.SaveChanges();
         
                 Employees.Add(selectedEmployee);
+        
+                NotifyMainWindowOfChanges();
         
                 OnPropertyChanged(nameof(Employees));
                 OnPropertyChanged(nameof(DisplayedEmployees));
@@ -200,6 +202,8 @@ namespace FanShop.ViewModels
         
                 Employees.Remove(SelectedEmployee);
                 SelectedEmployee = null;
+        
+                NotifyMainWindowOfChanges();
         
                 OnPropertyChanged(nameof(Employees));
                 OnPropertyChanged(nameof(DisplayedEmployees));
@@ -256,6 +260,15 @@ namespace FanShop.ViewModels
                     IsAdditionalEmployeesTextVisible = true;
                 }
                 return displayed;
+            }
+        }
+        
+        private void NotifyMainWindowOfChanges()
+        {
+            var mainWindow = Application.Current.MainWindow;
+            if (mainWindow?.DataContext is MainWindowViewModel mainViewModel)
+            {
+                mainViewModel.RefreshStatistics();
             }
         }
     }
