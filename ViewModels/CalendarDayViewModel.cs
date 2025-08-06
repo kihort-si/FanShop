@@ -94,6 +94,7 @@ namespace FanShop.ViewModels
         public ICommand AddEmployeesCommand { get; }
         public ICommand RemoveEmployeesCommand { get; }
         public ICommand PrintPassCommand { get; }
+        public ICommand CloseWindowCommand { get; }
         
         private Employee? _selectedEmployee;
 
@@ -114,6 +115,7 @@ namespace FanShop.ViewModels
             AddEmployeesCommand = new RelayCommand(AddEmployees);
             RemoveEmployeesCommand = new RelayCommand(RemoveEmployees, CanEditEmployee);
             PrintPassCommand = new RelayCommand(PrintPass);
+            CloseWindowCommand = new RelayCommand(CloseWindow);
         }
 
         private void ShowDayDetails(object? parameter)
@@ -219,6 +221,11 @@ namespace FanShop.ViewModels
         {
             MessageBox.Show("Пропуск распечатан!");
         }
+        
+        private void CloseWindow(object? parameter)
+        {
+            Application.Current.Windows[1]?.Close();
+        }
 
         private string _additionalEmployeesText;
         public string AdditionalEmployeesText
@@ -252,12 +259,17 @@ namespace FanShop.ViewModels
         {
             get
             {
-                var displayed = Employees.Take(3).Select(e => e.FirstName).ToList();
+                var displayed = Employees.Take(4).Select(e => e.FirstName).ToList();
         
-                if (Employees.Count > 3)
+                if (Employees.Count > 4)
                 {
-                    AdditionalEmployeesText = $"Ещё {Employees.Count - 3}";
+                    AdditionalEmployeesText = $"Ещё {Employees.Count - 4}";
                     IsAdditionalEmployeesTextVisible = true;
+                }
+                else
+                {
+                    AdditionalEmployeesText = string.Empty;
+                    IsAdditionalEmployeesTextVisible = false;
                 }
                 return displayed;
             }

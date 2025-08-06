@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using FanShop.Models;
@@ -38,6 +39,105 @@ namespace FanShop.ViewModels
             {
                 _editableEmployee = value;
                 OnPropertyChanged(nameof(EditableEmployee));
+                OnPropertyChanged(nameof(CanSaveEmployee));
+            }
+        }
+        
+        private string _surname = string.Empty;
+        private string _firstName = string.Empty;
+        private string _lastName = string.Empty;
+        private string _dateOfBirth = string.Empty;
+        private string _placeOfBirth = string.Empty;
+        private string _passport = string.Empty;
+        
+        public string Surname
+        {
+            get => _surname;
+            set
+            {
+                _surname = value;
+                if (EditableEmployee != null)
+                    EditableEmployee.Surname = value;
+                OnPropertyChanged(nameof(Surname));
+                OnPropertyChanged(nameof(CanSaveEmployee));
+            }
+        }
+        
+        public string FirstName
+        {
+            get => _firstName;
+            set
+            {
+                _firstName = value;
+                if (EditableEmployee != null)
+                    EditableEmployee.FirstName = value;
+                OnPropertyChanged(nameof(FirstName));
+                OnPropertyChanged(nameof(CanSaveEmployee));
+            }
+        }
+        
+        public string LastName
+        {
+            get => _lastName;
+            set
+            {
+                _lastName = value;
+                if (EditableEmployee != null)
+                    EditableEmployee.LastName = value;
+                OnPropertyChanged(nameof(LastName));
+                OnPropertyChanged(nameof(CanSaveEmployee));
+            }
+        }
+        
+        public string DateOfBirth
+        {
+            get => _dateOfBirth;
+            set
+            {
+                _dateOfBirth = value;
+                if (EditableEmployee != null)
+                    EditableEmployee.DateOfBirth = value;
+                OnPropertyChanged(nameof(DateOfBirth));
+                OnPropertyChanged(nameof(CanSaveEmployee));
+            }
+        }
+        
+        public string PlaceOfBirth
+        {
+            get => _placeOfBirth;
+            set
+            {
+                _placeOfBirth = value;
+                if (EditableEmployee != null)
+                    EditableEmployee.PlaceOfBirth = value;
+                OnPropertyChanged(nameof(PlaceOfBirth));
+                OnPropertyChanged(nameof(CanSaveEmployee));
+            }
+        }
+        
+        public string Passport
+        {
+            get => _passport;
+            set
+            {
+                _passport = value;
+                if (EditableEmployee != null)
+                    EditableEmployee.Passport = value;
+                OnPropertyChanged(nameof(Passport));
+                OnPropertyChanged(nameof(CanSaveEmployee));
+            }
+        }
+        
+        public bool CanSaveEmployee
+        {
+            get
+            {
+                return !string.IsNullOrWhiteSpace(_surname) &&
+                       !string.IsNullOrWhiteSpace(_firstName) &&
+                       !string.IsNullOrWhiteSpace(_lastName) &&
+                       !string.IsNullOrWhiteSpace(_dateOfBirth) &&
+                       !string.IsNullOrWhiteSpace(_placeOfBirth) &&
+                       !string.IsNullOrWhiteSpace(_passport);
             }
         }
 
@@ -71,32 +171,30 @@ namespace FanShop.ViewModels
         private void AddEmployee(object? parameter)
         {
             SelectedEmployee = null;
-            EditableEmployee = new Employee
-            {
-                FirstName = string.Empty,
-                LastName = string.Empty,
-                Surname = string.Empty,
-                DateOfBirth = string.Empty,
-                PlaceOfBirth = string.Empty,
-                Passport = string.Empty
-            };
-
+            EditableEmployee = new Employee();
+            
+            Surname = string.Empty;
+            FirstName = string.Empty;
+            LastName = string.Empty;
+            DateOfBirth = string.Empty;
+            PlaceOfBirth = string.Empty;
+            Passport = string.Empty;
+        
             IsEditOverlayVisible = true;
         }
-
+        
         private void EditEmployee(object? parameter)
         {
             if (SelectedEmployee != null)
             {
-                EditableEmployee = new Employee
-                {
-                    FirstName = SelectedEmployee.FirstName,
-                    LastName = SelectedEmployee.LastName,
-                    Surname = SelectedEmployee.Surname,
-                    DateOfBirth = SelectedEmployee.DateOfBirth,
-                    PlaceOfBirth = SelectedEmployee.PlaceOfBirth,
-                    Passport = SelectedEmployee.Passport
-                };
+                EditableEmployee = new Employee();
+                
+                Surname = SelectedEmployee.Surname;
+                FirstName = SelectedEmployee.FirstName;
+                LastName = SelectedEmployee.LastName;
+                DateOfBirth = SelectedEmployee.DateOfBirth;
+                PlaceOfBirth = SelectedEmployee.PlaceOfBirth;
+                Passport = SelectedEmployee.Passport;
                 
                 IsEditOverlayVisible = true;
             }

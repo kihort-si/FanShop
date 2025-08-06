@@ -6,8 +6,8 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"></converters:BoolToVisibilityConverter>
-        <converters:BoolToColorConverter x:Key="BoolToColorConverter"></converters:BoolToColorConverter>
         <converters:ZeroToVisibilityConverter x:Key="ZeroToVisibilityConverter"></converters:ZeroToVisibilityConverter>
         <converters:BoolToBackgroundConverter x:Key="BoolToBackgroundConverter"></converters:BoolToBackgroundConverter>
+        <converters:DateToTodayColorConverter x:Key="DateToTodayColorConverter"></converters:DateToTodayColorConverter>
     </Application.Resources>
 </Application>

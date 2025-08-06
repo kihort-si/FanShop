@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using FanShop.Models;
 using FanShop.Services;
 using FanShop.Windows;
 using Microsoft.EntityFrameworkCore;
@@ -68,6 +69,8 @@ namespace FanShop.ViewModels
         public ICommand CloseMenuCommand { get; }
         
         public ICommand OpenEmployeeWindowCommand { get; }
+        public ICommand LoadMatchesCommand { get; }
+        public ICommand OpenSettingsWindowCommand { get; }
 
         public MainWindowViewModel()
         {
@@ -85,6 +88,8 @@ namespace FanShop.ViewModels
             GenerateCalendar(_currentYear, _currentMonth);
             
             OpenEmployeeWindowCommand = new RelayCommand(OpenEmployeeWindow);
+            LoadMatchesCommand = new RelayCommand(async _ => await LoadMatchesFromFirebase());
+            OpenSettingsWindowCommand = new RelayCommand(OpenSettingsWindow);
         }
 
         private async void GoToPreviousMonth(object? parameter)
@@ -198,6 +203,25 @@ namespace FanShop.ViewModels
             employeeWindow.ShowDialog();
         }
         
+        private void OpenSettingsWindow(object? parameter)
+        {
+            var settingsWindow = new SettingsWindow();
+            var viewModel = (SettingsWindowViewModel)settingsWindow.DataContext;
+            
+            viewModel.CloseRequested += () =>
+            {
+                settingsWindow.Close();
+                RefreshStatistics();
+            };
+            
+            settingsWindow.ShowDialog();
+        }
+        
+        private Settings GetSettings()
+        {
+            return Settings.Load();
+        }
+        
         public class EmployeeStatistic
         {
             public string EmployeeName { get; set; }
@@ -265,12 +289,16 @@ namespace FanShop.ViewModels
             using var context = new AppDbContext();
             var firstDayOfMonth = new DateTime(_currentYear, _currentMonth, 1);
             var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
-
-            var total = context.WorkDays
+            var settings = GetSettings();
+        
+            var workDayEmployees = context.WorkDays
                 .Where(wd => wd.Date >= firstDayOfMonth && wd.Date <= lastDayOfMonth)
                 .SelectMany(wd => wd.WorkDayEmployees)
-                .Sum(wde => wde.WorkDuration == "Целый день" ? 2500 : 1250);
-
+                .ToList();
+            
+            var total = workDayEmployees
+                .Sum(wde => wde.WorkDuration == "Целый день" ? (double)settings.DailySalary : (double)settings.DailySalary / 2);
+        
             return $"{total:N0} руб.";
         }
         
@@ -279,6 +307,7 @@ namespace FanShop.ViewModels
             using var context = new AppDbContext();
             var firstDayOfMonth = new DateTime(_currentYear, _currentMonth, 1);
             var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+            var settings = GetSettings();
         
             var workDayEmployees = context.WorkDays
                 .Where(wd => wd.Date >= firstDayOfMonth && wd.Date <= lastDayOfMonth)
@@ -292,7 +321,7 @@ namespace FanShop.ViewModels
                 {
                     EmployeeName = $"{g.Key.FirstName} {g.Key.Surname}",
                     WorkDaysCount = g.Count(),
-                    SalaryAmount = g.Sum(wde => wde.WorkDuration == "Целый день" ? 2500 : 1250)
+                    SalaryAmount = g.Sum(wde => wde.WorkDuration == "Целый день" ? settings.DailySalary : settings.DailySalary / 2)
                 })
                 .OrderByDescending(x => x.SalaryAmount)
                 .Select(x => new EmployeeStatistic

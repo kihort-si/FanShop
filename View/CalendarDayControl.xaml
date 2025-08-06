@@ -29,7 +29,7 @@
                        HorizontalAlignment="Left"
                        Margin="0,0,0,0">
                 <TextBlock.Foreground>
-                    <SolidColorBrush Color="{Binding IsCurrentMonth, Converter={StaticResource BoolToColorConverter}}"></SolidColorBrush>
+                    <SolidColorBrush Color="{Binding ., Converter={StaticResource DateToTodayColorConverter}}"/>
                 </TextBlock.Foreground>
             </TextBlock>
 

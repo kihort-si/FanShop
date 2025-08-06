@@ -41,16 +41,18 @@
                         Command="{Binding ToggleMenuCommand}"
                         Width="40"
                         Height="40"
-                        FontSize="20"
                         Background="Transparent"
-                        Foreground="White"
                         BorderThickness="0"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center"
                         Margin="0,12,24,12">
                     <Button.Style>
                         <Style TargetType="Button">
-                            <Setter Property="Content" Value="☰"/>
+                            <Setter Property="Content">
+                                <Setter.Value>
+                                    <Image Source="pack://application:,,,/Resources/menu_icon.png" Width="24" Height="24"/>
+                                </Setter.Value>
+                            </Setter>
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="Button">
@@ -62,7 +64,11 @@
                             </Setter>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsMenuOpen}" Value="True">
-                                    <Setter Property="Content" Value="☓"/>
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <Image Source="pack://application:,,,/Resources/close_icon.png" Width="24" Height="24"/>
+                                        </Setter.Value>
+                                    </Setter>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -319,7 +325,8 @@
                             Background="White"
                             Foreground="#009EE1"
                             BorderThickness="0"
-                            FontSize="16"/>
+                            FontSize="16"
+                            Command="{Binding LoadMatchesCommand}"/>
 
                     <Button Content="Настройки"
                             Height="50"
@@ -327,7 +334,8 @@
                             Background="White"
                             Foreground="#009EE1"
                             BorderThickness="0"
-                            FontSize="16"/>
+                            FontSize="16"
+                            Command="{Binding OpenSettingsWindowCommand}"/>
                 </StackPanel>
             </Border>
         </Grid>

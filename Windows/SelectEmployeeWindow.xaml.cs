@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using FanShop.Models;
 using FanShop.ViewModels;
 

@@ -5,25 +5,60 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:FanShop.Windows"
         mc:Ignorable="d"
-        Title="Детали дня" Height="300" Width="450">
+        Title="Детали дня" Height="300" Width="450" WindowStartupLocation="CenterScreen" WindowStyle="None">
     <StackPanel Margin="10">
         <TextBlock Text="Сотрудники на этот день:" FontWeight="Bold" Margin="0,0,0,10"/>
         <ListBox ItemsSource="{Binding Employees}"
                  SelectedItem="{Binding SelectedEmployee}"
-                 BorderThickness="0">
+                 BorderThickness="0"
+                 Background="Transparent"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 ScrollViewer.CanContentScroll="True"
+                 MaxHeight="180">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock>
-                        <Run Text="{Binding FirstName}" />
-                        <Run Text="{Binding Surname}" />
-                    </TextBlock>
+                    <Border Background="#F8F9FA" 
+                            BorderBrush="#E9ECEF" 
+                            BorderThickness="1" 
+                            CornerRadius="5" 
+                            Padding="10,8" 
+                            Margin="0,2">
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center">
+                                    <Run Text="{Binding FirstName}" />
+                                    <Run Text="{Binding Surname}" />
+                                </TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
                 </DataTemplate>
             </ListBox.ItemTemplate>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="Padding" Value="0"/>
+                    <Setter Property="Margin" Value="0"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <ContentPresenter/>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
         </ListBox>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button Content="Добавить сотрудника" Margin="0,0,10,0" Command="{Binding AddEmployeesCommand}" />
-            <Button Content="Удалить сотрудника" Margin="0,0,10,0" Command="{Binding RemoveEmployeesCommand}" />
-            <Button Content="Распечатать пропуск" Command="{Binding PrintPassCommand}" />
+            <Button Content="Добавить" Width="80" Height="30" Margin="0,0,10,0"
+                    Command="{Binding AddEmployeesCommand}" Background="#009EE1" Foreground="White" BorderThickness="0" />
+            <Button Content="Удалить" Width="80" Height="30" Margin="0,0,10,0"
+                    Command="{Binding RemoveEmployeesCommand}" Background="#EB0004" Foreground="White" BorderThickness="0" />
+            <Button Content="Распечатать пропуск" Width="140" Height="30" Margin="0,0,10,0"
+                    Command="{Binding PrintPassCommand}" Background="#009EE1" Foreground="White" BorderThickness="0" />
+            <Button Content="Закрыть" Width="80" Height="30"
+                    Command="{Binding CloseWindowCommand}" Background="Gray" Foreground="White" BorderThickness="0"/>
         </StackPanel>
     </StackPanel>
 </Window>

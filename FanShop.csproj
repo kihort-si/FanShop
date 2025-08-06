@@ -30,6 +30,12 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <None Remove="Resources\CSKA.png" />
+      <Content Include="Resources\menu_icon.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\close_icon.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>
