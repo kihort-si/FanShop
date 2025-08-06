@@ -15,11 +15,19 @@ public class AppDbContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Employee>()
-            .HasMany(e => e.WorkDays)
-            .WithMany(w => w.Employees)
-            .UsingEntity(j => j.ToTable("EmployeeWorkDays"));
-        
+        modelBuilder.Entity<WorkDayEmployee>()
+            .HasKey(wde => wde.WorkDayEmployeeID);
+    
+        modelBuilder.Entity<WorkDayEmployee>()
+            .HasOne(wde => wde.WorkDay)
+            .WithMany(w => w.WorkDayEmployees)
+            .HasForeignKey(wde => wde.WorkDayID);
+    
+        modelBuilder.Entity<WorkDayEmployee>()
+            .HasOne(wde => wde.Employee)
+            .WithMany(e => e.WorkDayEmployees)
+            .HasForeignKey(wde => wde.EmployeeID);
+    
         base.OnModelCreating(modelBuilder);
     }
 }

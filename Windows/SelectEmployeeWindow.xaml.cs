@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using FanShop.Models;
 using FanShop.ViewModels;
 
@@ -7,6 +8,8 @@ namespace FanShop.Windows;
 public partial class SelectEmployeeWindow : Window
 {
     public Employee? SelectedEmployee { get; private set; }
+
+    public string SelectedWorkDuration { get; set; } = "Целый день";
     
     public SelectEmployeeWindow()
     {
@@ -20,6 +23,15 @@ public partial class SelectEmployeeWindow : Window
             SelectedEmployee = viewModel.SelectedEmployee;
             DialogResult = true;
             Close();
+        }
+    }
+    
+    private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var comboBox = sender as ComboBox;
+        if (comboBox != null && comboBox.SelectedItem == null)
+        {
+            comboBox.SelectedIndex = 0;
         }
     }
 }

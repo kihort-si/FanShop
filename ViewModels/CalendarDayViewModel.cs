@@ -23,11 +23,12 @@ namespace FanShop.ViewModels
                 {
                     using var context = new AppDbContext();
                     var workDay = context.WorkDays
-                        .Include(w => w.Employees)
+                        .Include(w => w.WorkDayEmployees)
+                        .ThenInclude(wde => wde.Employee)
                         .FirstOrDefault(w => w.Date == Date);
         
                     _employees = workDay != null
-                        ? new ObservableCollection<Employee>(workDay.Employees)
+                        ? new ObservableCollection<Employee>(workDay.WorkDayEmployees.Select(wde => wde.Employee))
                         : new ObservableCollection<Employee>();
                 }
                 return _employees;
@@ -146,25 +147,20 @@ namespace FanShop.ViewModels
             if (selectEmployeeWindow.ShowDialog() == true && selectEmployeeWindow.SelectedEmployee != null)
             {
                 var selectedEmployee = selectEmployeeWindow.SelectedEmployee;
+                var selectedWorkDuration = selectEmployeeWindow.SelectedWorkDuration; // "FullDay" или "HalfDay"
         
-                Employees.Add(selectedEmployee);
+                var workDay = context.WorkDays
+                    .Include(w => w.WorkDayEmployees)
+                    .FirstOrDefault(w => w.Date == Date) ?? new WorkDay { Date = Date };
         
-                var trackedEmployee = context.Employees.Local.FirstOrDefault(e => e.EmployeeID == selectedEmployee.EmployeeID);
-                if (trackedEmployee == null)
+                var workDayEmployee = new WorkDayEmployee
                 {
-                    trackedEmployee = context.Employees.FirstOrDefault(e => e.EmployeeID == selectedEmployee.EmployeeID);
-                    if (trackedEmployee == null)
-                    {
-                        context.Employees.Add(selectedEmployee);
-                        trackedEmployee = selectedEmployee;
-                    }
-                }
+                    EmployeeID = selectedEmployee.EmployeeID,
+                    WorkDayID = workDay.WorkDayID,
+                    WorkDuration = selectedWorkDuration
+                };
         
-                var workDay = context.WorkDays.FirstOrDefault(w => w.Date == Date) ?? new WorkDay { Date = Date };
-                if (!workDay.Employees.Any(e => e.EmployeeID == trackedEmployee.EmployeeID))
-                {
-                    workDay.Employees.Add(trackedEmployee);
-                }
+                workDay.WorkDayEmployees.Add(workDayEmployee);
         
                 if (workDay.WorkDayID == 0)
                 {
@@ -172,6 +168,8 @@ namespace FanShop.ViewModels
                 }
         
                 context.SaveChanges();
+        
+                Employees.Add(selectedEmployee);
         
                 OnPropertyChanged(nameof(Employees));
                 OnPropertyChanged(nameof(DisplayedEmployees));
@@ -183,26 +181,26 @@ namespace FanShop.ViewModels
             if (SelectedEmployee != null)
             {
                 using var context = new AppDbContext();
-
+        
                 var workDay = context.WorkDays
-                    .Include(w => w.Employees)
+                    .Include(w => w.WorkDayEmployees)
                     .FirstOrDefault(w => w.Date == Date);
-
+        
                 if (workDay != null)
                 {
-                    var employeeToRemove = workDay.Employees
-                        .FirstOrDefault(e => e.EmployeeID == SelectedEmployee.EmployeeID);
-
-                    if (employeeToRemove != null)
+                    var workDayEmployeeToRemove = workDay.WorkDayEmployees
+                        .FirstOrDefault(wde => wde.EmployeeID == SelectedEmployee.EmployeeID);
+        
+                    if (workDayEmployeeToRemove != null)
                     {
-                        workDay.Employees.Remove(employeeToRemove);
+                        context.Remove(workDayEmployeeToRemove);
                         context.SaveChanges();
                     }
                 }
-
+        
                 Employees.Remove(SelectedEmployee);
                 SelectedEmployee = null;
-
+        
                 OnPropertyChanged(nameof(Employees));
                 OnPropertyChanged(nameof(DisplayedEmployees));
             }
@@ -250,16 +248,16 @@ namespace FanShop.ViewModels
         {
             get
             {
-                var displayed = Employees.Take(3).Cast<object>().ToList();
+                var displayed = Employees.Take(3).Select(e => e.FirstName).ToList();
+        
                 if (Employees.Count > 3)
                 {
-                    AdditionalEmployeesText = ($"Ещё {Employees.Count - 3}");
+                    AdditionalEmployeesText = $"Ещё {Employees.Count - 3}";
                     IsAdditionalEmployeesTextVisible = true;
                 }
-                return displayed.Select(e => e is Employee emp ? emp.FirstName : e);;
+                return displayed;
             }
         }
-
     }
 
     public class MatchInfo

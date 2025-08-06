@@ -12,10 +12,21 @@
                  MouseDoubleClick="ListBox_MouseDoubleClick">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock>
-                        <Run Text="{Binding FirstName}" />
-                        <Run Text="{Binding Surname}" />
-                    </TextBlock>
+                    <StackPanel>
+                        <TextBlock>
+                            <Run Text="{Binding FirstName}" />
+                            <Run Text="{Binding Surname}" />
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal" Margin="10">
+                            <TextBlock Text="Время работы:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <ComboBox SelectedValue="{Binding SelectedWorkDuration, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}"
+                                      SelectedValuePath="Content"
+                                      Width="100" SelectionChanged="ComboBox_SelectionChanged">
+                                <ComboBoxItem Content="Целый день" />
+                                <ComboBoxItem Content="Полдня" />
+                            </ComboBox>
+                        </StackPanel>
+                    </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
