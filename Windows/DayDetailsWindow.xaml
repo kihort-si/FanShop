@@ -5,7 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:FanShop.Windows"
         mc:Ignorable="d"
-        Title="Детали дня" Height="300" Width="450" WindowStartupLocation="CenterScreen" WindowStyle="None">
+        Title="Детали дня" Height="300" Width="450" WindowStartupLocation="CenterScreen" WindowStyle="None" Icon="/icon.ico">
     <StackPanel Margin="10">
         <TextBlock Text="Сотрудники на этот день:" FontWeight="Bold" Margin="0,0,0,10"/>
         <ListBox ItemsSource="{Binding Employees}"

@@ -7,7 +7,7 @@
         xmlns:viewModels="clr-namespace:FanShop.ViewModels"
         mc:Ignorable="d"
         Title="Настройки" Height="300" Width="400"
-        WindowStartupLocation="CenterScreen" WindowStyle="None" ResizeMode="NoResize">
+        WindowStartupLocation="CenterScreen" WindowStyle="None" ResizeMode="NoResize" >
     <Window.DataContext>
         <viewModels:SettingsWindowViewModel/>
     </Window.DataContext>

@@ -10,7 +10,8 @@
         xmlns:converters="clr-namespace:FanShop.Converters"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
-        Title="FANSHOP" Height="800" Width="1000">
+        Title="FANSHOP" Height="800" Width="1000" WindowStartupLocation="CenterScreen" WindowState="Maximized"
+        Icon="icon.ico">
     <Window.DataContext>
         <vm:MainWindowViewModel />
     </Window.DataContext>
