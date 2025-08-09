@@ -6,7 +6,9 @@ namespace FanShop.Models;
 public class Settings
 {
     public string ResponsiblePerson { get; set; } = "";
-    public decimal DailySalary { get; set; } = 2500;
+    public string ResponsiblePhoneNumber { get; set; } = "";
+    public string ResponsiblePosition { get; set; } = "Управляющий магазином Фаншоп";
+    public decimal DailySalary { get; set; } = 0;
     
     private static readonly string SettingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FanShop", "settings.json");
     

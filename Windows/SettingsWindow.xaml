@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:FanShop.Windows"
         xmlns:viewModels="clr-namespace:FanShop.ViewModels"
         mc:Ignorable="d"
-        Title="Настройки" Height="300" Width="400"
+        Title="Настройки" Height="320" Width="400"
         WindowStartupLocation="CenterScreen" WindowStyle="None" ResizeMode="NoResize" >
     <Window.DataContext>
         <viewModels:SettingsWindowViewModel/>
@@ -17,17 +17,27 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Text="Ответственный:" Margin="0,0,0,5"/>
         <TextBox Grid.Row="1" Text="{Binding ResponsiblePerson}" Height="25" Margin="0,0,0,15"/>
+        
+        <TextBlock Grid.Row="2" Text="Номер телефона:" Margin="0,0,0,5"/>
+        <TextBox Grid.Row="3" Text="{Binding ResponsiblePhoneNumber}" Height="25" Margin="0,0,0,15"/>
+        
+        <TextBlock Grid.Row="4" Text="Должность:" Margin="0,0,0,5"/>
+        <TextBox Grid.Row="5" Text="{Binding ResponsiblePosition}" Height="25" Margin="0,0,0,15"/>
 
-        <TextBlock Grid.Row="2" Text="Заработная плата за день:" Margin="0,0,0,5"/>
-        <TextBox Grid.Row="3" Text="{Binding DailySalary}" Height="25" Margin="0,0,0,15"/>
+        <TextBlock Grid.Row="6" Text="Заработная плата за день:" Margin="0,0,0,5"/>
+        <TextBox Grid.Row="7" Text="{Binding DailySalary}" Height="25" Margin="0,0,0,15"/>
 
-        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="8" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="Сохранить" Width="80" Height="30" Margin="0,0,10,0"
                     Command="{Binding SaveCommand}" Background="#009EE1" Foreground="White" BorderThickness="0"/>
             <Button Content="Отмена" Width="80" Height="30"

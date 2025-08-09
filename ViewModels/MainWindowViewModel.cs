@@ -11,23 +11,26 @@ using Microsoft.EntityFrameworkCore;
 namespace FanShop.ViewModels
 
 {
-    public class MainWindowViewModel : INotifyPropertyChanged
+    public class MainWindowViewModel : BaseViewModel
     {
         public int _currentYear;
         public int _currentMonth;
 
         public int CalendarRows { get; private set; } = 6;
-        
+
         private readonly FirebaseService _firebaseService;
+        private readonly StatisticsService _statisticsService;
         public ObservableCollection<CalendarDayViewModel> CalendarDays { get; set; } = new();
-        
+
         public ObservableCollection<MatchInfo> AllMatches { get; set; } = new ObservableCollection<MatchInfo>();
-        
+
+        private DateTime _lastCalendarUpdateDate;
 
         public string CurrentMonthName => new DateTime(_currentYear, _currentMonth, 1)
             .ToString("MMMM yyyy", new CultureInfo("ru-RU")).ToUpper();
-        
-        public string FormattedMonthTitle => $"Информация о месяце ({char.ToUpper(CurrentMonthName[0]) + CurrentMonthName.Substring(1).ToLower()})";
+
+        public string FormattedMonthTitle =>
+            $"Информация о месяце ({char.ToUpper(CurrentMonthName[0]) + CurrentMonthName.Substring(1).ToLower()})";
 
         public string PreviousMonthName
         {
@@ -49,44 +52,49 @@ namespace FanShop.ViewModels
 
         public ICommand PreviousMonthCommand { get; }
         public ICommand NextMonthCommand { get; }
-        
+
         private bool _isMenuOpen;
-        
+
         public bool IsMenuOpen
         {
             get => _isMenuOpen;
-            set
-            {
-                if (_isMenuOpen != value)
-                {
-                    _isMenuOpen = value;
-                    OnPropertyChanged(nameof(IsMenuOpen));
-                }
-            }
+            set => SetProperty(ref _isMenuOpen, value);
         }
-        
+
+        public int TotalEmployeesCount => _statisticsService.GetTotalEmployeesCount(_currentYear, _currentMonth);
+        public int WorkDaysCount => _statisticsService.GetWorkDaysCount(_currentYear, _currentMonth);
+        public int TotalShiftCount => _statisticsService.GetTotalShiftCount(_currentYear, _currentMonth);
+        public string TotalSalary => _statisticsService.GetTotalSalary(_currentYear, _currentMonth);
+
+        public ObservableCollection<EmployeeStatistic> EmployeeStatistics =>
+            _statisticsService.GetEmployeeStatistics(_currentYear, _currentMonth);
+
+        public int MonthMatchesCount => GetMonthMatchesCount();
         public ICommand ToggleMenuCommand { get; }
         public ICommand CloseMenuCommand { get; }
-        
+
         public ICommand OpenEmployeeWindowCommand { get; }
         public ICommand LoadMatchesCommand { get; }
         public ICommand OpenSettingsWindowCommand { get; }
 
         public MainWindowViewModel()
         {
-            _firebaseService = new FirebaseService("https://fanshop-11123-default-rtdb.europe-west1.firebasedatabase.app/");
-            
+            _firebaseService =
+                new FirebaseService("https://fanshop-11123-default-rtdb.europe-west1.firebasedatabase.app/");
+            _statisticsService = new StatisticsService();
+
             _currentYear = DateTime.Now.Year;
             _currentMonth = DateTime.Now.Month;
 
             PreviousMonthCommand = new RelayCommand(GoToPreviousMonth);
             NextMonthCommand = new RelayCommand(GoToNextMonth);
-            
+
             ToggleMenuCommand = new RelayCommand(_ => IsMenuOpen = !IsMenuOpen);
             CloseMenuCommand = new RelayCommand(_ => IsMenuOpen = false);
             LoadMatchesFromFirebase();
             GenerateCalendar(_currentYear, _currentMonth);
-            
+            _lastCalendarUpdateDate = DateTime.Today;
+
             OpenEmployeeWindowCommand = new RelayCommand(OpenEmployeeWindow);
             LoadMatchesCommand = new RelayCommand(async _ => await LoadMatchesFromFirebase());
             OpenSettingsWindowCommand = new RelayCommand(OpenSettingsWindow);
@@ -101,12 +109,7 @@ namespace FanShop.ViewModels
             OnPropertyChanged(nameof(CurrentMonthName));
             OnPropertyChanged(nameof(PreviousMonthName));
             OnPropertyChanged(nameof(NextMonthName));
-            OnPropertyChanged(nameof(TotalEmployeesCount));
-            OnPropertyChanged(nameof(WorkDaysCount));
-            OnPropertyChanged(nameof(MonthMatchesCount));
-            OnPropertyChanged(nameof(TotalShiftCount));
-            OnPropertyChanged(nameof(TotalSalary));
-            OnPropertyChanged(nameof(EmployeeStatistics));
+            RefreshStatistics();
             OnPropertyChanged(nameof(FormattedMonthTitle));
         }
 
@@ -119,19 +122,14 @@ namespace FanShop.ViewModels
             OnPropertyChanged(nameof(CurrentMonthName));
             OnPropertyChanged(nameof(PreviousMonthName));
             OnPropertyChanged(nameof(NextMonthName));
-            OnPropertyChanged(nameof(TotalEmployeesCount));
-            OnPropertyChanged(nameof(WorkDaysCount));
-            OnPropertyChanged(nameof(MonthMatchesCount));
-            OnPropertyChanged(nameof(TotalShiftCount));
-            OnPropertyChanged(nameof(TotalSalary));
-            OnPropertyChanged(nameof(EmployeeStatistics));
+            RefreshStatistics();
             OnPropertyChanged(nameof(FormattedMonthTitle));
         }
-        
+
         private async Task LoadMatchesFromFirebase()
         {
             var matches = await _firebaseService.GetMatchesAsync();
-    
+
             AllMatches.Clear();
 
             foreach (var match in matches)
@@ -155,24 +153,25 @@ namespace FanShop.ViewModels
         private async Task GenerateCalendar(int year, int month)
         {
             CalendarDays.Clear();
-            
+
             DateTime firstDayOfMonth = new DateTime(year, month, 1);
             int offset = (int)firstDayOfMonth.DayOfWeek;
             offset = offset == 0 ? 6 : offset - 1;
             int daysInMonth = DateTime.DaysInMonth(year, month);
-            
+
             DateTime lastDayOfMonth = new DateTime(year, month, daysInMonth);
             int endOffset = 7 - ((int)lastDayOfMonth.DayOfWeek == 0 ? 7 : (int)lastDayOfMonth.DayOfWeek);
 
             int totalDays = daysInMonth + offset + endOffset;
-            
+
             CalendarRows = (int)Math.Ceiling((double)totalDays / 7);
             OnPropertyChanged(nameof(CalendarRows));
-            
+
             var matchesForMonth = AllMatches.Where(m =>
             {
                 DateTime matchDate = DateTime.Parse(m.Time);
-                return matchDate >= firstDayOfMonth.AddDays(-offset) && matchDate <= lastDayOfMonth.AddDays(endOffset + 1);
+                return matchDate >= firstDayOfMonth.AddDays(-offset) &&
+                       matchDate <= lastDayOfMonth.AddDays(endOffset + 1);
             }).ToList();
 
             for (int i = 0; i < totalDays; i++)
@@ -183,7 +182,7 @@ namespace FanShop.ViewModels
                     Date = date,
                     IsCurrentMonth = date.Month == _currentMonth && date.Year == _currentYear
                 };
-                
+
                 var matchForThisDay = matchesForMonth.FirstOrDefault(m => DateTime.Parse(m.Time).Date == date.Date);
                 if (matchForThisDay != null)
                 {
@@ -193,7 +192,7 @@ namespace FanShop.ViewModels
                 CalendarDays.Add(calendarDay);
             }
         }
-        
+
         private void OpenEmployeeWindow(object? parameter)
         {
             var employeeWindow = new EmployeeWindow
@@ -202,66 +201,26 @@ namespace FanShop.ViewModels
             };
             employeeWindow.ShowDialog();
         }
-        
+
         private void OpenSettingsWindow(object? parameter)
         {
             var settingsWindow = new SettingsWindow();
             var viewModel = (SettingsWindowViewModel)settingsWindow.DataContext;
-            
+
             viewModel.CloseRequested += () =>
             {
                 settingsWindow.Close();
                 RefreshStatistics();
             };
-            
+
             settingsWindow.ShowDialog();
         }
-        
+
         private Settings GetSettings()
         {
             return Settings.Load();
         }
-        
-        public class EmployeeStatistic
-        {
-            public string EmployeeName { get; set; }
-            public int WorkDaysCount { get; set; }
-            public string TotalSalary { get; set; }
-        }
-        
-        public int TotalEmployeesCount => GetTotalEmployeesCount();
-        public int WorkDaysCount => GetWorkDaysCount();
-        public int MonthMatchesCount => GetMonthMatchesCount();
-        public int TotalShiftCount => GetTotalShiftCount();
-        public string TotalSalary => GetTotalSalary();
-        public ObservableCollection<EmployeeStatistic> EmployeeStatistics => GetEmployeeStatistics();
-        
-        private int GetTotalEmployeesCount()
-        {
-            using var context = new AppDbContext();
-            var firstDayOfMonth = new DateTime(_currentYear, _currentMonth, 1);
-            var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
-            
-            return context.WorkDays
-                .Where(wd => wd.Date >= firstDayOfMonth && wd.Date <= lastDayOfMonth)
-                .SelectMany(wd => wd.WorkDayEmployees)
-                .Select(wde => wde.EmployeeID)
-                .Distinct()
-                .Count();
-        }
-        
-        private int GetWorkDaysCount()
-        {
-            using var context = new AppDbContext();
-            var firstDayOfMonth = new DateTime(_currentYear, _currentMonth, 1);
-            var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
-            
-            return context.WorkDays
-                .Where(wd => wd.Date >= firstDayOfMonth && wd.Date <= lastDayOfMonth)
-                .Where(wd => wd.WorkDayEmployees.Any())
-                .Count();
-        }
-        
+
         private int GetMonthMatchesCount()
         {
             var firstDayOfMonth = new DateTime(_currentYear, _currentMonth, 1);
@@ -272,76 +231,22 @@ namespace FanShop.ViewModels
                 .Count(cd => cd.HasMatch);
         }
 
-        private int GetTotalShiftCount()
+        public async Task CheckAndUpdateCalendarAsync()
         {
-            using var context = new AppDbContext();
-            var firstDayOfMonth = new DateTime(_currentYear, _currentMonth, 1);
-            var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+            if (_lastCalendarUpdateDate != DateTime.Today)
+            {
+                await GenerateCalendar(_currentYear, _currentMonth);
+                RefreshStatistics();
 
-            return context.WorkDays
-                .Where(wd => wd.Date >= firstDayOfMonth && wd.Date <= lastDayOfMonth)
-                .SelectMany(wd => wd.WorkDayEmployees)
-                .Count();
+                _lastCalendarUpdateDate = DateTime.Today;
+
+                OnPropertyChanged(nameof(CurrentMonthName));
+                OnPropertyChanged(nameof(PreviousMonthName));
+                OnPropertyChanged(nameof(NextMonthName));
+                OnPropertyChanged(nameof(FormattedMonthTitle));
+            }
         }
 
-        private string GetTotalSalary()
-        {
-            using var context = new AppDbContext();
-            var firstDayOfMonth = new DateTime(_currentYear, _currentMonth, 1);
-            var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
-            var settings = GetSettings();
-        
-            var workDayEmployees = context.WorkDays
-                .Where(wd => wd.Date >= firstDayOfMonth && wd.Date <= lastDayOfMonth)
-                .SelectMany(wd => wd.WorkDayEmployees)
-                .ToList();
-            
-            var total = workDayEmployees
-                .Sum(wde => wde.WorkDuration == "Целый день" ? (double)settings.DailySalary : (double)settings.DailySalary / 2);
-        
-            return $"{total:N0} руб.";
-        }
-        
-        private ObservableCollection<EmployeeStatistic> GetEmployeeStatistics()
-        {
-            using var context = new AppDbContext();
-            var firstDayOfMonth = new DateTime(_currentYear, _currentMonth, 1);
-            var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
-            var settings = GetSettings();
-        
-            var workDayEmployees = context.WorkDays
-                .Where(wd => wd.Date >= firstDayOfMonth && wd.Date <= lastDayOfMonth)
-                .SelectMany(wd => wd.WorkDayEmployees)
-                .Include(wde => wde.Employee)
-                .ToList();
-        
-            var statistics = workDayEmployees
-                .GroupBy(wde => new { wde.Employee.FirstName, wde.Employee.Surname })
-                .Select(g => new
-                {
-                    EmployeeName = $"{g.Key.FirstName} {g.Key.Surname}",
-                    WorkDaysCount = g.Count(),
-                    SalaryAmount = g.Sum(wde => wde.WorkDuration == "Целый день" ? settings.DailySalary : settings.DailySalary / 2)
-                })
-                .OrderByDescending(x => x.SalaryAmount)
-                .Select(x => new EmployeeStatistic
-                {
-                    EmployeeName = x.EmployeeName,
-                    WorkDaysCount = x.WorkDaysCount,
-                    TotalSalary = $"{x.SalaryAmount:N0} руб."
-                })
-                .ToList();
-        
-            return new ObservableCollection<EmployeeStatistic>(statistics);
-        }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        
         public void RefreshStatistics()
         {
             OnPropertyChanged(nameof(TotalEmployeesCount));
@@ -352,7 +257,7 @@ namespace FanShop.ViewModels
             OnPropertyChanged(nameof(EmployeeStatistics));
         }
     }
-    
+
     public class RelayCommand : ICommand
     {
         private readonly Action<object?> _execute;
@@ -369,7 +274,7 @@ namespace FanShop.ViewModels
         public void Execute(object? parameter) => _execute(parameter);
 
         public event EventHandler? CanExecuteChanged;
-        
+
         public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
     }
 }

@@ -23,11 +23,7 @@ namespace FanShop.ViewModels
         public bool IsEditOverlayVisible
         {
             get => _isEditOverlayVisible;
-            set
-            {
-                _isEditOverlayVisible = value;
-                OnPropertyChanged(nameof(IsEditOverlayVisible));
-            }
+            set => SetProperty(ref _isEditOverlayVisible, value);
         }
 
         private Employee? _editableEmployee;
@@ -37,9 +33,10 @@ namespace FanShop.ViewModels
             get => _editableEmployee;
             set
             {
-                _editableEmployee = value;
-                OnPropertyChanged(nameof(EditableEmployee));
-                OnPropertyChanged(nameof(CanSaveEmployee));
+                if (SetProperty(ref _editableEmployee, value))
+                {
+                    OnPropertyChanged(nameof(CanSaveEmployee));
+                }
             }
         }
         

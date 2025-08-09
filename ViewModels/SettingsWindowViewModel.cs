@@ -4,7 +4,7 @@ using FanShop.Models;
 
 namespace FanShop.ViewModels
 {
-    public class SettingsWindowViewModel : INotifyPropertyChanged
+    public class SettingsWindowViewModel : BaseViewModel
     {
         private Settings _settings;
 
@@ -15,6 +15,26 @@ namespace FanShop.ViewModels
             {
                 _settings.ResponsiblePerson = value;
                 OnPropertyChanged(nameof(ResponsiblePerson));
+            }
+        }
+
+        public string ResponsiblePhoneNumber 
+        {
+            get => _settings.ResponsiblePhoneNumber;
+            set
+            {
+                _settings.ResponsiblePhoneNumber = value;
+                OnPropertyChanged(nameof(ResponsiblePhoneNumber));
+            }
+        }
+        
+        public string ResponsiblePosition
+        {
+            get => _settings.ResponsiblePosition;
+            set
+            {
+                _settings.ResponsiblePosition = value;
+                OnPropertyChanged(nameof(ResponsiblePosition));
             }
         }
 
@@ -49,12 +69,6 @@ namespace FanShop.ViewModels
         private void Cancel(object? parameter)
         {
             CloseRequested?.Invoke();
-        }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using FanShop.ViewModels;
 
 namespace FanShop;
 
@@ -20,4 +21,15 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
     }
+    
+    protected override async void OnActivated(EventArgs e)
+    {
+        base.OnActivated(e);
+
+        if (DataContext is MainWindowViewModel vm)
+        {
+            await vm.CheckAndUpdateCalendarAsync();
+        }
+    }
+
 }
