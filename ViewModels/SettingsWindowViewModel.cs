@@ -8,6 +8,16 @@ namespace FanShop.ViewModels
     {
         private Settings _settings;
 
+        public string Head
+        {
+            get => _settings.Head;
+            set
+            {
+                _settings.Head = value;
+                OnPropertyChanged(nameof(Head));
+            }
+        }
+
         public string ResponsiblePerson
         {
             get => _settings.ResponsiblePerson;
@@ -35,6 +45,16 @@ namespace FanShop.ViewModels
             {
                 _settings.ResponsiblePosition = value;
                 OnPropertyChanged(nameof(ResponsiblePosition));
+            }
+        }
+
+        public string VisitGoal
+        {
+            get => _settings.VisitGoal;
+            set
+            {
+                _settings.VisitGoal = value;
+                OnPropertyChanged(nameof(VisitGoal));
             }
         }
 

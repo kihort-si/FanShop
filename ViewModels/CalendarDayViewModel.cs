@@ -204,7 +204,7 @@ namespace FanShop.ViewModels
                 return;
             }
 
-            PassDocumentGenerator.CreateAndShowPassPdf(Date, Employees);
+            PassDocumentGenerator.CreateWordPass(Date, Employees);
         }
 
         private void CloseWindow(object? parameter)
