@@ -9,8 +9,14 @@ namespace FanShop.ViewModels
 {
     public class EmployeeWindowViewModel : BaseViewModel
     {
-        public ObservableCollection<Employee> Employees { get; set; } = new();
-
+        private ObservableCollection<Employee> _employees = new();
+    
+        public ObservableCollection<Employee> Employees
+        {
+            get => _employees;
+            set => SetProperty(ref _employees, value);
+        }
+        
         public ICommand AddEmployeeCommand { get; }
         public ICommand EditEmployeeCommand { get; }
         public ICommand RemoveEmployeeCommand { get; }
@@ -141,8 +147,19 @@ namespace FanShop.ViewModels
         public EmployeeWindowViewModel()
         {
             using var context = new AppDbContext();
-            Employees = new ObservableCollection<Employee>(context.Employees.ToList());
+            var allEmployees = context.Employees.ToList();
+        
+            var employeesWithStats = allEmployees.Select(emp => new
+                {
+                    Employee = emp,
+                    WorkDaysCount = GetWorkDaysCount(emp.EmployeeID, context)
+                })
+                .OrderByDescending(x => x.WorkDaysCount)
+                .ThenBy(x => x.Employee.Surname)
+                .Select(x => x.Employee)
+                .ToList();
 
+            Employees = new ObservableCollection<Employee>(employeesWithStats);
             AddEmployeeCommand = new RelayCommand(AddEmployee);
             EditEmployeeCommand = new RelayCommand(EditEmployee, CanEditEmployee);
             RemoveEmployeeCommand = new RelayCommand(RemoveEmployee, CanEditEmployee);
@@ -206,7 +223,6 @@ namespace FanShop.ViewModels
                 {
                     context.Employees.Add(EditableEmployee);
                     context.SaveChanges();
-                    Employees.Add(EditableEmployee);
                 }
                 else
                 {
@@ -221,20 +237,13 @@ namespace FanShop.ViewModels
                         employee.Passport = EditableEmployee.Passport;
                         context.Employees.Update(employee);
                         context.SaveChanges();
-
-                        var index = Employees.IndexOf(SelectedEmployee);
-                        if (index >= 0)
-                        {
-                            Employees[index] = employee;
-                        }
-
-                        SelectedEmployee = employee;
-                        SelectedEmployee = null;
                     }
                 }
 
                 context.SaveChanges();
                 IsEditOverlayVisible = false;
+            
+                RefreshEmployeesSorting();
             }
         }
 
@@ -261,6 +270,45 @@ namespace FanShop.ViewModels
         private bool CanEditEmployee(object? parameter)
         {
             return SelectedEmployee != null;
+        }
+        
+        private int GetWorkDaysCount(int employeeId, AppDbContext context)
+        {
+            var thirtyDaysAgo = DateTime.Now.AddDays(-30);
+        
+            try
+            {
+                return context.WorkDays
+                    .Where(wd => wd.Date >= thirtyDaysAgo)
+                    .SelectMany(wd => wd.WorkDayEmployees)
+                    .Count(wde => wde.EmployeeID == employeeId);
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        private void RefreshEmployeesSorting()
+        {
+            using var context = new AppDbContext();
+            var allEmployees = context.Employees.ToList();
+        
+            var employeesWithStats = allEmployees.Select(emp => new
+                {
+                    Employee = emp,
+                    WorkDaysCount = GetWorkDaysCount(emp.EmployeeID, context)
+                })
+                .OrderByDescending(x => x.WorkDaysCount)
+                .ThenBy(x => x.Employee.Surname)
+                .Select(x => x.Employee)
+                .ToList();
+
+            Employees.Clear();
+            foreach (var employee in employeesWithStats)
+            {
+                Employees.Add(employee);
+            }
         }
 
         private void CloseWindow(object? parameter)
