@@ -5,7 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:FanShop.Windows"
         mc:Ignorable="d"
-        Title="Выбор сотрудника" Height="400" Width="300" WindowStartupLocation="CenterScreen" Icon="/icon.ico">
+        Title="Выбор сотрудника" Height="400" Width="300" WindowStartupLocation="CenterScreen" Icon="/icon.ico" ShowInTaskbar="False">
     <Grid>
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
             <ListBox ItemsSource="{Binding Employees}"

@@ -105,6 +105,8 @@ namespace FanShop.ViewModels
                 {
                     DataContext = this
                 };
+                dayDetailsWindow.Owner = Application.Current.MainWindow;
+                dayDetailsWindow.ShowInTaskbar = false;
                 dayDetailsWindow.ShowDialog();
             }
         }
@@ -124,6 +126,9 @@ namespace FanShop.ViewModels
             {
                 DataContext = employeeWindowViewModel
             };
+            
+            selectEmployeeWindow.Owner = Application.Current.MainWindow;
+            selectEmployeeWindow.ShowInTaskbar = false;
 
             if (selectEmployeeWindow.ShowDialog() == true && selectEmployeeWindow.SelectedEmployee != null)
             {

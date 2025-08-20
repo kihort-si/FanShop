@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using FanShop.Models;
@@ -199,6 +200,8 @@ namespace FanShop.ViewModels
             {
                 DataContext = new EmployeeWindowViewModel()
             };
+            employeeWindow.Owner = Application.Current.MainWindow;
+            employeeWindow.ShowInTaskbar = false;
             employeeWindow.ShowDialog();
         }
 
@@ -212,7 +215,9 @@ namespace FanShop.ViewModels
                 settingsWindow.Close();
                 RefreshStatistics();
             };
-
+            
+            settingsWindow.Owner = Application.Current.MainWindow;
+            settingsWindow.ShowInTaskbar = false;
             settingsWindow.ShowDialog();
         }
 
@@ -235,7 +240,7 @@ namespace FanShop.ViewModels
         {
             if (_lastCalendarUpdateDate != DateTime.Today)
             {
-                await GenerateCalendar(_currentYear, _currentMonth);
+                await LoadMatchesFromFirebase();
                 RefreshStatistics();
 
                 _lastCalendarUpdateDate = DateTime.Today;
