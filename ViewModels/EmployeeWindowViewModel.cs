@@ -191,6 +191,7 @@ namespace FanShop.ViewModels
             FirstName = string.Empty;
             LastName = string.Empty;
             DateOfBirth = string.Empty;
+            DateOfBirthPicker = null;
             PlaceOfBirth = string.Empty;
             Passport = string.Empty;
         
@@ -207,6 +208,16 @@ namespace FanShop.ViewModels
                 FirstName = SelectedEmployee.FirstName;
                 LastName = SelectedEmployee.LastName;
                 DateOfBirth = SelectedEmployee.DateOfBirth;
+                
+                if (DateTime.TryParseExact(SelectedEmployee.DateOfBirth, "dd.MM.yyyy", null, System.Globalization.DateTimeStyles.None, out DateTime parsedDate))
+                {
+                    DateOfBirthPicker = parsedDate;
+                }
+                else
+                {
+                    DateOfBirthPicker = null;
+                }
+                
                 PlaceOfBirth = SelectedEmployee.PlaceOfBirth;
                 Passport = SelectedEmployee.Passport;
                 
@@ -270,6 +281,26 @@ namespace FanShop.ViewModels
         private bool CanEditEmployee(object? parameter)
         {
             return SelectedEmployee != null;
+        }
+        
+        private DateTime? _dateOfBirthPicker;
+        
+        public DateTime? DateOfBirthPicker
+        {
+            get => _dateOfBirthPicker;
+            set
+            {
+                _dateOfBirthPicker = value;
+                if (value.HasValue)
+                {
+                    DateOfBirth = value.Value.ToString("dd.MM.yyyy");
+                }
+                else
+                {
+                    DateOfBirth = string.Empty;
+                }
+                OnPropertyChanged(nameof(DateOfBirthPicker));
+            }
         }
         
         private int GetWorkDaysCount(int employeeId, AppDbContext context)
