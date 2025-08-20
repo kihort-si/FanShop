@@ -2,6 +2,7 @@
 using System.Data;
 using System.Windows;
 using FanShop.Services;
+using Application = System.Windows.Application;
 
 namespace FanShop;
 

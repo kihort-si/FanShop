@@ -8,6 +8,7 @@ using FanShop.Models;
 using FanShop.Services;
 using FanShop.Windows;
 using Microsoft.EntityFrameworkCore;
+using Application = System.Windows.Application;
 
 namespace FanShop.ViewModels
 
@@ -76,6 +77,7 @@ namespace FanShop.ViewModels
 
         public ICommand OpenEmployeeWindowCommand { get; }
         public ICommand LoadMatchesCommand { get; }
+        public ICommand OpenTaskCategoriesWindowCommand { get; }
         public ICommand OpenSettingsWindowCommand { get; }
 
         public MainWindowViewModel()
@@ -98,6 +100,7 @@ namespace FanShop.ViewModels
 
             OpenEmployeeWindowCommand = new RelayCommand(OpenEmployeeWindow);
             LoadMatchesCommand = new RelayCommand(async _ => await LoadMatchesFromFirebase());
+            OpenTaskCategoriesWindowCommand = new RelayCommand(OpenTaskCategoriesWindow);
             OpenSettingsWindowCommand = new RelayCommand(OpenSettingsWindow);
         }
 
@@ -203,6 +206,17 @@ namespace FanShop.ViewModels
             employeeWindow.Owner = Application.Current.MainWindow;
             employeeWindow.ShowInTaskbar = false;
             employeeWindow.ShowDialog();
+        }
+
+        private void OpenTaskCategoriesWindow(object? parameter)
+        {
+            var dayTasksWindow = new TaskCategoriesWindow
+            {
+                DataContext = new TaskCategoriesWindowViewModel()
+            };
+            dayTasksWindow.Owner = Application.Current.MainWindow;
+            dayTasksWindow.ShowInTaskbar = false;
+            dayTasksWindow.ShowDialog();
         }
 
         private void OpenSettingsWindow(object? parameter)

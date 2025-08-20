@@ -5,50 +5,182 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:FanShop.Windows"
         mc:Ignorable="d"
-        Title="Выбор сотрудника" Height="400" Width="300" WindowStartupLocation="CenterScreen" Icon="/icon.ico" ShowInTaskbar="False">
-    <Grid>
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-            <ListBox ItemsSource="{Binding Employees}"
-                     SelectedItem="{Binding SelectedEmployee}" 
-                     MouseDoubleClick="ListBox_MouseDoubleClick"
-                     BorderThickness="0"
-                     Background="Transparent">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Border Background="White" 
-                                BorderBrush="LightGray" 
-                                BorderThickness="1" 
-                                CornerRadius="5" 
-                                Margin="5" 
-                                Padding="10">
-                            <StackPanel>
-                                <TextBlock FontWeight="Bold" 
-                                           FontSize="14" 
-                                           Margin="0,0,0,8">
-                                    <Run Text="{Binding FirstName}" />
-                                    <Run Text="{Binding Surname}" />
-                                </TextBlock>
-                                <StackPanel Orientation="Horizontal" 
-                                            VerticalAlignment="Center">
-                                    <TextBlock Text="Время работы:" 
-                                               VerticalAlignment="Center" 
-                                               Margin="0,0,10,0"
-                                               FontSize="12"
-                                               Foreground="Gray"/>
-                                    <ComboBox SelectedValue="{Binding SelectedWorkDuration, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}"
-                                              SelectedValuePath="Content"
-                                              Width="120" 
-                                              SelectionChanged="ComboBox_SelectionChanged"
-                                              BorderBrush="LightGray">
-                                        <ComboBoxItem Content="Целый день" />
-                                        <ComboBoxItem Content="Полдня" />
-                                    </ComboBox>
-                                </StackPanel>
-                            </StackPanel>
-                        </Border>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </ScrollViewer>
-    </Grid>
+        Title="Выбор сотрудника" Height="450" Width="400"
+        WindowStyle="None" ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen" Icon="/icon.ico"
+        ShowInTaskbar="False" AllowsTransparency="True"
+        Background="Transparent" BorderThickness="0">
+
+    <Border Background="White" CornerRadius="8">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" CornerRadius="8,8,0,0" MouseLeftButtonDown="Border_MouseLeftButtonDown">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#009EE1" Offset="0.0"/>
+                        <GradientStop Color="#0077B5" Offset="1.0"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Grid Height="40">
+                    <TextBlock Text="ВЫБОР СОТРУДНИКА" FontSize="14" FontWeight="Bold" Foreground="White"
+                               VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <Button Content="✕" HorizontalAlignment="Right" Width="40" Height="40"
+                            Background="Transparent" Foreground="White" BorderThickness="0"
+                            Click="CloseButton_Click" FontWeight="Bold" FontSize="14">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" Padding="8">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#E81123"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="15">
+                <ListBox ItemsSource="{Binding Employees}"
+                         SelectedItem="{Binding SelectedEmployee}"
+                         MouseDoubleClick="ListBox_MouseDoubleClick"
+                         BorderThickness="1" BorderBrush="#E0E0E0"
+                         Background="White">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="#F8F9FA" BorderBrush="#E9ECEF"
+                                    BorderThickness="1" CornerRadius="5"
+                                    Padding="15,10" Margin="0,2">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    
+                                    <Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <TextBlock Grid.Column="0" FontWeight="SemiBold" FontSize="14">
+                                            <Run Text="{Binding FirstName}" />
+                                            <Run Text="{Binding Surname}" />
+                                        </TextBlock>
+                                        
+                                        <Border Grid.Column="1" Background="#E3F2FD" 
+                                                CornerRadius="4" Padding="8,4" 
+                                                VerticalAlignment="Center">
+                                            <TextBlock Text="Сотрудник" 
+                                                       Foreground="#0077B5" 
+                                                       FontWeight="Medium" 
+                                                       FontSize="12"/>
+                                        </Border>
+                                    </Grid>
+                                    
+                                    <Grid Grid.Row="1" Margin="0,10,0,0">
+                                        <TextBlock Text="Время работы:" 
+                                                   VerticalAlignment="Center" 
+                                                   Margin="0,0,10,0"
+                                                   FontWeight="Medium"
+                                                   FontSize="12"
+                                                   Foreground="#555555"/>
+                                        <ComboBox SelectedValue="{Binding SelectedWorkDuration, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}"
+                                                  SelectedValuePath="Content"
+                                                  Width="140" HorizontalAlignment="Right"
+                                                  SelectionChanged="ComboBox_SelectionChanged"
+                                                  BorderBrush="#CCCCCC"
+                                                  Padding="8,5">
+                                            <ComboBoxItem Content="Целый день" />
+                                            <ComboBoxItem Content="Полдня" />
+                                        </ComboBox>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="0,4"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="#E3F2FD"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#F0F7FF"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+            </ScrollViewer>
+
+            <Border Grid.Row="2" Background="#F5F5F5" CornerRadius="0,0,8,8" Padding="10">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="Выбрать" Width="120" Height="36"
+                            Background="#009EE1" Foreground="White"
+                            BorderThickness="0" Margin="0,0,10,0" Cursor="Hand"
+                            Click="SelectButton_Click">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{TemplateBinding Background}"
+                                        CornerRadius="4" Padding="12,6">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Opacity" Value="0.9"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <Button Content="Отмена" Width="120" Height="36"
+                            Background="#666666" Foreground="White"
+                            BorderThickness="0" Margin="0" Cursor="Hand"
+                            Click="CancelButton_Click">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{TemplateBinding Background}"
+                                        CornerRadius="4" Padding="12,6">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Opacity" Value="0.9"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
 </Window>

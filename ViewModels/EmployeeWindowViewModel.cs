@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Input;
 using FanShop.Models;
 using FanShop.Services;
+using Application = System.Windows.Application;
 
 namespace FanShop.ViewModels
 {

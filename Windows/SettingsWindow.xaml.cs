@@ -1,16 +1,27 @@
 ﻿using System.Windows;
-using FanShop.ViewModels;
+using System.Windows.Input;
 
-namespace FanShop.Windows;
-
-public partial class SettingsWindow : Window
+namespace FanShop.Windows
 {
-    public SettingsWindow()
+    public partial class SettingsWindow : Window
     {
-        InitializeComponent();
-        if (DataContext is SettingsWindowViewModel viewModel)
+        public SettingsWindow()
         {
-            viewModel.CloseRequested += () => Close();
+            InitializeComponent();
+            
+            var viewModel = DataContext as ViewModels.SettingsWindowViewModel;
+            if (viewModel != null)
+            {
+                viewModel.CloseRequested += () => Close();
+            }
+        }
+        
+        private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                DragMove();
+            }
         }
     }
 }

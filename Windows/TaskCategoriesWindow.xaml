@@ -1,0 +1,114 @@
+﻿<Window x:Class="FanShop.Windows.TaskCategoriesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:FanShop.Windows"
+        mc:Ignorable="d"
+        Title="Категории задач" Height="400" Width="600" WindowStyle="None" ResizeMode="NoResize" Background="White" WindowStartupLocation="CenterScreen" Icon="/icon.ico" ShowInTaskbar="False">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <ListBox ItemsSource="{Binding TaskCategories}"
+                 SelectedItem="{Binding SelectedCategory}" 
+                 Margin="10">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <Rectangle Width="16" Height="16" Margin="0,0,8,0">
+                            <Rectangle.Fill>
+                                <SolidColorBrush Color="{Binding Color}"/>
+                            </Rectangle.Fill>
+                        </Rectangle>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding Description}" FontSize="10" Foreground="Gray" 
+                                       Visibility="{Binding Description, Converter={x:Static local:StringToVisibilityConverter.Instance}}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+            <Button Content="Добавить" Width="80" Height="30" Margin="0,0,10,0"
+                    Command="{Binding AddCategoryCommand}" Background="#009EE1" Foreground="White" BorderThickness="0" />
+            <Button Content="Изменить" Width="80" Height="30" Margin="0,0,10,0"
+                    Command="{Binding EditCategoryCommand}" Background="#009EE1" Foreground="White" BorderThickness="0" />
+            <Button Content="Удалить" Width="80" Height="30" Margin="0,0,10,0"
+                    Command="{Binding RemoveCategoryCommand}" Background="#EB0004" Foreground="White" BorderThickness="0" />
+            <Button Content="Закрыть" Width="80" Height="30"
+                    Command="{Binding CloseWindowCommand}" Background="Gray" Foreground="White" BorderThickness="0"/>
+        </StackPanel>
+
+        <Grid Grid.RowSpan="2" Background="#80000000" 
+              Visibility="{Binding IsEditOverlayVisible, Converter={x:Static local:BooleanToVisibilityConverter.Instance}}">
+            <Border Background="White" Width="400" Height="370" CornerRadius="10" 
+                    BorderBrush="#009EE1" BorderThickness="2">
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="{Binding SelectedCategory, Converter={x:Static local:CategoryTitleConverter.Instance}}" 
+                               FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+
+                    <StackPanel Grid.Row="1" Margin="0,0,0,10">
+                        <TextBlock Text="Название*:" FontWeight="Bold" Margin="0,0,0,5"/>
+                        <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" 
+                                 Height="30" Padding="5" BorderBrush="#009EE1"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Margin="0,0,0,10">
+                        <TextBlock Text="Описание:" FontWeight="Bold" Margin="0,0,0,5"/>
+                        <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" 
+                                 Height="60" Padding="5" BorderBrush="#009EE1" 
+                                 TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="3" Margin="0,0,0,10">
+                        <TextBlock Text="Цвет*:" FontWeight="Bold" Margin="0,0,0,5"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Width="30" Height="30" Margin="0,0,10,0" 
+                                    Command="{Binding OpenColorPickerCommand}"
+                                    Background="Transparent" BorderThickness="0" Padding="0">
+                                <Rectangle Width="30" Height="30" Stroke="Black" StrokeThickness="1">
+                                    <Rectangle.Fill>
+                                        <SolidColorBrush Color="{Binding Color}"/>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                            </Button>
+                            <TextBox Text="{Binding Color, UpdateSourceTrigger=PropertyChanged}" 
+                                     Width="100" Height="30" Padding="5" BorderBrush="#009EE1" VerticalAlignment="Top"/>
+                            <Button Content="🎨" Width="30" Height="30" Margin="5,0,0,0"
+                                    Command="{Binding GenerateRandomColorCommand}" 
+                                    Background="#009EE1" Foreground="White" BorderThickness="0"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <TextBlock Grid.Row="4" Text="* - обязательные поля" 
+                               FontSize="10" Foreground="Gray" Margin="0,0,0,10"/>
+
+                    <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="Сохранить" Width="100" Height="35" Margin="0,0,10,0"
+                                Command="{Binding SaveEditedCategoryCommand}" 
+                                IsEnabled="{Binding CanSaveCategory}"
+                                Background="#009EE1" Foreground="White" BorderThickness="0"/>
+                        <Button Content="Отмена" Width="100" Height="35"
+                                Command="{Binding CancelEditCommand}" 
+                                Background="Gray" Foreground="White" BorderThickness="0"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

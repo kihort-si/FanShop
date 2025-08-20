@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace FanShop.Windows
 {
@@ -9,6 +10,14 @@ namespace FanShop.Windows
         public EmployeeWindow()
         {
             InitializeComponent();
+        }
+        
+        private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                DragMove();
+            }
         }
     }
 

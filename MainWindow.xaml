@@ -10,21 +10,113 @@
         xmlns:converters="clr-namespace:FanShop.Converters"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
-        Title="FANSHOP" Height="800" Width="1000" WindowStartupLocation="CenterScreen" WindowState="Maximized"
+        Title="FANSHOP" Height="800" Width="1000" 
+        WindowStartupLocation="CenterScreen" 
+        WindowStyle="None"
+        AllowsTransparency="True" WindowState="Maximized" Background="Transparent"
         Icon="icon.ico">
     <Window.DataContext>
         <vm:MainWindowViewModel />
     </Window.DataContext>
-    <ScrollViewer>
+    
+    <Border Background="White" CornerRadius="8">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="60"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="60"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
+            
+            <Border Grid.Row="0" CornerRadius="8,8,0,0" MouseLeftButtonDown="Border_MouseLeftButtonDown">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#009EE1" Offset="0.0"/>
+                        <GradientStop Color="#0077B5" Offset="1.0"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Grid Height="40">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="−" Width="40" Height="40"
+                                Background="Transparent" Foreground="White" BorderThickness="0"
+                                Click="MinimizeButton_Click" FontWeight="Bold" FontSize="16">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}" Padding="8">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#20FFFFFF"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        
+                        <Button Content="□" Width="40" Height="40"
+                                Background="Transparent" Foreground="White" BorderThickness="0"
+                                Click="MaximizeButton_Click" FontWeight="Bold" FontSize="14">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}" Padding="8">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#20FFFFFF"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        
+                        <Button Content="✕" Width="40" Height="40"
+                                Background="Transparent" Foreground="White" BorderThickness="0"
+                                Click="CloseButton_Click" FontWeight="Bold" FontSize="14">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}" Padding="8">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#E81123"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
 
-            <Grid Grid.Row="0" Background="#009EE1">
+            <Grid Grid.Row="1">
+                <Grid.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#009EE1" Offset="0.0"/>
+                        <GradientStop Color="#0077B5" Offset="1.0"/>
+                    </LinearGradientBrush>
+                </Grid.Background>
+                
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
@@ -77,268 +169,271 @@
                 </Button>
             </Grid>
 
-            <StackPanel Grid.Row="1" 
-                        Orientation="Horizontal" 
-                        VerticalAlignment="Center" 
-                        HorizontalAlignment="Center" 
-                        Background="#FFFFFF">
-                <Button
-                        Content="{Binding PreviousMonthName}"
-                        Command="{Binding PreviousMonthCommand}"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        FontSize="14"
-                        Foreground="Gray"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Content" Value="☰"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border Background="{TemplateBinding Background}">
-                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                        </Border>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsMenuOpen}" Value="True">
-                                    <Setter Property="Content" Value="☓"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
-
-                <TextBlock
-                           Text="{Binding CurrentMonthName}"
-                           FontSize="20"
-                           FontWeight="Bold"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Margin="20, 0"/>
-
-                <Button
-                        Content="{Binding NextMonthName}"
-                        Command="{Binding NextMonthCommand}"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        FontSize="14"
-                        Foreground="Gray"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Content" Value="☰"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border Background="{TemplateBinding Background}">
-                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                        </Border>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsMenuOpen}" Value="True">
-                                    <Setter Property="Content" Value="☓"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
-            </StackPanel>
-
-            <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,0,0,0">
-                <Grid Width="770" Height="30" Margin="0,0,0,5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-            
-                    <TextBlock Grid.Column="0" Text="ПН" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                               FontWeight="Bold" FontSize="14" Foreground="#656565"/>
-                    <TextBlock Grid.Column="1" Text="ВТ" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                               FontWeight="Bold" FontSize="14" Foreground="#656565"/>
-                    <TextBlock Grid.Column="2" Text="СР" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                               FontWeight="Bold" FontSize="14" Foreground="#656565"/>
-                    <TextBlock Grid.Column="3" Text="ЧТ" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                               FontWeight="Bold" FontSize="14" Foreground="#656565"/>
-                    <TextBlock Grid.Column="4" Text="ПТ" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                               FontWeight="Bold" FontSize="14" Foreground="#656565"/>
-                    <TextBlock Grid.Column="5" Text="СБ" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                               FontWeight="Bold" FontSize="14" Foreground="#995B5B"/>
-                    <TextBlock Grid.Column="6" Text="ВС" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                               FontWeight="Bold" FontSize="14" Foreground="#995B5B"/>
-                </Grid>
-            
-                <ItemsControl ItemsSource="{Binding CalendarDays}" BorderBrush="LightGray" BorderThickness="0.5">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <UniformGrid Columns="7" Rows="{Binding CalendarRows}"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Width="110" Height="125" BorderBrush="LightGray" BorderThickness="0.5">
-                                <view:CalendarDayControl/>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
-            
-            <Border Grid.Row="3" Background="#F5F5F5" Margin="20,20,20,20" CornerRadius="8">
-                <Border.Effect>
-                    <DropShadowEffect ShadowDepth="2" BlurRadius="5" Opacity="0.2"/>
-                </Border.Effect>
-                <StackPanel Margin="20">
-                    <TextBlock FontSize="18"
-                               FontWeight="Bold"
-                               Foreground="#009EE1"
-                               Margin="0,0,0,15"
-                               Text="{Binding FormattedMonthTitle}" />
+            <ScrollViewer Grid.Row="2" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
                     
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        
-                        <StackPanel Grid.Column="0" Margin="0,0,20,0">
-                            <TextBlock Text="Общая статистика:" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <StackPanel Grid.Row="0" 
+                                Orientation="Horizontal" 
+                                VerticalAlignment="Center" 
+                                HorizontalAlignment="Center" 
+                                Background="#FFFFFF"
+                                Margin="0,10,0,0">
+                        <Button
+                                Content="{Binding PreviousMonthName}"
+                                Command="{Binding PreviousMonthCommand}"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                FontSize="14"
+                                Foreground="Gray"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+
+                        <TextBlock
+                                   Text="{Binding CurrentMonthName}"
+                                   FontSize="20"
+                                   FontWeight="Bold"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Margin="20, 0"/>
+
+                        <Button
+                                Content="{Binding NextMonthName}"
+                                Command="{Binding NextMonthCommand}"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                FontSize="14"
+                                Foreground="Gray"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,0,0,0">
+                        <Grid Width="770" Height="30" Margin="0,0,0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                    
+                            <TextBlock Grid.Column="0" Text="ПН" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                       FontWeight="Bold" FontSize="14" Foreground="#656565"/>
+                            <TextBlock Grid.Column="1" Text="ВТ" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                       FontWeight="Bold" FontSize="14" Foreground="#656565"/>
+                            <TextBlock Grid.Column="2" Text="СР" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                       FontWeight="Bold" FontSize="14" Foreground="#656565"/>
+                            <TextBlock Grid.Column="3" Text="ЧТ" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                       FontWeight="Bold" FontSize="14" Foreground="#656565"/>
+                            <TextBlock Grid.Column="4" Text="ПТ" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                       FontWeight="Bold" FontSize="14" Foreground="#656565"/>
+                            <TextBlock Grid.Column="5" Text="СБ" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                       FontWeight="Bold" FontSize="14" Foreground="#995B5B"/>
+                            <TextBlock Grid.Column="6" Text="ВС" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                       FontWeight="Bold" FontSize="14" Foreground="#995B5B"/>
+                        </Grid>
+                    
+                        <ItemsControl ItemsSource="{Binding CalendarDays}" BorderBrush="LightGray" BorderThickness="0.5">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="7" Rows="{Binding CalendarRows}"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Width="110" Height="125" BorderBrush="LightGray" BorderThickness="0.5">
+                                        <view:CalendarDayControl/>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+            
+                    <Border Grid.Row="2" Background="#F5F5F5" Margin="20,20,20,20" CornerRadius="8">
+                        <Border.Effect>
+                            <DropShadowEffect ShadowDepth="2" BlurRadius="5" Opacity="0.2"/>
+                        </Border.Effect>
+                        <StackPanel Margin="20">
+                            <TextBlock FontSize="18"
+                                       FontWeight="Bold"
+                                       Foreground="#009EE1"
+                                       Margin="0,0,0,15"
+                                       Text="{Binding FormattedMonthTitle}" />
                             
-                            <Grid Margin="0,0,0,5">
+                            <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Количество матчей:"/>
-                                <TextBlock Grid.Column="1" Text="{Binding MonthMatchesCount}" FontWeight="Bold"/>
-                            </Grid>
-                            
-                            <Grid Margin="0,0,0,5">
-                                <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Количество вызванных сотрудников:"/>
-                                <TextBlock Grid.Column="1" Text="{Binding TotalEmployeesCount}" FontWeight="Bold"/>
-                            </Grid>
-                            
-                            <Grid Margin="0,0,0,5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Количество дней с сотрудниками:"/>
-                                <TextBlock Grid.Column="1" Text="{Binding WorkDaysCount}" FontWeight="Bold"/>
-                            </Grid>
-                            
-                            <Grid Margin="0,0,0,5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Количесвто отработанных смен:"/>
-                                <TextBlock Grid.Column="1" Text="{Binding TotalShiftCount}" FontWeight="Bold"/>
-                            </Grid>
-                            
-                            <Grid Margin="0,0,0,5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Заработная плата:"/>
-                                <TextBlock Grid.Column="1" Text="{Binding TotalSalary}" FontWeight="Bold"/>
+                                
+                                <StackPanel Grid.Column="0" Margin="0,0,20,0">
+                                    <TextBlock Text="Общая статистика:" FontWeight="Bold" Margin="0,0,0,10"/>
+                                    
+                                    <Grid Margin="0,0,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="Количество матчей:"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding MonthMatchesCount}" FontWeight="Bold"/>
+                                    </Grid>
+                                    
+                                    <Grid Margin="0,0,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="Количество вызванных сотрудников:"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding TotalEmployeesCount}" FontWeight="Bold"/>
+                                    </Grid>
+                                    
+                                    <Grid Margin="0,0,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="Количество дней с сотрудниками:"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding WorkDaysCount}" FontWeight="Bold"/>
+                                    </Grid>
+                                    
+                                    <Grid Margin="0,0,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="Количесвто отработанных смен:"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding TotalShiftCount}" FontWeight="Bold"/>
+                                    </Grid>
+                                    
+                                    <Grid Margin="0,0,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="Заработная плата:"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding TotalSalary}" FontWeight="Bold"/>
+                                    </Grid>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="Статистика по сотрудникам:" FontWeight="Bold" Margin="0,0,0,10"/>
+                                    
+                                    <ScrollViewer MaxHeight="150" VerticalScrollBarVisibility="Auto">
+                                        <ItemsControl ItemsSource="{Binding EmployeeStatistics}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Margin="0,0,0,8">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="2*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{Binding EmployeeName}" VerticalAlignment="Center"/>
+                                                        <TextBlock Grid.Column="1" Margin="10,0,10,0" VerticalAlignment="Center">
+                                                            <Run Text="{Binding WorkDaysCount}"/>
+                                                            <Run Text="смен"/>
+                                                        </TextBlock>
+                                                        <TextBlock Grid.Column="2" Text="{Binding TotalSalary}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                </StackPanel>
                             </Grid>
                         </StackPanel>
-                        
-                        <StackPanel Grid.Column="1">
-                            <TextBlock Text="Статистика по сотрудникам:" FontWeight="Bold" Margin="0,0,0,10"/>
+                    </Border>
+            
+                    <Border Grid.RowSpan="3" Background="Black" Opacity="0.5"
+                            Visibility="{Binding IsMenuOpen, Converter={x:Static converters:BoolToVisibilityConverter.Instance}}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <i:InvokeCommandAction Command="{Binding CloseMenuCommand}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Border>
+            
+                    <Border Grid.RowSpan="3" Background="White" Width="300" HorizontalAlignment="Right"
+                            Visibility="{Binding IsMenuOpen, Converter={x:Static converters:BoolToVisibilityConverter.Instance}}">
+                        <Border.Effect>
+                            <DropShadowEffect ShadowDepth="5" BlurRadius="10" Opacity="0.3"/>
+                        </Border.Effect>
+                        <StackPanel Margin="0,20,0,0">
+                            <Button Content="Сотрудники"
+                                    Height="50"
+                                    Margin="0"
+                                    Background="White"
+                                    Foreground="#009EE1"
+                                    BorderThickness="0"
+                                    FontSize="16"
+                                    Command="{Binding OpenEmployeeWindowCommand}"/>
+
+                            <Button Content="Обновить расписание"
+                                    Height="50"
+                                    Margin="0"
+                                    Background="White"
+                                    Foreground="#009EE1"
+                                    BorderThickness="0"
+                                    FontSize="16"
+                                    Command="{Binding LoadMatchesCommand}"/>
                             
-                            <ScrollViewer MaxHeight="150" VerticalScrollBarVisibility="Auto">
-                                <ItemsControl ItemsSource="{Binding EmployeeStatistics}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid Margin="0,0,0,8">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="2*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="{Binding EmployeeName}" VerticalAlignment="Center"/>
-                                                <TextBlock Grid.Column="1" Margin="10,0,10,0" VerticalAlignment="Center">
-                                                    <Run Text="{Binding WorkDaysCount}"/>
-                                                    <Run Text="смен"/>
-                                                </TextBlock>
-                                                <TextBlock Grid.Column="2" Text="{Binding TotalSalary}" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </ScrollViewer>
+                            <Button Content="Задачи"
+                                    Height="50"
+                                    Margin="0"
+                                    Background="White"
+                                    Foreground="#009EE1"
+                                    BorderThickness="0"
+                                    FontSize="16"
+                                    Command="{Binding OpenTaskCategoriesWindowCommand}"/>
+
+
+                            <Button Content="Настройки"
+                                    Height="50"
+                                    Margin="0"
+                                    Background="White"
+                                    Foreground="#009EE1"
+                                    BorderThickness="0"
+                                    FontSize="16"
+                                    Command="{Binding OpenSettingsWindowCommand}"/>
                         </StackPanel>
-                    </Grid>
-                </StackPanel>
-            </Border>
-            
-            <Border Grid.Row="1" Grid.RowSpan="3"
-                    Background="Black"
-                    Opacity="0.5"
-                    Visibility="{Binding IsMenuOpen, Converter={x:Static converters:BoolToVisibilityConverter.Instance}}"
-            >
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseLeftButtonDown">
-                        <i:InvokeCommandAction Command="{Binding CloseMenuCommand}"/>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </Border>
-            
-            <Border Grid.Row="1" Grid.RowSpan="3"
-                    Background="White"
-                    Width="300"
-                    HorizontalAlignment="Right"
-                    Visibility="{Binding IsMenuOpen, Converter={x:Static converters:BoolToVisibilityConverter.Instance}}">
-                <Border.Effect>
-                    <DropShadowEffect ShadowDepth="5" BlurRadius="10" Opacity="0.3"/>
-                </Border.Effect>
-                <StackPanel Margin="0 20 0 0">
-                    <Button Content="Сотрудники"
-                            Height="50"
-                            Margin="0"
-                            Background="White"
-                            Foreground="#009EE1"
-                            BorderThickness="0"
-                            FontSize="16"
-                            Command="{Binding OpenEmployeeWindowCommand}"/>
-
-                    <Button Content="Обновить расписание"
-                            Height="50"
-                            Margin="0"
-                            Background="White"
-                            Foreground="#009EE1"
-                            BorderThickness="0"
-                            FontSize="16"
-                            Command="{Binding LoadMatchesCommand}"/>
-
-                    <Button Content="Настройки"
-                            Height="50"
-                            Margin="0"
-                            Background="White"
-                            Foreground="#009EE1"
-                            BorderThickness="0"
-                            FontSize="16"
-                            Command="{Binding OpenSettingsWindowCommand}"/>
-                </StackPanel>
-            </Border>
+                    </Border>
+                </Grid>
+            </ScrollViewer>
         </Grid>
-    </ScrollViewer>
+    </Border>
 </Window>

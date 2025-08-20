@@ -7,6 +7,8 @@ public class AppDbContext : DbContext
 {
     public DbSet<Employee> Employees { get; set; }
     public DbSet<WorkDay> WorkDays { get; set; }
+    public DbSet<DayTask> DayTasks { get; set; }
+    public DbSet<TaskCategory> TaskCategories { get; set; }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -27,6 +29,12 @@ public class AppDbContext : DbContext
             .HasOne(wde => wde.Employee)
             .WithMany(e => e.WorkDayEmployees)
             .HasForeignKey(wde => wde.EmployeeID);
+        
+        modelBuilder.Entity<DayTask>()
+            .HasOne(t => t.Category)
+            .WithMany(c => c.Tasks)
+            .HasForeignKey(t => t.TaskCategoryID)
+            .OnDelete(DeleteBehavior.SetNull);
     
         base.OnModelCreating(modelBuilder);
     }

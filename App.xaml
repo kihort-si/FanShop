@@ -9,5 +9,6 @@
         <converters:ZeroToVisibilityConverter x:Key="ZeroToVisibilityConverter"></converters:ZeroToVisibilityConverter>
         <converters:BoolToBackgroundConverter x:Key="BoolToBackgroundConverter"></converters:BoolToBackgroundConverter>
         <converters:DateToTodayColorConverter x:Key="DateToTodayColorConverter"></converters:DateToTodayColorConverter>
+        <converters:TimeSpanFormatConverter x:Key="TimeSpanFormatConverter"></converters:TimeSpanFormatConverter>
     </Application.Resources>
 </Application>

@@ -3,36 +3,67 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using FanShop.Models;
 using FanShop.ViewModels;
+using ComboBox = System.Windows.Controls.ComboBox;
 
-namespace FanShop.Windows;
-
-public partial class SelectEmployeeWindow : Window
+namespace FanShop.Windows
 {
-    public Employee? SelectedEmployee { get; private set; }
-
-    public string SelectedWorkDuration { get; set; } = "Целый день";
-    
-    public SelectEmployeeWindow()
+    public partial class SelectEmployeeWindow : Window
     {
-        InitializeComponent();
-    }
-    
-    private void ListBox_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
-    {
-        if (DataContext is EmployeeWindowViewModel viewModel && viewModel.SelectedEmployee != null)
+        public Employee? SelectedEmployee { get; private set; }
+        public string SelectedWorkDuration { get; set; } = "Целый день";
+        
+        public SelectEmployeeWindow()
         {
-            SelectedEmployee = viewModel.SelectedEmployee;
-            DialogResult = true;
+            InitializeComponent();
+        }
+        
+        private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                DragMove();
+            }
+        }
+        
+        private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            SelectEmployee();
+        }
+        
+        private void SelectButton_Click(object sender, RoutedEventArgs e)
+        {
+            SelectEmployee();
+        }
+        
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = false;
             Close();
         }
-    }
-    
-    private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        var comboBox = sender as ComboBox;
-        if (comboBox != null && comboBox.SelectedItem == null)
+        
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            comboBox.SelectedIndex = 0;
+            DialogResult = false;
+            Close();
+        }
+        
+        private void SelectEmployee()
+        {
+            if (DataContext is EmployeeWindowViewModel viewModel && viewModel.SelectedEmployee != null)
+            {
+                SelectedEmployee = viewModel.SelectedEmployee;
+                DialogResult = true;
+                Close();
+            }
+        }
+        
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var comboBox = sender as ComboBox;
+            if (comboBox != null && comboBox.SelectedItem == null)
+            {
+                comboBox.SelectedIndex = 0;
+            }
         }
     }
 }

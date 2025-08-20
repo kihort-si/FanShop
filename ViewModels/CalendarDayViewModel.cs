@@ -8,6 +8,8 @@ using FanShop.Models;
 using FanShop.Services;
 using FanShop.Windows;
 using Microsoft.EntityFrameworkCore;
+using Application = System.Windows.Application;
+using MessageBox = System.Windows.MessageBox;
 
 namespace FanShop.ViewModels
 {
@@ -72,6 +74,7 @@ namespace FanShop.ViewModels
         public ICommand AddEmployeesCommand { get; }
         public ICommand RemoveEmployeesCommand { get; }
         public ICommand PrintPassCommand { get; }
+        public ICommand DailyScheduleCommand { get; }
         public ICommand CloseWindowCommand { get; }
 
         private Employee? _selectedEmployee;
@@ -94,6 +97,7 @@ namespace FanShop.ViewModels
             AddEmployeesCommand = new RelayCommand(AddEmployees);
             RemoveEmployeesCommand = new RelayCommand(RemoveEmployees, CanEditEmployee);
             PrintPassCommand = new RelayCommand(PrintPass);
+            DailyScheduleCommand = new RelayCommand(DaylySchedule);
             CloseWindowCommand = new RelayCommand(CloseWindow);
         }
 
@@ -210,6 +214,16 @@ namespace FanShop.ViewModels
             }
 
             PassDocumentGenerator.CreateWordPass(Date, Employees);
+        }
+
+        private void DaylySchedule(object? parameter)
+        {
+            var dayTasksWindow = new DayTasksWindow
+            {
+                DataContext = new DayTasksWindowViewModel(Date)
+            };
+            dayTasksWindow.Owner = Application.Current.MainWindow;
+            dayTasksWindow.ShowDialog();
         }
 
         private void CloseWindow(object? parameter)
