@@ -10,7 +10,7 @@
         Title="График задач на день" Height="600" Width="1000" 
         WindowStyle="None" ResizeMode="NoResize" 
         WindowStartupLocation="CenterScreen" Icon="/icon.ico" 
-        ShowInTaskbar="False" BorderThickness="0">
+        ShowInTaskbar="False" BorderThickness="0" AllowsTransparency="True" Background="Transparent">
     
     <Window.Resources>
         <Style x:Key="ActionButton" TargetType="Button">
@@ -70,9 +70,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" CornerRadius="8,8,0,0" MouseLeftButtonDown="Border_MouseLeftButtonDown">
@@ -83,7 +81,7 @@
                 </LinearGradientBrush>
             </Border.Background>
             <Grid Height="40">
-                <TextBlock Text="ГРАФИК ЗАДАЧ" FontSize="14" FontWeight="Bold" Foreground="White"
+                <TextBlock Text="ТАЙМИНГ" FontSize="14" FontWeight="Bold" Foreground="White"
                            VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <Button Content="✕" HorizontalAlignment="Right" Width="40" Height="40"
                         Background="Transparent" Foreground="White" BorderThickness="0"
@@ -109,116 +107,132 @@
                 </Button>
             </Grid>
         </Border>
+        
+        <Border Grid.Row="1" Background="White" CornerRadius="0, 0, 8, 8" BorderThickness="3, 0, 3, 3">
+            <Border.BorderBrush>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#009EE1" Offset="0.0"/>
+                    <GradientStop Color="#0077B5" Offset="1.0"/>
+                </LinearGradientBrush>
+            </Border.BorderBrush>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <Border Grid.Row="0" Background="#F2F9FF" Padding="15">
+                    <TextBlock FontSize="18" FontWeight="SemiBold" Foreground="#333333"
+                               HorizontalAlignment="Center">
+                        <Run Text="Тайминг"/>
+                        <Run Text="{Binding Date, Converter={x:Static local:RussianDateConverter.Instance}}"/>
+                    </TextBlock>
+                </Border>
 
-        <Border Grid.Row="1" Background="#F2F9FF" Padding="15">
-            <TextBlock FontSize="18" FontWeight="SemiBold" Foreground="#333333"
-                       HorizontalAlignment="Center">
-                <Run Text="График на"/>
-                <Run Text="{Binding Date, Converter={x:Static local:RussianDateConverter.Instance}}"/>
-            </TextBlock>
-        </Border>
+                <DataGrid Grid.Row="1" ItemsSource="{Binding DayTasks}"
+                          SelectedItem="{Binding SelectedTask}"
+                          AutoGenerateColumns="False" CanUserAddRows="False"
+                          HeadersVisibility="Column" GridLinesVisibility="Horizontal"
+                          Margin="15" CanUserDeleteRows="False" Background="White"
+                          ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
+                          CellStyle="{StaticResource DataGridCellStyle}"
+                          RowStyle="{StaticResource DataGridRowStyle}"
+                          VerticalGridLinesBrush="Transparent"
+                          HorizontalGridLinesBrush="#E0E0E0"
+                          BorderThickness="1" BorderBrush="#E0E0E0"
+                          RowHeaderWidth="0"
+                          CellEditEnding="DataGrid_CellEditEnding"
+                          RowEditEnding="DataGrid_RowEditEnding"
+                          SelectionMode="Single"
+                          SelectionUnit="FullRow">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Начало" Width="70">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding StartTimeText}" Margin="5" 
+                                               MouseLeftButtonDown="TimeColumn_MouseLeftButtonDown"
+                                               Cursor="Hand"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                                            
+                        <DataGridTemplateColumn Header="Конец" Width="70">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding EndTimeText}" Margin="5" 
+                                               MouseLeftButtonDown="TimeColumn_MouseLeftButtonDown"
+                                               Cursor="Hand"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
 
-        <DataGrid Grid.Row="2" ItemsSource="{Binding DayTasks}"
-                  SelectedItem="{Binding SelectedTask}"
-                  AutoGenerateColumns="False" CanUserAddRows="False"
-                  HeadersVisibility="Column" GridLinesVisibility="Horizontal"
-                  Margin="15" CanUserDeleteRows="False" Background="White"
-                  ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
-                  CellStyle="{StaticResource DataGridCellStyle}"
-                  RowStyle="{StaticResource DataGridRowStyle}"
-                  VerticalGridLinesBrush="Transparent"
-                  HorizontalGridLinesBrush="#E0E0E0"
-                  BorderThickness="1" BorderBrush="#E0E0E0"
-                  RowHeaderWidth="0"
-                  CellEditEnding="DataGrid_CellEditEnding"
-                  RowEditEnding="DataGrid_RowEditEnding"
-                  SelectionMode="Single"
-                  SelectionUnit="FullRow">
-            <DataGrid.Columns>
-                <DataGridTemplateColumn Header="Начало" Width="70">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding StartTimeText}" Margin="5" 
-                                       MouseLeftButtonDown="TimeColumn_MouseLeftButtonDown"
-                                       Cursor="Hand"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                                    
-                <DataGridTemplateColumn Header="Конец" Width="70">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding EndTimeText}" Margin="5" 
-                                       MouseLeftButtonDown="TimeColumn_MouseLeftButtonDown"
-                                       Cursor="Hand"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Название" Width="*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Title}" Margin="5"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Margin="0"
+                                             KeyDown="TextBox_KeyDown"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+                        </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="Название" Width="*">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Title}" Margin="5"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                    <DataGridTemplateColumn.CellEditingTemplate>
-                        <DataTemplate>
-                            <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Margin="0"
-                                     KeyDown="TextBox_KeyDown"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellEditingTemplate>
-                </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Описание" Width="200">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Comment}" Margin="5" TextWrapping="Wrap"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding Comment, UpdateSourceTrigger=PropertyChanged}" Margin="0"
+                                             KeyDown="TextBox_KeyDown"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+                        </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="Описание" Width="200">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Comment}" Margin="5" TextWrapping="Wrap"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                    <DataGridTemplateColumn.CellEditingTemplate>
-                        <DataTemplate>
-                            <TextBox Text="{Binding Comment, UpdateSourceTrigger=PropertyChanged}" Margin="0"
-                                     KeyDown="TextBox_KeyDown"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellEditingTemplate>
-                </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Категория" Width="150">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border Background="{Binding Category.Color}" CornerRadius="4" Padding="6,3" Margin="2"
+                                            Visibility="{Binding Category, Converter={x:Static local:NullToVisibilityConverter.Instance}}">
+                                        <TextBlock Text="{Binding Category.Name}" Foreground="White" FontWeight="SemiBold" TextAlignment="Center"/>
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate>
+                                    <ComboBox ItemsSource="{Binding DataContext.TaskCategories, RelativeSource={RelativeSource AncestorType=Window}}"
+                                              SelectedItem="{Binding Category, UpdateSourceTrigger=PropertyChanged}"
+                                              DisplayMemberPath="Name" Margin="0"
+                                              DropDownClosed="ComboBox_DropDownClosed"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+                        </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="Категория" Width="150">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Border Background="{Binding Category.Color}" CornerRadius="4" Padding="6,3" Margin="2"
-                                    Visibility="{Binding Category, Converter={x:Static local:NullToVisibilityConverter.Instance}}">
-                                <TextBlock Text="{Binding Category.Name}" Foreground="White" FontWeight="SemiBold" TextAlignment="Center"/>
-                            </Border>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                    <DataGridTemplateColumn.CellEditingTemplate>
-                        <DataTemplate>
-                            <ComboBox ItemsSource="{Binding DataContext.TaskCategories, RelativeSource={RelativeSource AncestorType=Window}}"
-                                      SelectedItem="{Binding Category, UpdateSourceTrigger=PropertyChanged}"
-                                      DisplayMemberPath="Name" Margin="0"
-                                      DropDownClosed="ComboBox_DropDownClosed"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellEditingTemplate>
-                </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Время" Width="120" IsReadOnly="True">
+                            <DataGridTextColumn.Binding>
+                                <Binding Path="Duration" Converter="{x:Static converters:TimeSpanFormatConverter.Instance}"/>
+                            </DataGridTextColumn.Binding>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
 
-                <DataGridTextColumn Header="Время" Width="120" IsReadOnly="True">
-                    <DataGridTextColumn.Binding>
-                        <Binding Path="Duration" Converter="{x:Static converters:TimeSpanFormatConverter.Instance}"/>
-                    </DataGridTextColumn.Binding>
-                </DataGridTextColumn>
-            </DataGrid.Columns>
-        </DataGrid>
-
-        <Border Grid.Row="3" Background="#F5F5F5" CornerRadius="0,0,8,8" Padding="10">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Content="Добавить" Style="{StaticResource ActionButton}"
-                        Command="{Binding AddTaskCommand}" Background="#009EE1"/>
-                <Button Content="Удалить" Style="{StaticResource ActionButton}"
-                        Command="{Binding RemoveTaskCommand}" Background="#EB0004"/>
-                <Button Content="Закрыть" Style="{StaticResource ActionButton}"
-                        Command="{Binding CloseWindowCommand}" Background="#666666"/>
-            </StackPanel>
+                <Border Grid.Row="2" Background="#F5F5F5" CornerRadius="0,0,8,8" Padding="10">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="Добавить" Style="{StaticResource ActionButton}"
+                                Command="{Binding AddTaskCommand}" Background="#009EE1"/>
+                        <Button Content="Удалить" Style="{StaticResource ActionButton}"
+                                Command="{Binding RemoveTaskCommand}" Background="#EB0004"/>
+                        <Button Content="Закрыть" Style="{StaticResource ActionButton}"
+                                Command="{Binding CloseWindowCommand}" Background="#666666"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
         </Border>
     </Grid>
 </Window>

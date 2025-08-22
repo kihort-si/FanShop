@@ -10,5 +10,6 @@
         <converters:BoolToBackgroundConverter x:Key="BoolToBackgroundConverter"></converters:BoolToBackgroundConverter>
         <converters:DateToTodayColorConverter x:Key="DateToTodayColorConverter"></converters:DateToTodayColorConverter>
         <converters:TimeSpanFormatConverter x:Key="TimeSpanFormatConverter"></converters:TimeSpanFormatConverter>
+        <converters:ShiftToRussian x:Key="ShiftToRussian"></converters:ShiftToRussian>
     </Application.Resources>
 </Application>

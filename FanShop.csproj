@@ -40,6 +40,8 @@
       <Content Include="icon.ico">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+      <None Remove="Resources\fullsize_icon.png" />
+      <None Remove="Resources\collapse_icon.png" />
     </ItemGroup>
 
     <ItemGroup>

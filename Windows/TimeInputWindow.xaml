@@ -9,10 +9,7 @@
         BorderThickness="0"
         ShowInTaskbar="False">
         
-    <Border Background="White" CornerRadius="8" Margin="5">
-        <Border.Effect>
-            <DropShadowEffect BlurRadius="10" ShadowDepth="1" Direction="270" Color="#BBBBBB" Opacity="0.6"/>
-        </Border.Effect>
+    <Border Background="Transparent" CornerRadius="8">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -54,90 +51,106 @@
                 </Grid>
             </Border>
             
-            <Grid Grid.Row="1" Margin="20">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
+            <Border Grid.Row="1" CornerRadius="0, 0, 8, 8" BorderThickness="3, 0, 3, 3" Background="White">
+                <Border.BorderBrush>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#009EE1" Offset="0.0"/>
+                        <GradientStop Color="#0077B5" Offset="1.0"/>
+                    </LinearGradientBrush>
+                </Border.BorderBrush>
                 
-                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" 
-                            VerticalAlignment="Center">
-                    <Border Background="#F8F9FA" BorderBrush="#E0E0E0" 
-                            BorderThickness="1" CornerRadius="4" Padding="8,4" Width="80" Margin="0,0,15,0">
-                        <StackPanel>
-                            <TextBlock Text="Часы" FontSize="12" Foreground="#666666" Margin="0,0,0,4"/>
-                            <TextBox x:Name="HoursTextBox" 
-                                     BorderThickness="0" Background="Transparent"
-                                     FontSize="18" FontWeight="Medium" TextAlignment="Center"
-                                     PreviewTextInput="NumberTextBox_PreviewTextInput"
-                                     MaxLength="2"/>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <Grid Grid.Row="0" Margin="20">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" 
+                                    VerticalAlignment="Center" Margin="0, 0, 0, 15">
+                            <Border Background="#F8F9FA" BorderBrush="#E0E0E0" 
+                                    BorderThickness="1" CornerRadius="4" Padding="8,4" Width="80" Margin="0,0,15,0">
+                                <StackPanel>
+                                    <TextBlock Text="Часы" FontSize="12" Foreground="#666666" Margin="0,0,0,4"/>
+                                    <TextBox x:Name="HoursTextBox" 
+                                             BorderThickness="0" Background="Transparent"
+                                             FontSize="18" FontWeight="Medium" TextAlignment="Center"
+                                             PreviewTextInput="NumberTextBox_PreviewTextInput"
+                                             MaxLength="2"/>
+                                </StackPanel>
+                            </Border>
+                            
+                            <TextBlock Text=":" FontSize="24" FontWeight="Bold" Foreground="#333333" 
+                                       VerticalAlignment="Center" Margin="0,0,0,6"/>
+                            
+                            <Border Background="#F8F9FA" BorderBrush="#E0E0E0" 
+                                    BorderThickness="1" CornerRadius="4" Padding="8,4" Width="80" Margin="15,0,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="Минуты" FontSize="12" Foreground="#666666" Margin="0,0,0,4"/>
+                                    <TextBox x:Name="MinutesTextBox"
+                                             BorderThickness="0" Background="Transparent"
+                                             FontSize="18" FontWeight="Medium" TextAlignment="Center"
+                                             PreviewTextInput="NumberTextBox_PreviewTextInput"
+                                             MaxLength="2"/>
+                                </StackPanel>
+                            </Border>
                         </StackPanel>
-                    </Border>
-                    
-                    <TextBlock Text=":" FontSize="24" FontWeight="Bold" Foreground="#333333" 
-                               VerticalAlignment="Center" Margin="0,0,0,6"/>
-                    
-                    <Border Background="#F8F9FA" BorderBrush="#E0E0E0" 
-                            BorderThickness="1" CornerRadius="4" Padding="8,4" Width="80" Margin="15,0,0,0">
-                        <StackPanel>
-                            <TextBlock Text="Минуты" FontSize="12" Foreground="#666666" Margin="0,0,0,4"/>
-                            <TextBox x:Name="MinutesTextBox"
-                                     BorderThickness="0" Background="Transparent"
-                                     FontSize="18" FontWeight="Medium" TextAlignment="Center"
-                                     PreviewTextInput="NumberTextBox_PreviewTextInput"
-                                     MaxLength="2"/>
+                        
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+                            <Button Content="Подтвердить" Width="120" Height="36" 
+                                    Background="#009EE1" Foreground="White" 
+                                    BorderThickness="0" Margin="0,0,10,0" Cursor="Hand"
+                                    Click="OkButton_Click" IsDefault="True">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" 
+                                                CornerRadius="4" Padding="12,6">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Button.Template>
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Opacity" Value="0.9"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                            
+                            <Button Content="Отмена" Width="120" Height="36"
+                                    Background="#666666" Foreground="White"
+                                    BorderThickness="0" Margin="10,0,0,0" Cursor="Hand"
+                                    Click="CancelButton_Click" IsCancel="True">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" 
+                                                CornerRadius="4" Padding="12,6">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Button.Template>
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Opacity" Value="0.9"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
                         </StackPanel>
-                    </Border>
-                </StackPanel>
-                
-                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
-                    <Button Content="Подтвердить" Width="120" Height="36" 
-                            Background="#009EE1" Foreground="White" 
-                            BorderThickness="0" Margin="0,0,10,0" Cursor="Hand"
-                            Click="OkButton_Click" IsDefault="True">
-                        <Button.Template>
-                            <ControlTemplate TargetType="Button">
-                                <Border Background="{TemplateBinding Background}" 
-                                        CornerRadius="4" Padding="12,6">
-                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                            </ControlTemplate>
-                        </Button.Template>
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Opacity" Value="0.9"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                    
-                    <Button Content="Отмена" Width="120" Height="36"
-                            Background="#666666" Foreground="White"
-                            BorderThickness="0" Margin="10,0,0,0" Cursor="Hand"
-                            Click="CancelButton_Click" IsCancel="True">
-                        <Button.Template>
-                            <ControlTemplate TargetType="Button">
-                                <Border Background="{TemplateBinding Background}" 
-                                        CornerRadius="4" Padding="12,6">
-                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                            </ControlTemplate>
-                        </Button.Template>
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Opacity" Value="0.9"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                </StackPanel>
-            </Grid>
+                    </Grid>
+                </Grid>
+            </Border>
         </Grid>
     </Border>
 </Window>

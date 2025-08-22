@@ -26,6 +26,7 @@
             <TextBlock Text="{Binding Date.Day}"
                        FontSize="12"
                        FontWeight="Bold"
+                       FontFamily="Open Sans"
                        HorizontalAlignment="Left"
                        Margin="0,0,0,0">
                 <TextBlock.Foreground>
@@ -42,6 +43,7 @@
                                 CornerRadius="3">
                             <TextBlock FontSize="8"
                                        FontWeight="SemiBold"
+                                       FontFamily="Open Sans"
                                        Text="{Binding}" />
                         </Border>
                     </DataTemplate>
@@ -55,7 +57,9 @@
                        HorizontalAlignment="Center"
                        Visibility="{Binding IsAdditionalEmployeesTextVisible, Converter={StaticResource BoolToVisibilityConverter}}"
                        FontWeight="SemiBold"
-                       FontSize="8"></TextBlock>
+                       FontSize="8"
+                       FontFamily="Open Sans">
+            </TextBlock>
 
             <StackPanel Grid.Row="1" Orientation="Vertical"
                         Margin="0,8,0,0"
@@ -66,11 +70,13 @@
                 </Image>
                 <TextBlock Text="{Binding Match.TeamName}"
                            FontWeight="Bold"
+                           FontFamily="Open Sans"
                            Margin="0,0,0,0"
                            HorizontalAlignment="Center">
                 </TextBlock>
                 <TextBlock Text="{Binding Match.SartTime}"
                            FontWeight="SemiBold"
+                           FontFamily="Open Sans"
                            Margin="0,0,0,0"
                            HorizontalAlignment="Center">
                 </TextBlock>

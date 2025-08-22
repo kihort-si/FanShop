@@ -96,7 +96,7 @@ namespace FanShop.ViewModels
             ShowDayDetailsCommand = new RelayCommand(ShowDayDetails);
             AddEmployeesCommand = new RelayCommand(AddEmployees);
             RemoveEmployeesCommand = new RelayCommand(RemoveEmployees, CanEditEmployee);
-            PrintPassCommand = new RelayCommand(PrintPass);
+            PrintPassCommand = new RelayCommand(PrintPass, CanPrintPass);
             DailyScheduleCommand = new RelayCommand(DaylySchedule);
             CloseWindowCommand = new RelayCommand(CloseWindow);
         }
@@ -203,6 +203,11 @@ namespace FanShop.ViewModels
         private bool CanEditEmployee(object? parameter)
         {
             return SelectedEmployee != null;
+        }
+        
+        private bool CanPrintPass(object? parameter)
+        {
+            return Employees.Count > 0;
         }
 
         private void PrintPass(object? parameter)

@@ -55,7 +55,7 @@ namespace FanShop.Services
             var total = workDayEmployees
                 .Sum(wde => wde.WorkDuration == "Целый день" ? (double)settings.DailySalary : (double)settings.DailySalary / 2);
         
-            return $"{total:N0} руб.";
+            return $"{total:N0}₽";
         }
 
         public ObservableCollection<EmployeeStatistic> GetEmployeeStatistics(int year, int month)
@@ -83,7 +83,7 @@ namespace FanShop.Services
                 {
                     EmployeeName = x.EmployeeName,
                     WorkDaysCount = x.WorkDaysCount,
-                    TotalSalary = $"{x.SalaryAmount:N0} руб."
+                    TotalSalary = $"{x.SalaryAmount:N0}₽"
                 })
                 .ToList();
         

@@ -10,7 +10,7 @@
         WindowStyle="None" ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen" 
         AllowsTransparency="True"
-        Background="White"
+        Background="Transparent"
         BorderThickness="0"
         ShowInTaskbar="False">
         
@@ -60,100 +60,115 @@
             </Grid>
         </Border>
         
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="25,20">
-                <TextBlock Text="Ответственный:" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
-                <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" 
-                        CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
-                    <TextBox Text="{Binding ResponsiblePerson, UpdateSourceTrigger=PropertyChanged}"
-                             BorderThickness="0" Background="Transparent" FontSize="14"/>
-                </Border>
+        <Border Grid.Row="1" CornerRadius="0, 0, 8, 8" BorderThickness="3, 0, 3, 3" Background="White">
+            <Border.BorderBrush>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#009EE1" Offset="0.0"/>
+                    <GradientStop Color="#0077B5" Offset="1.0"/>
+                </LinearGradientBrush>
+            </Border.BorderBrush>
+            
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                </Grid.RowDefinitions>
+                <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="25,20">
+                        <TextBlock Text="Ответственный:" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
+                        <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" 
+                                CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
+                            <TextBox Text="{Binding ResponsiblePerson, UpdateSourceTrigger=PropertyChanged}"
+                                     BorderThickness="0" Background="Transparent" FontSize="14"/>
+                        </Border>
+                        
+                        <TextBlock Text="Номер телефона:" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
+                        <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" 
+                                CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
+                            <TextBox Text="{Binding ResponsiblePhoneNumber, UpdateSourceTrigger=PropertyChanged}"
+                                     BorderThickness="0" Background="Transparent" FontSize="14"/>
+                        </Border>
+                        
+                        <TextBlock Text="Должность:" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
+                        <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" 
+                                CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
+                            <TextBox Text="{Binding ResponsiblePosition, UpdateSourceTrigger=PropertyChanged}"
+                                     BorderThickness="0" Background="Transparent" FontSize="14"/>
+                        </Border>
+                        
+                        <TextBlock Text="Цель визита:" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
+                        <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" 
+                                CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
+                            <TextBox Text="{Binding VisitGoal, UpdateSourceTrigger=PropertyChanged}"
+                                     BorderThickness="0" Background="Transparent" FontSize="14"/>
+                        </Border>
+                        
+                        <TextBlock Text="Начальник (ООО «Зенит-Трейд»):" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
+                        <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" 
+                                CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
+                            <TextBox Text="{Binding Head, UpdateSourceTrigger=PropertyChanged}"
+                                     BorderThickness="0" Background="Transparent" FontSize="14"/>
+                        </Border>
+                        
+                        <TextBlock Text="Заработная плата за день:" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
+                        <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" 
+                                CornerRadius="4" Padding="10,8" Margin="0,0,0,10">
+                            <TextBox Text="{Binding DailySalary, UpdateSourceTrigger=PropertyChanged}"
+                                     BorderThickness="0" Background="Transparent" FontSize="14"/>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
                 
-                <TextBlock Text="Номер телефона:" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
-                <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" 
-                        CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
-                    <TextBox Text="{Binding ResponsiblePhoneNumber, UpdateSourceTrigger=PropertyChanged}"
-                             BorderThickness="0" Background="Transparent" FontSize="14"/>
-                </Border>
-                
-                <TextBlock Text="Должность:" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
-                <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" 
-                        CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
-                    <TextBox Text="{Binding ResponsiblePosition, UpdateSourceTrigger=PropertyChanged}"
-                             BorderThickness="0" Background="Transparent" FontSize="14"/>
-                </Border>
-                
-                <TextBlock Text="Цель визита:" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
-                <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" 
-                        CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
-                    <TextBox Text="{Binding VisitGoal, UpdateSourceTrigger=PropertyChanged}"
-                             BorderThickness="0" Background="Transparent" FontSize="14"/>
-                </Border>
-                
-                <TextBlock Text="Начальник (ООО «Зенит-Трейд»):" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
-                <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" 
-                        CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
-                    <TextBox Text="{Binding Head, UpdateSourceTrigger=PropertyChanged}"
-                             BorderThickness="0" Background="Transparent" FontSize="14"/>
-                </Border>
-                
-                <TextBlock Text="Заработная плата за день:" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
-                <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" 
-                        CornerRadius="4" Padding="10,8" Margin="0,0,0,10">
-                    <TextBox Text="{Binding DailySalary, UpdateSourceTrigger=PropertyChanged}"
-                             BorderThickness="0" Background="Transparent" FontSize="14"/>
-                </Border>
-            </StackPanel>
-        </ScrollViewer>
-        
-        <Border Grid.Row="2" Background="#F5F5F5" CornerRadius="0,0,8,8" Padding="15">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Content="Сохранить" Width="120" Height="36"
-                        Background="#009EE1" Foreground="White"
-                        BorderThickness="0" Margin="0,0,15,0" Cursor="Hand"
-                        Command="{Binding SaveCommand}">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Border Background="{TemplateBinding Background}"
-                                    CornerRadius="4" Padding="12,6">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                        </ControlTemplate>
-                    </Button.Template>
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Opacity" Value="0.9"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
+                <Border Grid.Row="1" Background="#F5F5F5" CornerRadius="0,0,8,8" Padding="15">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="Сохранить" Width="120" Height="36"
+                                Background="#009EE1" Foreground="White"
+                                BorderThickness="0" Margin="0,0,15,0" Cursor="Hand"
+                                Command="{Binding SaveCommand}">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}"
+                                            CornerRadius="4" Padding="12,6">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Opacity" Value="0.9"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
 
-                <Button Content="Отмена" Width="120" Height="36"
-                        Background="#666666" Foreground="White"
-                        BorderThickness="0" Margin="0" Cursor="Hand"
-                        Command="{Binding CancelCommand}">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Border Background="{TemplateBinding Background}"
-                                    CornerRadius="4" Padding="12,6">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                        </ControlTemplate>
-                    </Button.Template>
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Opacity" Value="0.9"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
-            </StackPanel>
+                        <Button Content="Отмена" Width="120" Height="36"
+                                Background="#666666" Foreground="White"
+                                BorderThickness="0" Margin="0" Cursor="Hand"
+                                Command="{Binding CancelCommand}">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}"
+                                            CornerRadius="4" Padding="12,6">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Opacity" Value="0.9"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </Grid>
         </Border>
     </Grid>
 </Window>
