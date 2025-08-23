@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:FanShop"
              xmlns:converters="clr-namespace:FanShop.Converters"
-             StartupUri="MainWindow.xaml">
+             Startup="Application_Startup">
     <Application.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"></converters:BoolToVisibilityConverter>
         <converters:ZeroToVisibilityConverter x:Key="ZeroToVisibilityConverter"></converters:ZeroToVisibilityConverter>

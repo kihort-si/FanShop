@@ -130,7 +130,7 @@ namespace FanShop.ViewModels
             OnPropertyChanged(nameof(FormattedMonthTitle));
         }
 
-        private async Task LoadMatchesFromFirebase()
+        public async Task LoadMatchesFromFirebase()
         {
             var matches = await _firebaseService.GetMatchesAsync();
 
@@ -154,7 +154,7 @@ namespace FanShop.ViewModels
         }
 
 
-        private async Task GenerateCalendar(int year, int month)
+        public async Task GenerateCalendar(int year, int month)
         {
             CalendarDays.Clear();
 

@@ -42,6 +42,14 @@
       </Content>
       <None Remove="Resources\fullsize_icon.png" />
       <None Remove="Resources\collapse_icon.png" />
+      <None Remove="Resources\fanshop_logo_blue_and_light_blue.png" />
+      <Content Include="Resources\fanshop_logo_blue_and_light_blue.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Resources\zenit_arena.png" />
+      <Content Include="Resources\zenit_arena.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
     <ItemGroup>
