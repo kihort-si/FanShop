@@ -176,7 +176,7 @@
                         <Button Content="Пропуск" Style="{StaticResource ActionButton}"
                                 Command="{Binding PrintPassCommand}" Background="#009EE1" IsEnabled="{Binding CanPrintPass}"/>
                         <Button Content="Тайминг" Style="{StaticResource ActionButton}"
-                                Command="{Binding DailyScheduleCommand}" Background="#4CAF50"/>
+                                Command="{Binding DailyScheduleCommand}" Background="#174D7B"/>
                         <Button Content="Закрыть" Style="{StaticResource ActionButton}"
                                 Command="{Binding CloseWindowCommand}" Background="#666666"/>
                     </StackPanel>

@@ -43,6 +43,11 @@ namespace FanShop.Models
             get => new TimeSpan(EndHour, EndMinute, 0);
             set
             {
+                if (new TimeSpan(EndHour, EndMinute, 0) < StartTime)
+                {
+                    Date = Date.AddDays(1);
+                    OnPropertyChanged(nameof(Date));
+                }
                 EndHour = value.Hours;
                 EndMinute = value.Minutes;
                 OnPropertyChanged();
@@ -51,7 +56,7 @@ namespace FanShop.Models
         }
     
         [NotMapped]
-        public TimeSpan Duration => EndTime - StartTime;
+        public TimeSpan Duration => EndTime > StartTime ? EndTime - StartTime : (EndTime + TimeSpan.FromDays(1)) - StartTime;
     
         [NotMapped]
         public string StartTimeText

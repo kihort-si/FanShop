@@ -158,7 +158,7 @@
                            </Button>
 
                            <Button Content="Изменить" Width="100" Height="36"
-                                   Background="#4CAF50" Foreground="White" Margin="6,0"
+                                   Background="#174D7B" Foreground="White" Margin="6,0"
                                    BorderThickness="0" Cursor="Hand"
                                    Command="{Binding EditCategoryCommand}"
                                    IsEnabled="{Binding CanEditCategory}">
@@ -212,7 +212,7 @@
                            </Button>
                            
                            <Button Content="Аналитика" Width="100" Height="36"
-                                   Background="#FF9800" Foreground="White" Margin="6,0"
+                                   Background="#174D7B" Foreground="White" Margin="6,0"
                                    BorderThickness="0" Cursor="Hand"
                                    Command="{Binding OpenAnalyticsCommand}">
                                <Button.Template>
