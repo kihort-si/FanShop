@@ -109,6 +109,8 @@ namespace FanShop.ViewModels
                 {
                     DataContext = this
                 };
+                dayDetailsWindow.Height = Application.Current.MainWindow.Height;
+                dayDetailsWindow.Width = Application.Current.MainWindow.Width;
                 dayDetailsWindow.Owner = Application.Current.MainWindow;
                 dayDetailsWindow.ShowInTaskbar = false;
                 dayDetailsWindow.ShowDialog();
@@ -131,6 +133,8 @@ namespace FanShop.ViewModels
                 DataContext = employeeWindowViewModel
             };
             
+            selectEmployeeWindow.Height = new DayDetailsWindow().Height;
+            selectEmployeeWindow.Width = new DayDetailsWindow().Width;
             selectEmployeeWindow.Owner = Application.Current.MainWindow;
             selectEmployeeWindow.ShowInTaskbar = false;
 

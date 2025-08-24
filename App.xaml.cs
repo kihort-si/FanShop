@@ -54,6 +54,7 @@ public partial class App : Application
             _splashScreen.ViewModel.Stop();
     
             var mainWindow = new MainWindow { DataContext = _mainViewModel };
+            Application.Current.MainWindow = mainWindow;
             mainWindow.Show();
         }
         finally

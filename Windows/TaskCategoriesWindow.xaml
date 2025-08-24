@@ -230,7 +230,7 @@
                        </Border>
            
                        <Border Grid.RowSpan="4" Background="#80000000"
-                               Visibility="{Binding IsEditOverlayVisible, Converter={x:Static local:BooleanToVisibilityConverter.Instance}}">
+                               Visibility="{Binding IsEditOverlayVisible, Converter={x:Static local:BooleanToVisibilityConverter.Instance}}" CornerRadius="8">
                            <Border Background="Transparent" CornerRadius="8" MaxWidth="500" MaxHeight="500">
                                <Grid>
                                    <Grid.RowDefinitions>
