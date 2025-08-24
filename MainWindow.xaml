@@ -461,7 +461,7 @@
                                                                 <Grid.ColumnDefinitions>
                                                                     <ColumnDefinition Width="2*"/>
                                                                     <ColumnDefinition Width="Auto"/>
-                                                                    <ColumnDefinition Width="Auto"/>
+                                                                    <ColumnDefinition Width="65"/>
                                                                 </Grid.ColumnDefinitions>
                                                                 
                                                                 <StackPanel Grid.Column="0" Orientation="Horizontal">
@@ -476,7 +476,7 @@
                                                                 </StackPanel>
                                                                 
                                                                 <Border Grid.Column="1" Background="#F0F7FF" CornerRadius="15" 
-                                                                        Padding="8,3" Margin="5,0,15,0" HorizontalAlignment="Center">
+                                                                        Padding="8,3" Margin="5,0,0,0" HorizontalAlignment="Center">
                                                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
                                                                         <TextBlock Text="{Binding WorkDaysCount, Converter={x:Static converters:ShiftToRussian.Instance}}" FontSize="13" 
                                                                                    Foreground="#0077B5" FontWeight="SemiBold" TextAlignment="Center" HorizontalAlignment="Center"/>
@@ -485,7 +485,7 @@
                                                                 
                                                                 <TextBlock Grid.Column="2" Text="{Binding TotalSalary}" 
                                                                            FontSize="14" FontWeight="Bold" Foreground="#333333" 
-                                                                           VerticalAlignment="Center"/>
+                                                                           VerticalAlignment="Center" TextAlignment="Center"/>
                                                             </Grid>
                                                         </Border>
                                                     </DataTemplate>

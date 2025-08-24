@@ -56,11 +56,9 @@ public class SplashScreenViewModel : INotifyPropertyChanged
 
         try
         {
-            PickNewLoadingText();
-
             while (!_cts.Token.IsCancellationRequested)
             {
-                await Task.Delay(1000, _cts.Token);
+                await Task.Delay(1500, _cts.Token);
                 PickNewLoadingText();
             }
         }
@@ -74,14 +72,14 @@ public class SplashScreenViewModel : INotifyPropertyChanged
         _cts?.Cancel();
     }
 
-    private void PickNewLoadingText()
+    private string PickNewLoadingText()
     {
-        while (usedLoadingTexts.Count < loadingTexts.Length)
+        for (int i = 0; i < 2; i++)
         {
             var available = loadingTexts.Except(usedLoadingTexts).ToList();
 
             if (available.Count == 0)
-                return;
+                return "Готово!";
 
             string newText = available[random.Next(available.Count)];
 
@@ -92,7 +90,9 @@ public class SplashScreenViewModel : INotifyPropertyChanged
             {
                 LoadingText = curLoadingText;
             });
+            return curLoadingText;
         }
+        return "Готово!";
     }
 
     private async void OnLoaded()
@@ -108,6 +108,12 @@ public class SplashScreenViewModel : INotifyPropertyChanged
             {
                 percent = Math.Max(0, Math.Min(100, percent));
                 ProgressWidth = 360 * percent / 100;
+                if (percent == 100)
+                {
+                    _cts.Cancel();
+                    _loadingText = "Готово!";
+                    OnPropertyChanged(nameof(LoadingText));
+                }
             });
         }
         catch (Exception ex)

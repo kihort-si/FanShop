@@ -16,9 +16,9 @@ namespace FanShop.ViewModels
     public class CalendarDayViewModel : BaseViewModel
     {
         public DateTime Date { get; set; }
-        private ObservableCollection<Employee> _employees;
-
-        public ObservableCollection<Employee> Employees
+        private ObservableCollection<EmployeeWorkInfo> _employees;
+        
+        public ObservableCollection<EmployeeWorkInfo> Employees
         {
             get
             {
@@ -29,15 +29,34 @@ namespace FanShop.ViewModels
                         .Include(w => w.WorkDayEmployees)
                         .ThenInclude(wde => wde.Employee)
                         .FirstOrDefault(w => w.Date == Date);
-
+        
                     _employees = workDay != null
-                        ? new ObservableCollection<Employee>(workDay.WorkDayEmployees.Select(wde => wde.Employee))
-                        : new ObservableCollection<Employee>();
+                        ? new ObservableCollection<EmployeeWorkInfo>(
+                            workDay.WorkDayEmployees.Select(wde => new EmployeeWorkInfo 
+                            { 
+                                Employee = wde.Employee,
+                                WorkDuration = wde.WorkDuration
+                            }))
+                        : new ObservableCollection<EmployeeWorkInfo>();
                 }
-
+        
                 return _employees;
             }
             set => SetProperty(ref _employees, value);
+        }
+        
+        private EmployeeWorkInfo _selectedEmployee;
+        
+        public EmployeeWorkInfo SelectedEmployee
+        {
+            get => _selectedEmployee;
+            set
+            {
+                if (SetProperty(ref _selectedEmployee, value))
+                {
+                    (RemoveEmployeesCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                }
+            }
         }
 
         private MatchInfo _match;
@@ -84,21 +103,7 @@ namespace FanShop.ViewModels
         public ICommand PrintPassCommand { get; }
         public ICommand DailyScheduleCommand { get; }
         public ICommand CloseWindowCommand { get; }
-
-        private Employee? _selectedEmployee;
-
-        public Employee? SelectedEmployee
-        {
-            get => _selectedEmployee;
-            set
-            {
-                if (SetProperty(ref _selectedEmployee, value))
-                {
-                    (RemoveEmployeesCommand as RelayCommand)?.RaiseCanExecuteChanged();
-                }
-            }
-        }
-
+        
         public CalendarDayViewModel()
         {
             ShowDayDetailsCommand = new RelayCommand(ShowDayDetails);
@@ -135,7 +140,7 @@ namespace FanShop.ViewModels
             var employeeWindowViewModel = new EmployeeWindowViewModel();
 
             var availableEmployees = employeeWindowViewModel.Employees
-                .Where(e => !Employees.Any(existing => existing.EmployeeID == e.EmployeeID))
+                .Where(e => !Employees.Any(existing => existing.Employee.EmployeeID == e.EmployeeID))
                 .ToList();
 
             employeeWindowViewModel.Employees = new ObservableCollection<Employee>(availableEmployees);
@@ -174,7 +179,11 @@ namespace FanShop.ViewModels
 
                 context.SaveChanges();
 
-                Employees.Add(selectedEmployee);
+                Employees.Add(new EmployeeWorkInfo 
+                { 
+                    Employee = selectedEmployee,
+                    WorkDuration = selectedWorkDuration
+                });
 
                 NotifyMainWindowOfChanges();
 
@@ -196,7 +205,7 @@ namespace FanShop.ViewModels
                 if (workDay != null)
                 {
                     var workDayEmployeeToRemove = workDay.WorkDayEmployees
-                        .FirstOrDefault(wde => wde.EmployeeID == SelectedEmployee.EmployeeID);
+                        .FirstOrDefault(wde => wde.EmployeeID == SelectedEmployee.Employee.EmployeeID);
 
                     if (workDayEmployeeToRemove != null)
                     {
@@ -313,5 +322,15 @@ namespace FanShop.ViewModels
         public string Time { get; set; }
         public string SartTime { get; set; }
         public BitmapImage Logo { get; set; }
+    }
+    
+    public class EmployeeWorkInfo
+    {
+        public Employee Employee { get; set; }
+        public string WorkDuration { get; set; }
+        
+        public string FirstName => Employee.FirstName;
+        public string Surname => Employee.Surname;
+        public string DateOfBirth => Employee.DateOfBirth;
     }
 }

@@ -128,10 +128,10 @@
                                         
                                         <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                             <TextBlock FontWeight="SemiBold" FontSize="14">
-                                                <Run Text="{Binding FirstName}" />
-                                                <Run Text="{Binding Surname}" />
+                                                <Run Text="{Binding FirstName, Mode=OneWay}" />
+                                                <Run Text="{Binding Surname, Mode=OneWay}" />
                                             </TextBlock>
-                                            <TextBlock Text="{Binding Position}" 
+                                            <TextBlock Text="{Binding DateOfBirth, Mode=OneWay}" 
                                                        FontSize="12" Foreground="#666666" 
                                                        Margin="0,3,0,0"/>
                                         </StackPanel>
@@ -139,7 +139,7 @@
                                         <Border Grid.Column="1" Background="#E3F2FD" 
                                                 CornerRadius="4" Padding="8,4" 
                                                 VerticalAlignment="Center">
-                                            <TextBlock Text="Сотрудник" 
+                                            <TextBlock Text="{Binding WorkDuration}" 
                                                        Foreground="#0077B5" 
                                                        FontWeight="Medium" 
                                                        FontSize="12"/>

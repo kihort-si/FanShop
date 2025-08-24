@@ -3,13 +3,14 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using System.Collections.ObjectModel;
 using System.IO;
 using FanShop.Models;
+using FanShop.ViewModels;
 using Settings = FanShop.Models.Settings;
 
 namespace FanShop.Services
 {
     public static class PassDocumentGenerator
     {
-        public static void CreateWordPass(DateTime date, ObservableCollection<Employee> employees)
+        public static void CreateWordPass(DateTime date, ObservableCollection<EmployeeWorkInfo> employees)
         {
             string templatePath = Path.Combine(AppContext.BaseDirectory, "болванка.docx");
 
@@ -45,9 +46,9 @@ namespace FanShop.Services
                         }
 
                         var sorted = employees
-                            .OrderBy(e => e.Surname)
-                            .ThenBy(e => e.FirstName)
-                            .ThenBy(e => e.LastName)
+                            .OrderBy(e => e.Employee.Surname)
+                            .ThenBy(e => e.Employee.FirstName)
+                            .ThenBy(e => e.Employee.LastName)
                             .ToList();
 
                         for (int i = 0; i < sorted.Count; i++)
@@ -57,9 +58,9 @@ namespace FanShop.Services
                                 new string[]
                                 {
                                     (i + 1).ToString(),
-                                    $"{emp.Surname} {emp.FirstName} {emp.LastName}",
-                                    $"{emp.DateOfBirth:dd.MM.yyyy} {emp.PlaceOfBirth}",
-                                    emp.Passport ?? ""
+                                    $"{emp.Surname} {emp.FirstName} {emp.Employee.LastName}",
+                                    $"{emp.DateOfBirth:dd.MM.yyyy} {emp.Employee.PlaceOfBirth}",
+                                    emp.Employee.Passport ?? ""
                                 },
                                 0.83f
                             );
