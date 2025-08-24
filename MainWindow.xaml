@@ -476,10 +476,10 @@
                                                                 </StackPanel>
                                                                 
                                                                 <Border Grid.Column="1" Background="#F0F7FF" CornerRadius="15" 
-                                                                        Padding="8,3" Margin="5,0,15,0">
-                                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                        Padding="8,3" Margin="5,0,15,0" HorizontalAlignment="Center">
+                                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
                                                                         <TextBlock Text="{Binding WorkDaysCount, Converter={x:Static converters:ShiftToRussian.Instance}}" FontSize="13" 
-                                                                                   Foreground="#0077B5" FontWeight="SemiBold"/>
+                                                                                   Foreground="#0077B5" FontWeight="SemiBold" TextAlignment="Center" HorizontalAlignment="Center"/>
                                                                     </StackPanel>
                                                                 </Border>
                                                                 

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Application = System.Windows.Application;
 
 namespace FanShop.ViewModels;
 
@@ -7,6 +8,21 @@ public class SplashScreenViewModel : INotifyPropertyChanged
 {
     private double _progressWidth;
     private string _loadingText = "Загрузка...";
+    private string curLoadingText;
+    private readonly string[] loadingTexts = new string[]
+    {
+        "Делаем довесы...",
+        "Делаем внесение...",
+        "Печатаем чеки...",
+        "Собираем товары...",
+        "Получаем аккредитацию...",
+        "Проверяем сертификаты...",
+        "Печатаем ценники...",
+        "Снимаем защиту..."
+    };
+    private readonly List<string> usedLoadingTexts = new();
+    private Random random = new();
+    private CancellationTokenSource _cts;
 
     public double ProgressWidth 
     {
@@ -27,45 +43,24 @@ public class SplashScreenViewModel : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-    
-    private string curLoadingText;
-    
-    private readonly string[] loadingTexts = new string[]
-    {
-        "Делаем довесы...",
-        "Делаем внесение...",
-        "Печатаем чеки...",
-        "Собираем товары...",
-        "Получаем аккредитацию...",
-        "Проверяем сертификаты...",
-        "Печатаем ценники...",
-        "Снимаем защиту..."
-    };
-    
-    private readonly List<string> usedLoadingTexts = new();
-
-    private Random random = new();
-    
-    private CancellationTokenSource _cts;
 
     public SplashScreenViewModel()
     {
         StartTextRotation();
         OnLoaded();
     }
-    
+
     private async void StartTextRotation()
     {
         _cts = new CancellationTokenSource();
-        
+
         try
         {
             PickNewLoadingText();
-            
+
             while (!_cts.Token.IsCancellationRequested)
             {
-                await Task.Delay(1000, _cts.Token); 
-                
+                await Task.Delay(1000, _cts.Token);
                 PickNewLoadingText();
             }
         }
@@ -73,7 +68,7 @@ public class SplashScreenViewModel : INotifyPropertyChanged
         {
         }
     }
-    
+
     public void StopTextRotation()
     {
         _cts?.Cancel();
@@ -81,9 +76,8 @@ public class SplashScreenViewModel : INotifyPropertyChanged
 
     private void PickNewLoadingText()
     {
-        while (usedLoadingTexts.Count <= loadingTexts.Length)
+        while (usedLoadingTexts.Count < loadingTexts.Length)
         {
-
             var available = loadingTexts.Except(usedLoadingTexts).ToList();
 
             if (available.Count == 0)
@@ -94,49 +88,60 @@ public class SplashScreenViewModel : INotifyPropertyChanged
             curLoadingText = newText;
             usedLoadingTexts.Add(newText);
 
-            LoadingText = curLoadingText;
+            Application.Current.Dispatcher.Invoke(() => 
+            {
+                LoadingText = curLoadingText;
+            });
         }
     }
-    
+
     private async void OnLoaded()
     {
         await Task.Delay(100);
-        
-        StartLoading();
     }
-    
-    private async void StartLoading()
-    {
-        _cts = new CancellationTokenSource();
-        CancellationToken ct = _cts.Token;
-        for (int i = 0; i <= 80; i++)
-        {
-            if (ct.IsCancellationRequested)
-                return;
-            UpdateProgress(i);
-            await Task.Delay(10);
-        }
-    }
-    
-    private void UpdateProgress(int percent)
+
+    public void UpdateProgress(int percent)
     {
         try
         {
-            ProgressWidth = 360 * percent / 100;
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                percent = Math.Max(0, Math.Min(100, percent));
+                ProgressWidth = 360 * percent / 100;
+            });
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Ошибка: {ex.Message}");
+            Console.WriteLine($"Ошибка обновления прогресса: {ex.Message}");
         }
     }
-    
-    
-    
+
     public void StopLoading()
     {
-        ProgressWidth = 360;
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            ProgressWidth = 360;
+        });
+
         StopTextRotation();
         _cts?.Cancel();
+    }
+    
+    public void Stop()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = null;
+        
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            ProgressWidth = 360;
+        });
+        
+        usedLoadingTexts.Clear();
+        
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
     }
 
     public event PropertyChangedEventHandler PropertyChanged;

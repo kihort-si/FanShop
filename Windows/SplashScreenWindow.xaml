@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:FanShop.Windows"
         xmlns:viewModels="clr-namespace:FanShop.ViewModels"
         mc:Ignorable="d"
-        Title="Загрузка приложения" Height="300" Width="600" WindowStyle="None" WindowStartupLocation="CenterScreen">
+        Title="Загрузка приложения" Height="300" Width="600" WindowStyle="None" WindowStartupLocation="CenterScreen" AllowsTransparency="True">
     <Window.DataContext>
         <viewModels:SplashScreenViewModel/>
     </Window.DataContext>

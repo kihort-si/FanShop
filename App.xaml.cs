@@ -1,6 +1,4 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Windows;
+﻿using System.Windows;
 using FanShop.Services;
 using FanShop.ViewModels;
 using FanShop.Windows;
@@ -25,37 +23,42 @@ public partial class App : Application
     {
         _splashScreen = new SplashScreenWindow();
         _splashScreen.Show();
-        
-        await InitializeMainViewModelAsync();
-        
-        DbInitializer.Initialize();
-        
-        _splashScreen.ViewModel.StopLoading();
-        
-        var mainWindow = new MainWindow
-        {
-            DataContext = _mainViewModel
-        };
-        
-        mainWindow.Show();
-
-        _splashScreen.Close();
-        
-        MainWindow = mainWindow;
-    }
     
-    private async Task InitializeMainViewModelAsync()
-    {
-        _mainViewModel = new MainWindowViewModel();
+        try
+        {
+            _splashScreen.ViewModel.UpdateProgress(10);
+            await Task.Delay(100); 
+    
+            _mainViewModel = new MainWindowViewModel();
+            _splashScreen.ViewModel.UpdateProgress(30);
+            await Task.Delay(100); 
+    
+            await _mainViewModel.LoadMatchesFromFirebase();
+            _splashScreen.ViewModel.UpdateProgress(60);
+            await Task.Delay(100);
+    
+            await _mainViewModel.GenerateCalendar(_mainViewModel._currentYear, _mainViewModel._currentMonth);
+            _splashScreen.ViewModel.UpdateProgress(80);
+            await Task.Delay(100); 
+    
+            await _mainViewModel.CheckAndUpdateCalendarAsync();
+            _splashScreen.ViewModel.UpdateProgress(95);
+            await Task.Delay(100); 
+    
+            DbInitializer.Initialize();
+            _mainViewModel.RefreshStatistics();
             
-        await _mainViewModel.LoadMatchesFromFirebase();
-            
-        await _mainViewModel.GenerateCalendar(_mainViewModel._currentYear, _mainViewModel._currentMonth);
-            
-        await _mainViewModel.CheckAndUpdateCalendarAsync();
-            
-        _mainViewModel.RefreshStatistics();
-            
-        await Task.Delay(200);
+            _splashScreen.ViewModel.UpdateProgress(100);
+            await Task.Delay(100); 
+    
+            _splashScreen.ViewModel.Stop();
+    
+            var mainWindow = new MainWindow { DataContext = _mainViewModel };
+            mainWindow.Show();
+        }
+        finally
+        {
+            _splashScreen.Close();
+        }
     }
 }

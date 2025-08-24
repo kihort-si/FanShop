@@ -6,7 +6,7 @@ namespace FanShop.Windows;
 public partial class SplashScreenWindow : Window
 {
     public SplashScreenViewModel ViewModel { get; } = new SplashScreenViewModel();
-    
+
     public SplashScreenWindow()
     {
         InitializeComponent();
@@ -15,6 +15,12 @@ public partial class SplashScreenWindow : Window
 
     public void Stop()
     {
+        ViewModel.StopLoading();
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        base.OnClosed(e);
         ViewModel.StopLoading();
     }
 }
