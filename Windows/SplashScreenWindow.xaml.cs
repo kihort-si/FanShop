@@ -13,14 +13,8 @@ public partial class SplashScreenWindow : Window
         DataContext = ViewModel;
     }
 
-    public void Stop()
-    {
-        ViewModel.StopLoading();
-    }
-
     protected override void OnClosed(EventArgs e)
     {
         base.OnClosed(e);
-        ViewModel.StopLoading();
     }
 }

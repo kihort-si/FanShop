@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 using FanShop.Models;
 using FanShop.Services;
+using FanShop.Windows;
 using Application = System.Windows.Application;
 
 namespace FanShop.ViewModels;
@@ -20,6 +21,7 @@ public class TaskCategoriesWindowViewModel : BaseViewModel
     public ICommand AddCategoryCommand { get; }
     public ICommand EditCategoryCommand { get; }
     public ICommand RemoveCategoryCommand { get; }
+    public ICommand OpenAnalyticsCommand { get; }
     public ICommand CloseWindowCommand { get; }
     public ICommand SaveEditedCategoryCommand { get; }
     public ICommand CancelEditCommand { get; }
@@ -138,6 +140,7 @@ public class TaskCategoriesWindowViewModel : BaseViewModel
         RemoveCategoryCommand = new RelayCommand(RemoveCategory, CanEditCategory);
         CloseWindowCommand = new RelayCommand(CloseWindow);
         SaveEditedCategoryCommand = new RelayCommand(SaveEditedCategory);
+        OpenAnalyticsCommand = new RelayCommand(OpenAnalytics);
         CancelEditCommand = new RelayCommand(CancelEdit);
         GenerateRandomColorCommand = new RelayCommand(GenerateRandomColor);
         OpenColorPickerCommand = new RelayCommand(OpenColorPicker);
@@ -264,6 +267,16 @@ public class TaskCategoriesWindowViewModel : BaseViewModel
     {
         var existingColors = TaskCategories.Select(c => c.Color).ToHashSet();
         Color = ColorGenerator.GenerateUniquePastelColor(existingColors);
+    }
+    
+    private void OpenAnalytics(object? parameter)
+    {
+        var analyticsWindow = new TaskAnalyticsWindow
+        {
+            Owner = Application.Current.Windows.OfType<Window>()
+                .FirstOrDefault(w => w.GetType().Name == "TaskCategoriesWindow")
+        };
+        analyticsWindow.ShowDialog();
     }
 
     private void CloseWindow(object? parameter)

@@ -8,7 +8,6 @@ public class SplashScreenViewModel : INotifyPropertyChanged
 {
     private double _progressWidth;
     private string _loadingText = "Загрузка...";
-    private string curLoadingText;
     private readonly string[] loadingTexts = new string[]
     {
         "Делаем довесы...",
@@ -22,7 +21,7 @@ public class SplashScreenViewModel : INotifyPropertyChanged
     };
     private readonly List<string> usedLoadingTexts = new();
     private Random random = new();
-    private CancellationTokenSource _cts;
+    private List<string> available;
 
     public double ProgressWidth 
     {
@@ -46,53 +45,22 @@ public class SplashScreenViewModel : INotifyPropertyChanged
 
     public SplashScreenViewModel()
     {
-        StartTextRotation();
+        available = loadingTexts.Except(usedLoadingTexts).ToList();
+        _loadingText = PickNewLoadingText();
         OnLoaded();
-    }
-
-    private async void StartTextRotation()
-    {
-        _cts = new CancellationTokenSource();
-
-        try
-        {
-            while (!_cts.Token.IsCancellationRequested)
-            {
-                await Task.Delay(1500, _cts.Token);
-                PickNewLoadingText();
-            }
-        }
-        catch (TaskCanceledException)
-        {
-        }
-    }
-
-    public void StopTextRotation()
-    {
-        _cts?.Cancel();
     }
 
     private string PickNewLoadingText()
     {
-        for (int i = 0; i < 2; i++)
-        {
-            var available = loadingTexts.Except(usedLoadingTexts).ToList();
+        if (available.Count == 0)
+            return "Готово!";
 
-            if (available.Count == 0)
-                return "Готово!";
+        string newText = available[random.Next(available.Count)];
 
-            string newText = available[random.Next(available.Count)];
+        usedLoadingTexts.Add(newText);
+        available = loadingTexts.Except(usedLoadingTexts).ToList();
 
-            curLoadingText = newText;
-            usedLoadingTexts.Add(newText);
-
-            Application.Current.Dispatcher.Invoke(() => 
-            {
-                LoadingText = curLoadingText;
-            });
-            return curLoadingText;
-        }
-        return "Готово!";
+        return newText;
     }
 
     private async void OnLoaded()
@@ -108,9 +76,13 @@ public class SplashScreenViewModel : INotifyPropertyChanged
             {
                 percent = Math.Max(0, Math.Min(100, percent));
                 ProgressWidth = 360 * percent / 100;
+                if (percent == 30 || percent == 60)
+                {
+                    _loadingText = PickNewLoadingText();
+                    OnPropertyChanged(nameof(LoadingText));
+                }
                 if (percent == 100)
                 {
-                    _cts.Cancel();
                     _loadingText = "Готово!";
                     OnPropertyChanged(nameof(LoadingText));
                 }
@@ -121,29 +93,9 @@ public class SplashScreenViewModel : INotifyPropertyChanged
             Console.WriteLine($"Ошибка обновления прогресса: {ex.Message}");
         }
     }
-
-    public void StopLoading()
-    {
-        Application.Current.Dispatcher.Invoke(() =>
-        {
-            ProgressWidth = 360;
-        });
-
-        StopTextRotation();
-        _cts?.Cancel();
-    }
     
     public void Stop()
     {
-        _cts?.Cancel();
-        _cts?.Dispose();
-        _cts = null;
-        
-        Application.Current.Dispatcher.Invoke(() =>
-        {
-            ProgressWidth = 360;
-        });
-        
         usedLoadingTexts.Clear();
         
         GC.Collect();
