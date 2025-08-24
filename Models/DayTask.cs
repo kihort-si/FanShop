@@ -63,11 +63,9 @@ namespace FanShop.Models
                 
                 try
                 {
-                    // Преобразование ввода пользователя в часы и минуты
                     if (value.All(char.IsDigit))
                     {
-                        // Обработка ввода без разделителей
-                        if (value.Length <= 2) // только часы
+                        if (value.Length <= 2) 
                         {
                             if (int.TryParse(value, out int hour) && hour >= 0 && hour < 24)
                             {
@@ -75,7 +73,7 @@ namespace FanShop.Models
                                 StartMinute = 0;
                             }
                         }
-                        else if (value.Length == 3) // формат "130" = 1:30
+                        else if (value.Length == 3) 
                         {
                             int hour = int.Parse(value.Substring(0, 1));
                             int minute = int.Parse(value.Substring(1));
@@ -85,7 +83,7 @@ namespace FanShop.Models
                                 StartMinute = minute;
                             }
                         }
-                        else if (value.Length == 4) // формат "1230" = 12:30
+                        else if (value.Length == 4) 
                         {
                             int hour = int.Parse(value.Substring(0, 2));
                             int minute = int.Parse(value.Substring(2));
@@ -98,7 +96,6 @@ namespace FanShop.Models
                     }
                     else
                     {
-                        // Обработка ввода с разделителями
                         string[] parts = value.Replace('.', ':').Replace(',', ':').Split(':');
                         if (parts.Length >= 1 && int.TryParse(parts[0], out int hour) && hour >= 0 && hour < 24)
                         {
@@ -120,7 +117,6 @@ namespace FanShop.Models
                 }
                 catch
                 {
-                    // Игнорируем ошибки парсинга
                 }
             }
         }

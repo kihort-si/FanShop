@@ -4,10 +4,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:FanShop.Windows"
+        xmlns:converters="clr-namespace:FanShop.Converters"
         mc:Ignorable="d"
         Title="Детали дня" Height="500" Width="800" 
         WindowStyle="None" ResizeMode="NoResize" 
-        WindowStartupLocation="CenterScreen" Icon="/icon.ico" 
+        WindowStartupLocation="CenterOwner" Icon="/icon.ico" 
         ShowInTaskbar="False" BorderThickness="0" AllowsTransparency="True" Background="Transparent">
     
     <Window.Resources>
@@ -40,150 +41,152 @@
         </Style>
     </Window.Resources>
     
-    <Border Background="#80000000">
-        <Grid Height="500" Width="800">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+    <Grid Height="500" Width="800">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-            <Border Grid.Row="0" CornerRadius="8,8,0,0" MouseLeftButtonDown="Border_MouseLeftButtonDown">
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                        <GradientStop Color="#009EE1" Offset="0.0"/>
-                        <GradientStop Color="#0077B5" Offset="1.0"/>
-                    </LinearGradientBrush>
-                </Border.Background>
-                
-                <Grid Height="40">
-                    <TextBlock Text="ИНФОРМАЦИЯ" FontSize="14" FontWeight="Bold" Foreground="White"
-                               VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    <Button Content="✕" HorizontalAlignment="Right" Width="40" Height="40"
-                            Background="Transparent" Foreground="White" BorderThickness="0"
-                            Command="{Binding CloseWindowCommand}" FontWeight="Bold" FontSize="14">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}" Padding="8">
-                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
+        <Border Grid.Row="0" CornerRadius="8,8,0,0" MouseLeftButtonDown="Border_MouseLeftButtonDown">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#009EE1" Offset="0.0"/>
+                    <GradientStop Color="#0077B5" Offset="1.0"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            
+            <Grid Height="40">
+                <TextBlock Text="ИНФОРМАЦИЯ" FontSize="14" FontWeight="Bold" Foreground="White"
+                           VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <Button Content="✕" HorizontalAlignment="Right" Width="40" Height="40"
+                        Background="Transparent" Foreground="White" BorderThickness="0"
+                        Command="{Binding CloseWindowCommand}" FontWeight="Bold" FontSize="14">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" Padding="8">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#E81123"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1" CornerRadius="0, 0, 8, 8" BorderThickness="3, 0, 3, 3">
+            <Border.BorderBrush>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#009EE1" Offset="0.0"/>
+                    <GradientStop Color="#0077B5" Offset="1.0"/>
+                </LinearGradientBrush>
+            </Border.BorderBrush>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" Background="#F2F9FF" Padding="15">
+                    <TextBlock Text="{Binding Date, Converter={x:Static local:RussianDateConverter.Instance}}"
+                               FontSize="18" FontWeight="SemiBold" Foreground="#333333"
+                               HorizontalAlignment="Center">
+                    </TextBlock>
+                </Border>
+
+                <Grid Grid.Row="1" Background="White">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Grid.Row="0" Text="Сотрудники на этот день:" FontWeight="SemiBold" 
+                               Margin="15,15,15,10" Foreground="#333333"/>
+                    
+                    <ListView Grid.Row="1" ItemsSource="{Binding Employees}" 
+                              SelectedItem="{Binding SelectedEmployee}"
+                              BorderThickness="1" Margin="15, 0, 15, 15" BorderBrush="#E0E0E0" Background="White">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#F8F9FA" BorderBrush="#E9ECEF" 
+                                        BorderThickness="1" CornerRadius="5" 
+                                        Padding="15,10" Margin="5">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock FontWeight="SemiBold" FontSize="14">
+                                                <Run Text="{Binding FirstName}" />
+                                                <Run Text="{Binding Surname}" />
+                                            </TextBlock>
+                                            <TextBlock Text="{Binding Position}" 
+                                                       FontSize="12" Foreground="#666666" 
+                                                       Margin="0,3,0,0"/>
+                                        </StackPanel>
+                                        
+                                        <Border Grid.Column="1" Background="#E3F2FD" 
+                                                CornerRadius="4" Padding="8,4" 
+                                                VerticalAlignment="Center">
+                                            <TextBlock Text="Сотрудник" 
+                                                       Foreground="#0077B5" 
+                                                       FontWeight="Medium" 
+                                                       FontSize="12"/>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Margin" Value="0,2"/>
+                                <Setter Property="Background" Value="Transparent"/>
                                 <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="#E3F2FD"/>
+                                    </Trigger>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#E81123"/>
+                                        <Setter Property="Background" Value="#F0F7FF"/>
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
-                        </Button.Style>
-                    </Button>
+                        </ListView.ItemContainerStyle>
+                    </ListView>
                 </Grid>
-            </Border>
 
-            <Border Grid.Row="1" CornerRadius="0, 0, 8, 8" BorderThickness="3, 0, 3, 3">
-                <Border.BorderBrush>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                        <GradientStop Color="#009EE1" Offset="0.0"/>
-                        <GradientStop Color="#0077B5" Offset="1.0"/>
-                    </LinearGradientBrush>
-                </Border.BorderBrush>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="*"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Border Grid.Row="0" Background="#F2F9FF" Padding="15">
-                        <TextBlock Text="{Binding Date, Converter={x:Static local:RussianDateConverter.Instance}}"
-                                   FontSize="18" FontWeight="SemiBold" Foreground="#333333"
-                                   HorizontalAlignment="Center">
-                        </TextBlock>
-                    </Border>
-
-                    <Grid Grid.Row="1" Background="White">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        
-                        <TextBlock Grid.Row="0" Text="Сотрудники на этот день:" FontWeight="SemiBold" 
-                                   Margin="15,15,15,10" Foreground="#333333"/>
-                        
-                        <ListView Grid.Row="1" ItemsSource="{Binding Employees}" 
-                                  SelectedItem="{Binding SelectedEmployee}"
-                                  BorderThickness="1" Margin="15, 0, 15, 15" BorderBrush="#E0E0E0" Background="White">
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Background="#F8F9FA" BorderBrush="#E9ECEF" 
-                                            BorderThickness="1" CornerRadius="5" 
-                                            Padding="15,10" Margin="5">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            
-                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                <TextBlock FontWeight="SemiBold" FontSize="14">
-                                                    <Run Text="{Binding FirstName}" />
-                                                    <Run Text="{Binding Surname}" />
-                                                </TextBlock>
-                                                <TextBlock Text="{Binding Position}" 
-                                                           FontSize="12" Foreground="#666666" 
-                                                           Margin="0,3,0,0"/>
-                                            </StackPanel>
-                                            
-                                            <Border Grid.Column="1" Background="#E3F2FD" 
-                                                    CornerRadius="4" Padding="8,4" 
-                                                    VerticalAlignment="Center">
-                                                <TextBlock Text="Сотрудник" 
-                                                           Foreground="#0077B5" 
-                                                           FontWeight="Medium" 
-                                                           FontSize="12"/>
-                                            </Border>
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                            <ListView.ItemContainerStyle>
-                                <Style TargetType="ListViewItem">
-                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                    <Setter Property="Padding" Value="0"/>
-                                    <Setter Property="Margin" Value="0,2"/>
-                                    <Setter Property="Background" Value="Transparent"/>
-                                    <Style.Triggers>
-                                        <Trigger Property="IsSelected" Value="True">
-                                            <Setter Property="Background" Value="#E3F2FD"/>
-                                        </Trigger>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="#F0F7FF"/>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ListView.ItemContainerStyle>
-                        </ListView>
-                    </Grid>
-
-                    <Border Grid.Row="2" Background="#F5F5F5" CornerRadius="0,0,8,8" Padding="10">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Button Content="Добавить" Style="{StaticResource ActionButton}"
-                                    Command="{Binding AddEmployeesCommand}" Background="#009EE1"/>
-                            <Button Content="Удалить" Style="{StaticResource ActionButton}"
-                                    Command="{Binding RemoveEmployeesCommand}" Background="#EB0004" IsEnabled="{Binding CanEditEmployee}"/>
-                            <Button Content="Пропуск" Style="{StaticResource ActionButton}"
-                                    Command="{Binding PrintPassCommand}" Background="#009EE1" IsEnabled="{Binding CanPrintPass}"/>
-                            <Button Content="Тайминг" Style="{StaticResource ActionButton}"
-                                    Command="{Binding DailyScheduleCommand}" Background="#4CAF50"/>
-                            <Button Content="Закрыть" Style="{StaticResource ActionButton}"
-                                    Command="{Binding CloseWindowCommand}" Background="#666666"/>
-                        </StackPanel>
-                    </Border>
-                </Grid>
-            </Border>
-        </Grid>
-    </Border>
-    
+                <Border Grid.Row="2" Background="#F5F5F5" CornerRadius="0,0,8,8" Padding="10">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="Добавить" Style="{StaticResource ActionButton}"
+                                Command="{Binding AddEmployeesCommand}" Background="#009EE1"/>
+                        <Button Content="Удалить" Style="{StaticResource ActionButton}"
+                                Command="{Binding RemoveEmployeesCommand}" Background="#EB0004" IsEnabled="{Binding CanEditEmployee}"/>
+                        <Button Content="Пропуск" Style="{StaticResource ActionButton}"
+                                Command="{Binding PrintPassCommand}" Background="#009EE1" IsEnabled="{Binding CanPrintPass}"/>
+                        <Button Content="Тайминг" Style="{StaticResource ActionButton}"
+                                Command="{Binding DailyScheduleCommand}" Background="#4CAF50"/>
+                        <Button Content="Закрыть" Style="{StaticResource ActionButton}"
+                                Command="{Binding CloseWindowCommand}" Background="#666666"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+        
+        <Border Grid.Row="0" Grid.RowSpan="2" Background="Black" Opacity="0.5"
+                Visibility="{Binding IsBlackoutMode, Converter={x:Static converters:BoolToVisibilityConverter.Instance}}"
+                Panel.ZIndex="10" CornerRadius="8">
+        </Border>
+    </Grid>
 </Window>

@@ -69,6 +69,14 @@ namespace FanShop.ViewModels
             get => _isCurrentMonth;
             set => SetProperty(ref _isCurrentMonth, value);
         }
+        
+        private bool _isBlackoutMode;
+        
+        public bool IsBlackoutMode
+        {
+            get => _isBlackoutMode;
+            set => SetProperty(ref _isBlackoutMode, value);
+        }
 
         public ICommand ShowDayDetailsCommand { get; }
         public ICommand AddEmployeesCommand { get; }
@@ -109,9 +117,13 @@ namespace FanShop.ViewModels
                 {
                     DataContext = this
                 };
-                dayDetailsWindow.Height = Application.Current.MainWindow.Height;
-                dayDetailsWindow.Width = Application.Current.MainWindow.Width;
+                
                 dayDetailsWindow.Owner = Application.Current.MainWindow;
+                var mainViewModel = Application.Current.MainWindow?.DataContext as MainWindowViewModel;
+                if (mainViewModel != null)
+                {
+                    mainViewModel.SetBlackoutMode(true);
+                }
                 dayDetailsWindow.ShowInTaskbar = false;
                 dayDetailsWindow.ShowDialog();
             }
@@ -130,11 +142,10 @@ namespace FanShop.ViewModels
 
             var selectEmployeeWindow = new SelectEmployeeWindow
             {
-                DataContext = employeeWindowViewModel
+                DataContext = employeeWindowViewModel,
+                ParentViewModel = this
             };
-            
-            selectEmployeeWindow.Height = new DayDetailsWindow().Height;
-            selectEmployeeWindow.Width = new DayDetailsWindow().Width;
+            SetBlackoutMode(true);
             selectEmployeeWindow.Owner = Application.Current.MainWindow;
             selectEmployeeWindow.ShowInTaskbar = false;
 
@@ -238,6 +249,15 @@ namespace FanShop.ViewModels
         private void CloseWindow(object? parameter)
         {
             Application.Current.Windows[1]?.Close();
+            var mainViewModel = Application.Current.MainWindow?.DataContext as MainWindowViewModel;
+            if (mainViewModel != null)
+                mainViewModel.SetBlackoutMode(false);
+        }
+        
+        public void SetBlackoutMode(bool isBlackout)
+        {
+            IsBlackoutMode = isBlackout;
+            OnPropertyChanged(nameof(IsBlackoutMode));
         }
 
         private string _additionalEmployeesText;

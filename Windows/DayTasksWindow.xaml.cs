@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
 using FanShop.ViewModels;
 using ComboBox = System.Windows.Controls.ComboBox;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
@@ -46,17 +47,27 @@ namespace FanShop.Windows
         private void ComboBox_DropDownClosed(object sender, EventArgs e)
         {
             var comboBox = sender as ComboBox;
-            var dataGrid = GetParent<DataGrid>(comboBox);
-            dataGrid?.CommitEdit();
-            dataGrid?.CommitEdit();
+            var task = comboBox?.DataContext as Models.DayTask;
+            var viewModel = DataContext as DayTasksWindowViewModel;
+            
+            if (task != null && viewModel != null)
+            {
+                var dataGrid = GetParent<DataGrid>(comboBox);
+                dataGrid?.CommitEdit();
+                
+                Dispatcher.BeginInvoke(new Action(() => 
+                {
+                    viewModel.UpdateTaskTitleByCategory(task);
+                }));
+            }
         }
-
-        private static T GetParent<T>(DependencyObject child) where T : DependencyObject
+        
+        private T GetParent<T>(DependencyObject child) where T : DependencyObject
         {
-            var parent = System.Windows.Media.VisualTreeHelper.GetParent(child);
+            DependencyObject parent = VisualTreeHelper.GetParent(child);
             while (parent != null && !(parent is T))
             {
-                parent = System.Windows.Media.VisualTreeHelper.GetParent(parent);
+                parent = VisualTreeHelper.GetParent(parent);
             }
             return parent as T;
         }

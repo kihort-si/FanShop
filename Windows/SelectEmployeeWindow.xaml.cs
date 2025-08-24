@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using FanShop.Models;
 using FanShop.ViewModels;
+using Application = System.Windows.Application;
 using ComboBox = System.Windows.Controls.ComboBox;
 
 namespace FanShop.Windows
@@ -11,6 +12,7 @@ namespace FanShop.Windows
     {
         public Employee? SelectedEmployee { get; private set; }
         public string SelectedWorkDuration { get; set; } = "Целый день";
+        public CalendarDayViewModel ParentViewModel { get; set; }
         
         public SelectEmployeeWindow()
         {
@@ -38,12 +40,14 @@ namespace FanShop.Windows
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
+            ParentViewModel?.SetBlackoutMode(false);
             Close();
         }
         
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
+            ParentViewModel?.SetBlackoutMode(false);
             Close();
         }
         
@@ -53,6 +57,7 @@ namespace FanShop.Windows
             {
                 SelectedEmployee = viewModel.SelectedEmployee;
                 DialogResult = true;
+                ParentViewModel?.SetBlackoutMode(false);
                 Close();
             }
         }

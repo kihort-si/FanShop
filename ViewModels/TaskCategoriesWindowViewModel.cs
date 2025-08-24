@@ -65,6 +65,7 @@ public class TaskCategoriesWindowViewModel : BaseViewModel
     private string _name = string.Empty;
     private string _description = string.Empty;
     private string _color = string.Empty;
+    private string _defaultTask = string.Empty;
 
     public string Name
     {
@@ -100,6 +101,18 @@ public class TaskCategoriesWindowViewModel : BaseViewModel
             if (EditableCategory != null)
                 EditableCategory.Color = value;
             OnPropertyChanged(nameof(Color));
+        }
+    }
+    
+    public string DefaultTask
+    {
+        get => _defaultTask;
+        set
+        {
+            _defaultTask = value;
+            if (EditableCategory != null)
+                EditableCategory.DefaultTask = value;
+            OnPropertyChanged(nameof(DefaultTask));
         }
     }
     
@@ -146,6 +159,7 @@ public class TaskCategoriesWindowViewModel : BaseViewModel
         Description = string.Empty;
         var existingColors = TaskCategories.Select(c => c.Color).ToHashSet();
         Color = ColorGenerator.GenerateUniquePastelColor(existingColors);
+        DefaultTask = string.Empty;
 
         IsEditOverlayVisible = true;
     }
@@ -159,6 +173,7 @@ public class TaskCategoriesWindowViewModel : BaseViewModel
             Name = SelectedCategory.Name;
             Description = SelectedCategory.Description ?? string.Empty;
             Color = SelectedCategory.Color;
+            DefaultTask = SelectedCategory.DefaultTask ?? string.Empty;
 
             IsEditOverlayVisible = true;
         }
@@ -181,6 +196,7 @@ public class TaskCategoriesWindowViewModel : BaseViewModel
                     category.Name = EditableCategory.Name;
                     category.Description = EditableCategory.Description;
                     category.Color = EditableCategory.Color;
+                    category.DefaultTask = EditableCategory.DefaultTask;
                     context.TaskCategories.Update(category);
                 }
             }

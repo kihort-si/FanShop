@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using System.Windows.Input;
 
 namespace FanShop.Windows
 {
@@ -10,9 +9,9 @@ namespace FanShop.Windows
             InitializeComponent();
         }
         
-        private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void Border_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed)
+            if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed)
             {
                 DragMove();
             }

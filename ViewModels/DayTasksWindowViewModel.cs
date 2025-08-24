@@ -140,10 +140,11 @@ namespace FanShop.ViewModels
                 EndHour = DateTime.Now.AddHours(1).Hour,
                 EndMinute = DateTime.Now.AddHours(1).Minute
             };
-    
-            DayTasks.Add(newTask);
-        }
 
+            DayTasks.Add(newTask);
+            SaveTaskChanges(newTask);
+        }
+        
         private bool CanEditTask(object parameter)
         {
             return SelectedTask != null;
@@ -177,55 +178,47 @@ namespace FanShop.ViewModels
         
         public void SaveTaskChanges(object taskItem)
         {
-            if (taskItem is not DayTask task) return;
-        
-            try
+            if (taskItem is DayTask task)
             {
                 using var context = new AppDbContext();
-                
-                if (task.DayTaskID == 0)
+                var existingTask = context.DayTasks.Find(task.DayTaskID);
+        
+                if (existingTask == null)
                 {
-                    // Новая задача
+                    if (task.Category != null)
+                    {
+                        task.TaskCategoryID = task.Category.TaskCategoryID;
+                        task.Category = null;
+                    }
+                    
                     context.DayTasks.Add(task);
                 }
                 else
                 {
-                    // Существующая задача - используем более надежный подход
-                    var existingTask = context.DayTasks.Find(task.DayTaskID);
-                    if (existingTask != null)
-                    {
-                        // Обновляем свойства напрямую
-                        existingTask.StartHour = task.StartHour;
-                        existingTask.StartMinute = task.StartMinute;
-                        existingTask.EndHour = task.EndHour;
-                        existingTask.EndMinute = task.EndMinute;
-                        existingTask.Title = task.Title ?? string.Empty;
-                        existingTask.Comment = task.Comment ?? string.Empty;
-                        existingTask.TaskCategoryID = task.TaskCategoryID;
-                    }
-                    else
-                    {
-                        // Отсоединенное состояние - явно указываем что это модификация
-                        context.Entry(task).State = EntityState.Modified;
-                    }
+                    existingTask.StartHour = task.StartHour;
+                    existingTask.StartMinute = task.StartMinute;
+                    existingTask.EndHour = task.EndHour;
+                    existingTask.EndMinute = task.EndMinute;
+                    existingTask.Title = task.Title;
+                    existingTask.Comment = task.Comment;
+                    existingTask.TaskCategoryID = task.Category?.TaskCategoryID;
+                    
+                    context.DayTasks.Update(existingTask);
                 }
         
                 context.SaveChanges();
             }
-            catch (DbUpdateException dbEx)
+        }
+        
+        public void UpdateTaskTitleByCategory(DayTask task)
+        {
+            if (task?.Category != null && !string.IsNullOrEmpty(task.Category.DefaultTask))
             {
-                // Детальная информация об ошибке базы данных
-                var innerException = dbEx.InnerException;
-                MessageBox.Show($"Ошибка базы данных: {innerException?.Message ?? dbEx.Message}", 
-                    "Ошибка сохранения", MessageBoxButton.OK, MessageBoxImage.Error);
+                string oldTitle = task.Title;
+                task.Title = task.Category.DefaultTask;
+                task.OnPropertyChanged(nameof(task.Title));
                 
-                Console.WriteLine($"DbUpdateException: {dbEx}");
-                Console.WriteLine($"Inner Exception: {dbEx.InnerException}");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при сохранении: {ex.Message}", "Ошибка", 
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                SaveTaskChanges(task);
             }
         }
 

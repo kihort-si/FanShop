@@ -17,5 +17,7 @@ public class TaskCategory
     [MaxLength(7)]
     public string Color { get; set; }
     
+    public string? DefaultTask { get; set; }
+    
     public virtual ICollection<DayTask> Tasks { get; set; } = new List<DayTask>();
 }

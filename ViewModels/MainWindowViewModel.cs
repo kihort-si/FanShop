@@ -62,6 +62,14 @@ namespace FanShop.ViewModels
             get => _isMenuOpen;
             set => SetProperty(ref _isMenuOpen, value);
         }
+        
+        private bool _isBlackoutMode;
+        
+        public bool IsBlackoutMode
+        {
+            get => _isBlackoutMode;
+            set => SetProperty(ref _isBlackoutMode, value);
+        }
 
         public int TotalEmployeesCount => _statisticsService.GetTotalEmployeesCount(_currentYear, _currentMonth);
         public int WorkDaysCount => _statisticsService.GetWorkDaysCount(_currentYear, _currentMonth);
@@ -74,7 +82,6 @@ namespace FanShop.ViewModels
         public int MonthMatchesCount => GetMonthMatchesCount();
         public ICommand ToggleMenuCommand { get; }
         public ICommand CloseMenuCommand { get; }
-
         public ICommand OpenEmployeeWindowCommand { get; }
         public ICommand LoadMatchesCommand { get; }
         public ICommand OpenTaskCategoriesWindowCommand { get; }
@@ -92,8 +99,16 @@ namespace FanShop.ViewModels
             PreviousMonthCommand = new RelayCommand(GoToPreviousMonth);
             NextMonthCommand = new RelayCommand(GoToNextMonth);
 
-            ToggleMenuCommand = new RelayCommand(_ => IsMenuOpen = !IsMenuOpen);
-            CloseMenuCommand = new RelayCommand(_ => IsMenuOpen = false);
+            ToggleMenuCommand = new RelayCommand(_ =>
+            {
+                IsMenuOpen = !IsMenuOpen;
+                IsBlackoutMode = !IsBlackoutMode;
+            });
+            CloseMenuCommand = new RelayCommand(_ =>
+            {
+                IsMenuOpen = false;
+                IsBlackoutMode = false;
+            });
             LoadMatchesFromFirebase();
             GenerateCalendar(_currentYear, _currentMonth);
             _lastCalendarUpdateDate = DateTime.Today;
@@ -195,6 +210,12 @@ namespace FanShop.ViewModels
 
                 CalendarDays.Add(calendarDay);
             }
+        }
+        
+        public void SetBlackoutMode(bool isBlackout)
+        {
+            IsBlackoutMode = isBlackout;
+            OnPropertyChanged(nameof(IsBlackoutMode));
         }
 
         private void OpenEmployeeWindow(object? parameter)
