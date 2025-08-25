@@ -2,7 +2,9 @@
 using FanShop.Services;
 using FanShop.ViewModels;
 using FanShop.Windows;
+using Microsoft.EntityFrameworkCore;
 using Application = System.Windows.Application;
+using MessageBox = System.Windows.MessageBox;
 
 namespace FanShop;
 
@@ -26,10 +28,34 @@ public partial class App : Application
     
         try
         {
+            _splashScreen.ViewModel.UpdateProgress(5);
+            var updateService = new UpdateService();
+            bool updateAvailable = await updateService.CheckForUpdatesAsync();
+        
+            if (updateAvailable)
+            {
+                _splashScreen.ViewModel.UpdateProgress(8);
+            
+                bool updated = await updateService.UpdateAsync();
+                if (updated)
+                {
+                    MessageBox.Show("Доступно обновление приложения. После нажатия OK, программа будет перезапущена.",
+                        "Обновление FanShop", MessageBoxButton.OK, MessageBoxImage.Information);
+                
+                    updateService.ExecuteUpdate();
+                    return; 
+                }
+            }
+            
             _splashScreen.ViewModel.UpdateProgress(10);
             await Task.Delay(100); 
     
             _mainViewModel = new MainWindowViewModel();
+            using (var db = new AppDbContext())
+            {
+                db.Database.Migrate();
+            }
+
             _splashScreen.ViewModel.UpdateProgress(30);
             await Task.Delay(100); 
     
@@ -56,6 +82,11 @@ public partial class App : Application
             var mainWindow = new MainWindow { DataContext = _mainViewModel };
             Application.Current.MainWindow = mainWindow;
             mainWindow.Show();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Ошибка при запуске: {ex.Message}", "Ошибка", 
+                MessageBoxButton.OK, MessageBoxImage.Error);
         }
         finally
         {
