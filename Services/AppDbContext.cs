@@ -1,4 +1,5 @@
-﻿using FanShop.Models;
+﻿using System.IO;
+using FanShop.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace FanShop.Services;
@@ -12,8 +13,17 @@ public class AppDbContext : DbContext
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlite("Data Source=FanShop.db");
+        var appDataPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "FanShop");
+
+        Directory.CreateDirectory(appDataPath);
+
+        var dbPath = Path.Combine(appDataPath, "FanShop.db");
+
+        optionsBuilder.UseSqlite($"Data Source={dbPath}");
     }
+
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

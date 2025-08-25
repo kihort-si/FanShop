@@ -189,6 +189,7 @@ namespace FanShop.ViewModels
 
                 OnPropertyChanged(nameof(Employees));
                 OnPropertyChanged(nameof(DisplayedEmployees));
+                (PrintPassCommand as RelayCommand)?.RaiseCanExecuteChanged();
             }
         }
 

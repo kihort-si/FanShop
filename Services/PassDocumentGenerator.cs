@@ -12,7 +12,7 @@ namespace FanShop.Services
     {
         public static void CreateWordPass(DateTime date, ObservableCollection<EmployeeWorkInfo> employees)
         {
-            string templatePath = Path.Combine(AppContext.BaseDirectory, "болванка.docx");
+            string templatePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FanShop", "болванка.docx");
 
             string tempPath = Path.GetTempFileName();
             string outputPath = Path.ChangeExtension(tempPath, ".docx");

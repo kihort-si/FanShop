@@ -59,6 +59,7 @@ public class TaskCategoriesWindowViewModel : BaseViewModel
         {
             _selectedCategory = value;
             OnPropertyChanged(nameof(SelectedCategory));
+            OnPropertyChanged(nameof(CanSaveCategory));
             (RemoveCategoryCommand as RelayCommand)?.RaiseCanExecuteChanged();
             (EditCategoryCommand as RelayCommand)?.RaiseCanExecuteChanged();
         }
@@ -103,6 +104,7 @@ public class TaskCategoriesWindowViewModel : BaseViewModel
             if (EditableCategory != null)
                 EditableCategory.Color = value;
             OnPropertyChanged(nameof(Color));
+            OnPropertyChanged(nameof(CanSaveCategory));
         }
     }
     
