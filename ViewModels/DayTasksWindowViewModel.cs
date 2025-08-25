@@ -93,6 +93,13 @@ namespace FanShop.ViewModels
             get => _canSaveTask;
             set => SetProperty(ref _canSaveTask, value);
         }
+        
+        private List<string> _taskSuggestions;
+        public List<string> TaskSuggestions
+        {
+            get => _taskSuggestions;
+            set => SetProperty(ref _taskSuggestions, value);
+        }
 
         public ICommand AddTaskCommand { get; }
         public ICommand RemoveTaskCommand { get; } 
@@ -107,6 +114,7 @@ namespace FanShop.ViewModels
             CloseWindowCommand = new RelayCommand(CloseWindow);
 
             LoadData();
+            LoadTaskSuggestions();
         }
 
         private void LoadData()
@@ -134,11 +142,11 @@ namespace FanShop.ViewModels
                 Title = "Новая задача",
                 Comment = string.Empty,
                 StartTimeText = DateTime.Now.ToShortTimeString(),
-                EndTimeText = DateTime.Now.AddHours(1).ToShortTimeString(),
+                EndTimeText = DateTime.Now.AddMinutes(15).ToShortTimeString(),
                 StartHour = DateTime.Now.Hour,
                 StartMinute = DateTime.Now.Minute,
-                EndHour = DateTime.Now.AddHours(1).Hour,
-                EndMinute = DateTime.Now.AddHours(1).Minute
+                EndHour = DateTime.Now.AddMinutes(15).Hour,
+                EndMinute = DateTime.Now.AddMinutes(15).Minute
             };
 
             DayTasks.Add(newTask);
@@ -221,7 +229,19 @@ namespace FanShop.ViewModels
                 SaveTaskChanges(task);
             }
         }
-
+        
+        private void LoadTaskSuggestions()
+        {
+            using var context = new AppDbContext();
+        
+            TaskSuggestions = context.DayTasks
+                .Select(t => t.Title)
+                .Where(t => !string.IsNullOrEmpty(t))
+                .Distinct()
+                .OrderBy(t => t)
+                .ToList();
+        }
+        
         private void CloseWindow(object parameter)
         {
             foreach (Window window in Application.Current.Windows)

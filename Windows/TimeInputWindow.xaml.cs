@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using MessageBox = System.Windows.MessageBox;
 
@@ -9,13 +10,19 @@ namespace FanShop.Windows
     {
         public int Hour { get; private set; }
         public int Minute { get; private set; }
+        
+        private bool _isInitializing = true;
 
         public TimeInputWindow(int initialHour, int initialMinute)
         {
             InitializeComponent();
             
+            _isInitializing = true;
+            
             HoursTextBox.Text = initialHour.ToString("D2");
             MinutesTextBox.Text = initialMinute.ToString("D2");
+            
+            _isInitializing = false;
             
             HoursTextBox.SelectAll();
             HoursTextBox.Focus();
@@ -68,6 +75,15 @@ namespace FanShop.Windows
         private void NumberTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             e.Handled = !Regex.IsMatch(e.Text, @"^\d+$");
+        }
+        
+        private void HoursTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (!_isInitializing && HoursTextBox.Text.Length == 2)
+            {
+                MinutesTextBox.SelectAll();
+                MinutesTextBox.Focus();
+            }
         }
     }
 }

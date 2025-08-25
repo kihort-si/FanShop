@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:FanShop.Windows"
         xmlns:themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Luna"
         xmlns:converters="clr-namespace:FanShop.Converters"
+        xmlns:controls="clr-namespace:FanShop.Controls"
         mc:Ignorable="d"
         Title="График задач на день" Height="600" Width="1000" 
         WindowStyle="None" ResizeMode="NoResize" 
@@ -91,6 +92,42 @@
                     <Setter Property="Background" Value="#FAFBFC"/>
                 </Trigger>
             </Style.Triggers>
+        </Style>
+        
+        <Style x:Key="SuggestionListBoxItemStyle" TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F0F7FF"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#E3F2FD"/>
+                    <Setter Property="Foreground" Value="#0077B5"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        
+        <Style TargetType="controls:AutoCompleteTextBox">
+            <Setter Property="BorderBrush" Value="#CCCCCC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Style.Resources>
+                <Style TargetType="ListBox">
+                    <Setter Property="BorderThickness" Value="1"/>
+                    <Setter Property="BorderBrush" Value="#CCCCCC"/>
+                    <Setter Property="Background" Value="White"/>
+                    <Setter Property="ItemContainerStyle" Value="{StaticResource SuggestionListBoxItemStyle}"/>
+                </Style>
+                <Style TargetType="Border">
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" Value="#0077B5"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Style.Resources>
         </Style>
     </Window.Resources>
     
@@ -210,8 +247,12 @@
                             </DataGridTemplateColumn.CellTemplate>
                             <DataGridTemplateColumn.CellEditingTemplate>
                                 <DataTemplate>
-                                    <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Margin="0"
-                                             KeyDown="TextBox_KeyDown"/>
+                                    <controls:AutoCompleteTextBox 
+                                        Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" 
+                                        Margin="0"
+                                        KeyDown="TextBox_KeyDown"
+                                        Suggestions="{Binding DataContext.TaskSuggestions, 
+                                                     RelativeSource={RelativeSource AncestorType=Window}}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellEditingTemplate>
                         </DataGridTemplateColumn>

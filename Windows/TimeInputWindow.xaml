@@ -81,7 +81,8 @@
                                              BorderThickness="0" Background="Transparent"
                                              FontSize="18" FontWeight="Medium" TextAlignment="Center"
                                              PreviewTextInput="NumberTextBox_PreviewTextInput"
-                                             MaxLength="2"/>
+                                             MaxLength="2"
+                                             TextChanged="HoursTextBox_TextChanged"/>
                                 </StackPanel>
                             </Border>
                             
