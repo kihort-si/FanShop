@@ -111,11 +111,11 @@
                                                            FontWeight="Medium"
                                                            FontSize="12"
                                                            Foreground="#555555"/>
-                                                <ComboBox SelectedValue="{Binding SelectedWorkDuration, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}"
+                                                <ComboBox Style="{StaticResource ModernComboBox}"
+                                                          SelectedValue="{Binding SelectedWorkDuration, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}"
                                                           SelectedValuePath="Content"
                                                           Width="140" HorizontalAlignment="Right"
                                                           SelectionChanged="ComboBox_SelectionChanged"
-                                                          BorderBrush="#CCCCCC"
                                                           Padding="8,5">
                                                     <ComboBoxItem Content="Целый день" />
                                                     <ComboBoxItem Content="Полдня" />

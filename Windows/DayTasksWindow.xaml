@@ -38,30 +38,57 @@
             </Style.Triggers>
         </Style>
         
-        <Style x:Key="DataGridColumnHeaderStyle" TargetType="DataGridColumnHeader">
-            <Setter Property="Background" Value="#F5F5F5"/>
-            <Setter Property="Foreground" Value="#333333"/>
+        <Style x:Key="ModernDataGridColumnHeaderStyle" TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#F8F9FA"/>
+            <Setter Property="Foreground" Value="#444444"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Padding" Value="10,8"/>
-            <Setter Property="BorderThickness" Value="0,0,1,1"/>
-            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="BorderThickness" Value="0,0,0,2"/>
+            <Setter Property="BorderBrush" Value="#009EE1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
         
-        <Style x:Key="DataGridCellStyle" TargetType="DataGridCell">
+        <Style x:Key="ModernDataGridCellStyle" TargetType="DataGridCell">
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="8,4"/>
-            <Style.Triggers>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="#E3F2FD"/>
-                    <Setter Property="Foreground" Value="#000000"/>
-                </Trigger>
-            </Style.Triggers>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridCell">
+                        <Border x:Name="CellBorder" 
+                                Background="{TemplateBinding Background}" 
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="3" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#E3F2FD"/>
+                                <Setter Property="Foreground" Value="#000000"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
         
-        <Style x:Key="DataGridRowStyle" TargetType="DataGridRow">
+        <Style x:Key="ModernDataGridRowStyle" TargetType="DataGridRow">
+            <Setter Property="Margin" Value="0,4"/>
+            <Setter Property="Background" Value="Transparent"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="#F0F7FF"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#E3F2FD"/>
+                    <Setter Property="BorderThickness" Value="0,0,0,0"/>
+                </Trigger>
+                <Trigger Property="ItemsControl.AlternationIndex" Value="0">
+                    <Setter Property="Background" Value="#FFFFFF"/>
+                </Trigger>
+                <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                    <Setter Property="Background" Value="#FAFBFC"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -133,44 +160,52 @@
                 <DataGrid Grid.Row="1" ItemsSource="{Binding DayTasks}"
                           SelectedItem="{Binding SelectedTask}"
                           AutoGenerateColumns="False" CanUserAddRows="False"
-                          HeadersVisibility="Column" GridLinesVisibility="Horizontal"
+                          HeadersVisibility="Column" GridLinesVisibility="None"
                           Margin="15" CanUserDeleteRows="False" Background="White"
-                          ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
-                          CellStyle="{StaticResource DataGridCellStyle}"
-                          RowStyle="{StaticResource DataGridRowStyle}"
-                          VerticalGridLinesBrush="Transparent"
-                          HorizontalGridLinesBrush="#E0E0E0"
-                          BorderThickness="1" BorderBrush="#E0E0E0"
-                          RowHeaderWidth="0"
+                          ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeaderStyle}"
+                          CellStyle="{StaticResource ModernDataGridCellStyle}"
+                          RowStyle="{StaticResource ModernDataGridRowStyle}"
+                          BorderThickness="0" BorderBrush="Transparent"
+                          RowHeaderWidth="0" 
+                          AlternationCount="2"
                           CellEditEnding="DataGrid_CellEditEnding"
                           RowEditEnding="DataGrid_RowEditEnding"
                           SelectionMode="Single"
                           SelectionUnit="FullRow">
+                    <DataGrid.Resources>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#E3F2FD"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                    </DataGrid.Resources>
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Начало" Width="70">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding StartTimeText}" Margin="5" 
+                                    <TextBlock Text="{Binding StartTimeText}" 
                                                MouseLeftButtonDown="TimeColumn_MouseLeftButtonDown"
+                                               FontWeight="Medium"
                                                Cursor="Hand"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                                            
+                                        
                         <DataGridTemplateColumn Header="Конец" Width="70">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding EndTimeText}" Margin="5" 
+                                    <TextBlock Text="{Binding EndTimeText}" 
                                                MouseLeftButtonDown="TimeColumn_MouseLeftButtonDown"
+                                               FontWeight="Medium"
                                                Cursor="Hand"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-
+                
                         <DataGridTemplateColumn Header="Название" Width="*">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Title}" Margin="5"/>
+                                    <TextBlock Text="{Binding Title}" 
+                                               TextTrimming="CharacterEllipsis"
+                                               VerticalAlignment="Center"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                             <DataGridTemplateColumn.CellEditingTemplate>
@@ -180,11 +215,14 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellEditingTemplate>
                         </DataGridTemplateColumn>
-
+                
                         <DataGridTemplateColumn Header="Описание" Width="200">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Comment}" Margin="5" TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding Comment}" 
+                                               TextWrapping="NoWrap" 
+                                               TextTrimming="CharacterEllipsis" 
+                                               Opacity="0.8"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                             <DataGridTemplateColumn.CellEditingTemplate>
@@ -194,31 +232,44 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellEditingTemplate>
                         </DataGridTemplateColumn>
-
+                
                         <DataGridTemplateColumn Header="Категория" Width="150">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Border Background="{Binding Category.Color}" CornerRadius="4" Padding="6,3" Margin="2"
+                                    <Border Background="{Binding Category.Color}" 
+                                            CornerRadius="12" 
+                                            Padding="8,4" 
+                                            Margin="0"
+                                            HorizontalAlignment="Left"
                                             Visibility="{Binding Category, Converter={x:Static local:NullToVisibilityConverter.Instance}}">
-                                        <TextBlock Text="{Binding Category.Name}" Foreground="White" FontWeight="SemiBold" TextAlignment="Center"/>
+                                        <TextBlock Text="{Binding Category.Name}" 
+                                                   Foreground="#174D7B" 
+                                                   FontWeight="SemiBold" 
+                                                   TextAlignment="Center"
+                                                   FontSize="11"/>
                                     </Border>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                             <DataGridTemplateColumn.CellEditingTemplate>
                                 <DataTemplate>
-                                    <ComboBox ItemsSource="{Binding DataContext.TaskCategories, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    <ComboBox Style="{StaticResource ModernComboBox}" 
+                                              ItemsSource="{Binding DataContext.TaskCategories, RelativeSource={RelativeSource AncestorType=Window}}"
                                               SelectedItem="{Binding Category, UpdateSourceTrigger=PropertyChanged}"
                                               DisplayMemberPath="Name" Margin="0"
                                               DropDownClosed="ComboBox_DropDownClosed"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellEditingTemplate>
                         </DataGridTemplateColumn>
-
-                        <DataGridTextColumn Header="Время" Width="120" IsReadOnly="True">
-                            <DataGridTextColumn.Binding>
-                                <Binding Path="Duration" Converter="{x:Static converters:TimeSpanFormatConverter.Instance}"/>
-                            </DataGridTextColumn.Binding>
-                        </DataGridTextColumn>
+                
+                        <DataGridTemplateColumn Header="Время" Width="120" IsReadOnly="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Duration, Converter={x:Static converters:TimeSpanFormatConverter.Instance}}" 
+                                               FontWeight="SemiBold"
+                                               Foreground="#0077B5"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                     </DataGrid.Columns>
                 </DataGrid>
 

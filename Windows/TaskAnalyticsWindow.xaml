@@ -70,7 +70,7 @@
                     </Grid.RowDefinitions>
 
                     <Border Grid.Row="0" Background="#F2F9FF" Padding="15">
-                        <TextBlock Text="Аналитика использования времени" 
+                        <TextBlock Text="Аналитика рабочего времени" 
                                    FontSize="18" FontWeight="SemiBold" 
                                    Foreground="#333333" HorizontalAlignment="Center"/>
                     </Border>
@@ -87,10 +87,44 @@
                             </Grid.ColumnDefinitions>
                             
                             <TextBlock Grid.Column="0" Text="Период с:" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                            <DatePicker Grid.Column="1" SelectedDate="{Binding StartDate}" Width="130" Margin="0,0,15,0"/>
+                            <DatePicker Grid.Column="1" SelectedDate="{Binding StartDate}" Width="130" Margin="0,0,15,0"
+                                        BorderThickness="0" Background="Transparent" FontSize="12" VerticalAlignment="Center">
+                                <DatePicker.Resources>
+                                    <Style TargetType="DatePickerTextBox">
+                                        <Setter Property="Background" Value="Transparent"/>
+                                        <Setter Property="Foreground" Value="Black"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                        <Setter Property="Padding" Value="0"/>
+                                        <Setter Property="BorderBrush" Value="Transparent"/>
+                                        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                                    </Style>
+                                    <Style TargetType="DatePicker">
+                                        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                                        <Setter Property="IsTabStop" Value="False" />
+                                        <Setter Property="Foreground" Value="Black" />
+                                    </Style>
+                                </DatePicker.Resources>
+                            </DatePicker>
                             
                             <TextBlock Grid.Column="2" Text="по:" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                            <DatePicker Grid.Column="3" SelectedDate="{Binding EndDate}" Width="130" Margin="0,0,15,0"/>
+                            <DatePicker Grid.Column="3" SelectedDate="{Binding EndDate}" Width="130" Margin="0,0,15,0"
+                                        BorderThickness="0" Background="Transparent" FontSize="12" VerticalAlignment="Center">
+                                <DatePicker.Resources>
+                                    <Style TargetType="DatePickerTextBox">
+                                        <Setter Property="Background" Value="Transparent"/>
+                                        <Setter Property="Foreground" Value="Black"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                        <Setter Property="Padding" Value="0"/>
+                                        <Setter Property="BorderBrush" Value="Transparent"/>
+                                        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                                    </Style>
+                                    <Style TargetType="DatePicker">
+                                        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                                        <Setter Property="IsTabStop" Value="False" />
+                                        <Setter Property="Foreground" Value="Black" />
+                                    </Style>
+                                </DatePicker.Resources>
+                            </DatePicker>
                             
                             <Button Grid.Column="5" Content="Обновить" Height="32" Width="100"
                                     Background="#009EE1" Foreground="White" BorderThickness="0"
@@ -216,7 +250,7 @@
                                         
                                         <TextBlock Grid.Column="0" Text="Выберите категорию:" 
                                                   VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                        <ComboBox Grid.Column="1" ItemsSource="{Binding AvailableCategories}"
+                                        <ComboBox Grid.Column="1" Style="{StaticResource ModernComboBox}" ItemsSource="{Binding AvailableCategories}"
                                                  SelectedItem="{Binding SelectedCategoryForInterruptions}"
                                                  DisplayMemberPath="Name" Width="250"
                                                  HorizontalAlignment="Left"/>

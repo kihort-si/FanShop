@@ -336,7 +336,20 @@ namespace FanShop.ViewModels
                 })
                 .OrderByDescending(g => g.TotalMinutes)
                 .ToList();
-                
+            
+                foreach (var x1 in tasks
+                             .Where(t => t.Category == null)
+                             .GroupBy(t => "Без категории")
+                             .Select(g => new
+                             {
+                                 Category = "Без категории",
+                                 Color = "#CCCCCC",
+                                 TotalMinutes = g.Sum(t => t.Duration.TotalMinutes)
+                             })
+                             .OrderByDescending(g => g.TotalMinutes)
+                             .ToList())
+                    categoryData.Add(x1);
+
             var series = new List<ISeries>();
             
             var pieValues = new List<ISeries>();
