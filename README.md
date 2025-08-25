@@ -27,6 +27,10 @@
     - Manage employee roles, shift rules, and payroll settings
     - Import/export data for backup or transfer
 
+- 📊 **Analytics and Reporting**
+    - View statistics on wor days and hours worked
+    - Make visual charts for better insights
+
 ---
 
 ## UI Preview
@@ -35,7 +39,11 @@
 
 ![Employee adding](.github/images/EmployeeAdding.png)
 
-![Day view](.github/images/EmployeesForDay.png)
+![Menu view](.github/images/Menu.png)
+
+![Analytics view](.github/images/Analytics.png)
+
+![Category Adding](.github/images/CategoryAdding.png)
 
 ---
 
@@ -55,6 +63,7 @@
 - OpenXML SDK — for working with Word documents 
 - Entity Framework Core — for database interaction (SQLite)
 - Firebase — for cloud storage
+- LiveCharts2 — for data visualization
 
 ## Project Structure
 ```plaintext
@@ -63,6 +72,7 @@ FanShopCalendar/
 ├── ViewModels/          # ViewModel classes for the UI
 ├── Views/               # XAML UI files
 ├── Windows/             # Windows for different application features
+├── Controls/            # Custom user controls
 ├── Converters/          # Converters for data binding
 ├── Services/            # Business logic (payroll, pass generation, DB access)
 ├── Resources/           # Icons, templates, styles
