@@ -9,6 +9,7 @@ using FanShop.Services;
 using FanShop.Windows;
 using Microsoft.EntityFrameworkCore;
 using Application = System.Windows.Application;
+using MessageBox = System.Windows.MessageBox;
 
 namespace FanShop.ViewModels
 
@@ -147,25 +148,37 @@ namespace FanShop.ViewModels
 
         public async Task LoadMatchesFromFirebase()
         {
-            var matches = await _firebaseService.GetMatchesAsync();
-
-            AllMatches.Clear();
-
-            foreach (var match in matches)
+            try
             {
-                AllMatches.Add(new MatchInfo
+                var matches = await _firebaseService.GetMatchesAsync();
+
+                AllMatches.Clear();
+
+                foreach (var match in matches)
                 {
-                    TeamName = match.TeamName,
-                    Time = match.Time,
-                    SartTime = match.Time.Split('T')[1].Substring(0, 5),
-                    Logo = new BitmapImage(new Uri(match.Logo))
-                });
+                    AllMatches.Add(new MatchInfo
+                    {
+                        TeamName = match.TeamName,
+                        Time = match.Time,
+                        SartTime = match.Time.Split('T')[1].Substring(0, 5),
+                        Logo = new BitmapImage(new Uri(match.Logo))
+                    });
+                }
+
+                await GenerateCalendar(_currentYear, _currentMonth);
+
+                OnPropertyChanged(nameof(AllMatches));
+                OnPropertyChanged(nameof(MonthMatchesCount));
             }
-
-            await GenerateCalendar(_currentYear, _currentMonth);
-
-            OnPropertyChanged(nameof(AllMatches));
-            OnPropertyChanged(nameof(MonthMatchesCount));
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                MessageBox.Show(
+                    "Не удалось установить соединение с интернетом, расписание матчей не загрузилось. Попробуйте проверить ваше соединение.",
+                    "Нет связи с интернетом",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Information);
+            }
         }
 
 
