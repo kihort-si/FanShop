@@ -94,7 +94,6 @@ namespace FanShop.Windows
             if (e.Key == Key.Enter)
             {
                 var textBox = sender as TextBox;
-                Console.WriteLine($"Введено: {textBox?.Text}");
                 
                 var bindingExpression = textBox?.GetBindingExpression(TextBox.TextProperty);
                 bindingExpression?.UpdateSource();

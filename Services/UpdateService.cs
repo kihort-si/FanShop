@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
@@ -30,9 +31,9 @@ namespace FanShop.Services
                 if (latestRelease == null)
                     return false;
 
-                var latestVersionString = latestRelease.TagName.StartsWith("v")
-                    ? latestRelease.TagName.Substring(1)
-                    : latestRelease.TagName;
+                var latestVersionString = latestRelease.Tag_Name.StartsWith("v")
+                    ? latestRelease.Tag_Name.Substring(1)
+                    : latestRelease.Tag_Name;
 
                 if (!Version.TryParse(latestVersionString, out var latestVersion))
                     return false;
@@ -57,9 +58,9 @@ namespace FanShop.Services
                 string downloadUrl = null;
                 foreach (var asset in latestRelease.Assets)
                 {
-                    if (asset.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+                    if (asset.Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
                     {
-                        downloadUrl = asset.BrowserDownloadUrl;
+                        downloadUrl = asset.Browser_Download_Url;
                         break;
                     }
                 }
@@ -68,17 +69,34 @@ namespace FanShop.Services
                     return false;
 
                 var appPath = Process.GetCurrentProcess().MainModule.FileName;
-                var tempFilePath = Path.Combine(Path.GetDirectoryName(appPath), "update.exe");
+                var tempZipPath = Path.Combine(Path.GetTempPath(), "FanShopUpdate.zip");
+                var tempExtractPath = Path.Combine(Path.GetTempPath(), "FanShopUpdate");
 
-                await DownloadFileAsync(downloadUrl, tempFilePath);
+                await DownloadFileAsync(downloadUrl, tempZipPath);
 
-                CreateUpdateScript(appPath, tempFilePath);
+                if (Directory.Exists(tempExtractPath))
+                    Directory.Delete(tempExtractPath, true);
+
+                ZipFile.ExtractToDirectory(tempZipPath, tempExtractPath);
+                File.Delete(tempZipPath);
+
+                CreateUpdateScript(tempExtractPath, appPath);
+
+                string batPath = Path.Combine(Path.GetTempPath(), "update_fanshop.bat");
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = batPath,
+                    CreateNoWindow = true,
+                    UseShellExecute = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
+                });
+
+                Application.Current.Shutdown();
 
                 return true;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Ошибка при обновлении: {ex.Message}");
                 return false;
             }
         }
@@ -135,36 +153,38 @@ namespace FanShop.Services
             await response.Content.CopyToAsync(fileStream);
         }
 
-        private void CreateUpdateScript(string appPath, string updateFilePath)
+        private void CreateUpdateScript(string tempExtractPath, string appPath)
         {
-            var updaterPath = Path.Combine(Path.GetDirectoryName(appPath), "updater.bat");
-            var appFileName = Path.GetFileName(appPath);
+            string currentDir = Path.GetDirectoryName(appPath);
+            string appExeName = Path.GetFileName(appPath);
+            string batPath = Path.Combine(Path.GetTempPath(), "update_fanshop.bat");
 
-            var scriptContent = $@"@echo off
-timeout /t 2 /nobreak > nul
+            string script = $@"
+@echo off
 echo Обновление FanShop...
-if exist backup.exe del backup.exe
-copy ""{appFileName}"" backup.exe
-del ""{appFileName}""
-copy update.exe ""{appFileName}""
-del update.exe
-start """" ""{appFileName}""
+timeout /t 2 /nobreak > nul
+
+xcopy /E /Y /I ""{tempExtractPath}\*"" ""{currentDir}\""
+rmdir /S /Q ""{tempExtractPath}""
+
+start """" ""{Path.Combine(currentDir, appExeName)}""
+
 del ""%~f0""
 ";
 
-            File.WriteAllText(updaterPath, scriptContent);
+            File.WriteAllText(batPath, script);
         }
     }
 
     public class ReleaseInfo
     {
-        public string TagName { get; set; }
+        public string Tag_Name { get; set; }
         public ReleaseAsset[] Assets { get; set; }
     }
 
     public class ReleaseAsset
     {
         public string Name { get; set; }
-        public string BrowserDownloadUrl { get; set; }
+        public string Browser_Download_Url { get; set; }
     }
 }

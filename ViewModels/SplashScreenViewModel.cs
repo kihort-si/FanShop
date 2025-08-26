@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Application = System.Windows.Application;
 
@@ -90,7 +91,7 @@ public class SplashScreenViewModel : INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Ошибка обновления прогресса: {ex.Message}");
+            Debug.WriteLine($"Ошибка обновления прогресса: {ex.Message}");
         }
     }
     
