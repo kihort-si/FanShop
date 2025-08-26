@@ -10,6 +10,8 @@
         <ApplicationIcon>icon.ico</ApplicationIcon>
         <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
         <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
     </PropertyGroup>
 
     <ItemGroup>
@@ -53,6 +55,7 @@
       <Content Include="Resources\zenit_arena.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+      <Content Update="icon.ico" CopyToOutputDirectory="Never" />
     </ItemGroup>
 
     <ItemGroup>

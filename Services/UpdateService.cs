@@ -82,21 +82,28 @@ namespace FanShop.Services
 
                 CreateUpdateScript(tempExtractPath, appPath);
 
+                System.Windows.MessageBox.Show(
+                    "Приложение будет закрыто для обновления и автоматически запущено после завершения.",
+                    "Обновление FanShop",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Information);
+
                 string batPath = Path.Combine(Path.GetTempPath(), "update_fanshop.bat");
+
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = batPath,
-                    CreateNoWindow = true,
+                    CreateNoWindow = false,
                     UseShellExecute = true,
-                    WindowStyle = ProcessWindowStyle.Hidden
+                    WindowStyle = ProcessWindowStyle.Normal
                 });
 
-                Application.Current.Shutdown();
-
+                Environment.Exit(0);
                 return true;
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"Ошибка при обновлении: {ex.Message}");
                 return false;
             }
         }
@@ -160,17 +167,29 @@ namespace FanShop.Services
             string batPath = Path.Combine(Path.GetTempPath(), "update_fanshop.bat");
 
             string script = $@"
-@echo off
-echo Обновление FanShop...
-timeout /t 2 /nobreak > nul
-
-xcopy /E /Y /I ""{tempExtractPath}\*"" ""{currentDir}\""
-rmdir /S /Q ""{tempExtractPath}""
-
-start """" ""{Path.Combine(currentDir, appExeName)}""
-
-del ""%~f0""
-";
+        @echo off
+        echo Обновление FanShop...
+        timeout /t 3 /nobreak > nul
+        
+        REM Убедимся, что процесс завершен
+        taskkill /f /im ""{appExeName}"" /t >nul 2>&1
+        
+        REM Дополнительная пауза для освобождения файлов
+        timeout /t 2 /nobreak > nul
+        
+        REM Копируем файлы обновления
+        xcopy /E /Y /I ""{tempExtractPath}\*"" ""{currentDir}\""
+        
+        REM Удаляем временную папку
+        rmdir /S /Q ""{tempExtractPath}""
+        
+        REM Запускаем обновленное приложение
+        start """" ""{Path.Combine(currentDir, appExeName)}""
+        
+        REM Удаляем файл скрипта
+        timeout /t 1 /nobreak > nul
+        del ""%~f0""
+        ";
 
             File.WriteAllText(batPath, script);
         }
