@@ -55,7 +55,7 @@
       <Content Include="Resources\zenit_arena.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
-      <Content Update="icon.ico" CopyToOutputDirectory="Never" />
+      <Content Update="icon.ico" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
     <ItemGroup>
