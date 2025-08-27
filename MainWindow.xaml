@@ -43,7 +43,10 @@
                        Width="100"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Center"
-                       Margin="24,12,0,12"/>
+                       Margin="24,12,0,12"
+                       RenderOptions.BitmapScalingMode="HighQuality"
+                       RenderOptions.EdgeMode="Aliased"
+                       Stretch="Uniform"/>
 
                 <Button Grid.Column="2"
                         Command="{Binding ToggleMenuCommand}"
@@ -460,7 +463,7 @@
                                                             <Grid>
                                                                 <Grid.ColumnDefinitions>
                                                                     <ColumnDefinition Width="2*"/>
-                                                                    <ColumnDefinition Width="Auto"/>
+                                                                    <ColumnDefinition Width="65"/>
                                                                     <ColumnDefinition Width="65"/>
                                                                 </Grid.ColumnDefinitions>
                                                                 
@@ -476,10 +479,10 @@
                                                                 </StackPanel>
                                                                 
                                                                 <Border Grid.Column="1" Background="#F0F7FF" CornerRadius="15" 
-                                                                        Padding="8,3" Margin="5,0,0,0" HorizontalAlignment="Center">
+                                                                        Padding="8,3" Margin="0,0,0,0" HorizontalAlignment="Center">
                                                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
                                                                         <TextBlock Text="{Binding WorkDaysCount, Converter={x:Static converters:ShiftToRussian.Instance}}" FontSize="13" 
-                                                                                   Foreground="#0077B5" FontWeight="SemiBold" TextAlignment="Center" HorizontalAlignment="Center"/>
+                                                                                   Foreground="#0077B5" FontWeight="SemiBold"/>
                                                                     </StackPanel>
                                                                 </Border>
                                                                 

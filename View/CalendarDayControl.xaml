@@ -92,7 +92,10 @@
                         Visibility="{Binding HasMatch, Converter={StaticResource BoolToVisibilityConverter}}">
                 <Image Source="{Binding Match.Logo}"
                        Height="44"
-                       Width="Auto">
+                       Width="Auto"
+                       RenderOptions.BitmapScalingMode="HighQuality"
+                       RenderOptions.EdgeMode="Aliased"
+                       Stretch="Uniform">
                 </Image>
                 <TextBlock Text="{Binding Match.TeamName}"
                            FontWeight="Bold"
