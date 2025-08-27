@@ -161,7 +161,8 @@ namespace FanShop.ViewModels
                         TeamName = match.TeamName,
                         Time = match.Time,
                         SartTime = match.Time.Split('T')[1].Substring(0, 5),
-                        Logo = new BitmapImage(new Uri(match.Logo))
+                        Logo = new BitmapImage(new Uri(match.Logo)),
+                        CanChange = match.CanChange
                     });
                 }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
@@ -69,6 +70,7 @@ namespace FanShop.ViewModels
                 if (SetProperty(ref _match, value))
                 {
                     HasMatch = _match != null;
+                    OnPropertyChanged(nameof(ShowChangeNotice));
                 }
             }
         }
@@ -80,6 +82,8 @@ namespace FanShop.ViewModels
             get => _hasMatch;
             set => SetProperty(ref _hasMatch, value);
         }
+        
+        public bool ShowChangeNotice => HasMatch && Match != null && Match.CanChange;
 
         private bool _isCurrentMonth;
 
@@ -323,6 +327,7 @@ namespace FanShop.ViewModels
         public string Time { get; set; }
         public string SartTime { get; set; }
         public BitmapImage Logo { get; set; }
+        public bool CanChange { get; set; }
     }
     
     public class EmployeeWorkInfo

@@ -23,16 +23,42 @@
                 <RowDefinition Height="Auto"></RowDefinition>
             </Grid.RowDefinitions>
 
-            <TextBlock Text="{Binding Date.Day}"
-                       FontSize="12"
-                       FontWeight="Bold"
-                       FontFamily="Open Sans"
-                       HorizontalAlignment="Left"
-                       Margin="0,0,0,0">
-                <TextBlock.Foreground>
-                    <SolidColorBrush Color="{Binding ., Converter={StaticResource DateToTodayColorConverter}}"/>
-                </TextBlock.Foreground>
-            </TextBlock>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Date.Day}"
+                           FontSize="12"
+                           FontWeight="Bold"
+                           FontFamily="Open Sans"
+                           HorizontalAlignment="Left"
+                           Margin="0,0,0,0">
+                    <TextBlock.Foreground>
+                        <SolidColorBrush Color="{Binding ., Converter={StaticResource DateToTodayColorConverter}}"/>
+                    </TextBlock.Foreground>
+                </TextBlock>
+                <Border Grid.Column="1" Visibility="{Binding ShowChangeNotice, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Grid>
+                        <Ellipse Width="16" Height="16" Fill="#FFC107" />
+                        <TextBlock Text="?" 
+                                   FontWeight="Bold"
+                                   FontFamily="Open Sans"
+                                   FontSize="12"
+                                   Foreground="White"
+                                   HorizontalAlignment="Center" 
+                                   VerticalAlignment="Center" />
+                        <Grid.ToolTip>
+                            <ToolTip Background="#333333" Foreground="White" Padding="8,4">
+                                <TextBlock Text="Время и дата матча могут измениться" 
+                                           FontFamily="Open Sans"
+                                           FontSize="11" />
+                            </ToolTip>
+                        </Grid.ToolTip>
+                    </Grid>
+                </Border>
+            </Grid>
+            
 
             <ItemsControl Grid.Row="1" ItemsSource="{Binding DisplayedEmployees}">
                 <ItemsControl.ItemTemplate>
