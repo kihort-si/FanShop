@@ -754,7 +754,7 @@
                                        FontSize="16" 
                                        Foreground="#0077B5" 
                                        HorizontalAlignment="Center"/>
-                            <TextBlock Text="Версия 1.2.2" 
+                            <TextBlock Text="Версия 1.2.3" 
                                        FontSize="12" 
                                        Foreground="#666666" 
                                        HorizontalAlignment="Center"
