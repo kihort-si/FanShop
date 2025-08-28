@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
@@ -110,7 +112,6 @@ namespace FanShop.ViewModels
                 IsMenuOpen = false;
                 IsBlackoutMode = false;
             });
-            LoadMatchesFromFirebase();
             GenerateCalendar(_currentYear, _currentMonth);
             _lastCalendarUpdateDate = DateTime.Today;
 
@@ -165,6 +166,8 @@ namespace FanShop.ViewModels
                         CanChange = match.CanChange
                     });
                 }
+                
+                SaveMatchesToLocalFile(matches);
 
                 await GenerateCalendar(_currentYear, _currentMonth);
 
@@ -173,15 +176,22 @@ namespace FanShop.ViewModels
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                MessageBox.Show(
-                    "Не удалось установить соединение с интернетом, расписание матчей не загрузилось. Попробуйте проверить ваше соединение.",
-                    "Нет связи с интернетом",
-                    System.Windows.MessageBoxButton.OK,
-                    System.Windows.MessageBoxImage.Information);
+                if (LoadMatchesFromLocalFile())
+                {
+                    await GenerateCalendar(_currentYear, _currentMonth);
+                    OnPropertyChanged(nameof(AllMatches));
+                    OnPropertyChanged(nameof(MonthMatchesCount));
+                }
+                else
+                {
+                    MessageBox.Show(
+                        "Не удалось установить соединение с интернетом, расписание матчей не загрузилось. Локальная копия данных также недоступна.",
+                        "Ошибка загрузки данных",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
             }
         }
-
 
         public async Task GenerateCalendar(int year, int month)
         {
@@ -269,6 +279,59 @@ namespace FanShop.ViewModels
             settingsWindow.ShowInTaskbar = false;
             settingsWindow.ShowDialog();
         }
+        private static readonly string MatchesFilePath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), 
+            "FanShop", 
+            "matches.json");
+
+        private void SaveMatchesToLocalFile(IEnumerable<dynamic> matches)
+        {
+            try
+            {
+                var matchDtos = matches.Select(m => new MatchInfoDto
+                {
+                    TeamName = m.TeamName,
+                    Time = m.Time,
+                    SartTime = m.Time.Split('T')[1].Substring(0, 5),
+                    CanChange = m.CanChange
+                }).ToList();
+                
+                Directory.CreateDirectory(Path.GetDirectoryName(MatchesFilePath)!);
+                var json = JsonSerializer.Serialize(matchDtos, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(MatchesFilePath, json);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка сохранения данных матчей: {ex.Message}");
+            }
+        }
+
+        private bool LoadMatchesFromLocalFile()
+        {
+            try
+            {
+                if (File.Exists(MatchesFilePath))
+                {
+                    var json = File.ReadAllText(MatchesFilePath);
+                    var matches = JsonSerializer.Deserialize<List<MatchInfo>>(json);
+            
+                    if (matches != null && matches.Any())
+                    {
+                        AllMatches.Clear();
+                        foreach (var match in matches)
+                        {
+                            AllMatches.Add(match);
+                        }
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка загрузки данных матчей: {ex.Message}");
+            }
+            return false;
+        }
 
         private Settings GetSettings()
         {
@@ -310,6 +373,14 @@ namespace FanShop.ViewModels
             OnPropertyChanged(nameof(TotalSalary));
             OnPropertyChanged(nameof(EmployeeStatistics));
         }
+    }
+    
+    public class MatchInfoDto
+    {
+        public string TeamName { get; set; }
+        public string Time { get; set; }
+        public string SartTime { get; set; }
+        public bool CanChange { get; set; }
     }
 
     public class RelayCommand : ICommand
