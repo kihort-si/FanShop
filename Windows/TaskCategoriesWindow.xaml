@@ -4,6 +4,7 @@
        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
        xmlns:local="clr-namespace:FanShop.Windows"
+       xmlns:utils="clr-namespace:FanShop.Utils"
        mc:Ignorable="d"
        Title="Категории задач" Height="600" Width="650"
        WindowStyle="None" ResizeMode="NoResize"
@@ -309,7 +310,8 @@
                                    <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1"
                                            CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
                                        <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
-                                                BorderThickness="0" Background="Transparent" FontSize="14"/>
+                                                BorderThickness="0" Background="Transparent" FontSize="14"
+                                                utils:KeyboardNavigation.EnableArrowNavigation="True"/>
                                    </Border>
 
                                    <TextBlock Text="Описание:" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
@@ -317,14 +319,16 @@
                                            CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
                                        <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
                                                 BorderThickness="0" Background="Transparent" FontSize="14"
-                                                TextWrapping="Wrap" AcceptsReturn="True" Height="70"/>
+                                                TextWrapping="Wrap" AcceptsReturn="True" Height="70"
+                                                utils:KeyboardNavigation.EnableArrowNavigation="True"/>
                                    </Border>
                                    
                                    <TextBlock Text="Задача по умолчанию:" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
                                    <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1"
                                            CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
                                        <TextBox Text="{Binding DefaultTask, UpdateSourceTrigger=PropertyChanged}"
-                                                BorderThickness="0" Background="Transparent" FontSize="14"/>
+                                                BorderThickness="0" Background="Transparent" FontSize="14"
+                                                utils:KeyboardNavigation.EnableArrowNavigation="True"/>
                                    </Border>
                                    
                                    <StackPanel Margin="0,0,0,10">

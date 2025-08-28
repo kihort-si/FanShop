@@ -5,6 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:FanShop.Windows"
         xmlns:viewModels="clr-namespace:FanShop.ViewModels"
+        xmlns:utils="clr-namespace:FanShop.Utils"
         mc:Ignorable="d"
         Title="Настройки" Height="500" Width="450"
         WindowStyle="None" ResizeMode="NoResize"
@@ -79,42 +80,48 @@
                         <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" 
                                 CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
                             <TextBox Text="{Binding ResponsiblePerson, UpdateSourceTrigger=PropertyChanged}"
-                                     BorderThickness="0" Background="Transparent" FontSize="14"/>
+                                     BorderThickness="0" Background="Transparent" FontSize="14"
+                                     utils:KeyboardNavigation.EnableArrowNavigation="True"/>
                         </Border>
                         
                         <TextBlock Text="Номер телефона:" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
                         <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" 
                                 CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
                             <TextBox Text="{Binding ResponsiblePhoneNumber, UpdateSourceTrigger=PropertyChanged}"
-                                     BorderThickness="0" Background="Transparent" FontSize="14"/>
+                                     BorderThickness="0" Background="Transparent" FontSize="14"
+                                     utils:KeyboardNavigation.EnableArrowNavigation="True"/>
                         </Border>
                         
                         <TextBlock Text="Должность:" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
                         <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" 
                                 CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
                             <TextBox Text="{Binding ResponsiblePosition, UpdateSourceTrigger=PropertyChanged}"
-                                     BorderThickness="0" Background="Transparent" FontSize="14"/>
+                                     BorderThickness="0" Background="Transparent" FontSize="14"
+                                     utils:KeyboardNavigation.EnableArrowNavigation="True"/>
                         </Border>
                         
                         <TextBlock Text="Цель визита:" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
                         <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" 
                                 CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
                             <TextBox Text="{Binding VisitGoal, UpdateSourceTrigger=PropertyChanged}"
-                                     BorderThickness="0" Background="Transparent" FontSize="14"/>
+                                     BorderThickness="0" Background="Transparent" FontSize="14"
+                                     utils:KeyboardNavigation.EnableArrowNavigation="True"/>
                         </Border>
                         
                         <TextBlock Text="Начальник (ООО «Зенит-Трейд»):" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
                         <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" 
                                 CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
                             <TextBox Text="{Binding Head, UpdateSourceTrigger=PropertyChanged}"
-                                     BorderThickness="0" Background="Transparent" FontSize="14"/>
+                                     BorderThickness="0" Background="Transparent" FontSize="14"
+                                     utils:KeyboardNavigation.EnableArrowNavigation="True"/>
                         </Border>
                         
                         <TextBlock Text="Заработная плата за день:" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
                         <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" 
                                 CornerRadius="4" Padding="10,8" Margin="0,0,0,10">
                             <TextBox Text="{Binding DailySalary, UpdateSourceTrigger=PropertyChanged}"
-                                     BorderThickness="0" Background="Transparent" FontSize="14"/>
+                                     BorderThickness="0" Background="Transparent" FontSize="14"
+                                     utils:KeyboardNavigation.EnableArrowNavigation="True"/>
                         </Border>
                     </StackPanel>
                 </ScrollViewer>

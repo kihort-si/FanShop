@@ -4,6 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:FanShop.Windows"
+        xmlns:utils="clr-namespace:FanShop.Utils"
         mc:Ignorable="d"
         Title="Сотрудники" Height="650" Width="700"
         WindowStyle="None" ResizeMode="NoResize"
@@ -292,28 +293,32 @@
                                         <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1"
                                                 CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
                                             <TextBox Text="{Binding Surname, UpdateSourceTrigger=PropertyChanged}"
-                                                     BorderThickness="0" Background="Transparent" FontSize="14"/>
+                                                     BorderThickness="0" Background="Transparent" FontSize="14"
+                                                     utils:KeyboardNavigation.EnableArrowNavigation="True"/>
                                         </Border>
 
                                         <TextBlock Text="Имя:" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
                                         <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1"
                                                 CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
                                             <TextBox Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}"
-                                                     BorderThickness="0" Background="Transparent" FontSize="14"/>
+                                                     BorderThickness="0" Background="Transparent" FontSize="14"
+                                                     utils:KeyboardNavigation.EnableArrowNavigation="True"/>
                                         </Border>
 
                                         <TextBlock Text="Отчество:" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
                                         <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1"
                                                 CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
                                             <TextBox Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}"
-                                                     BorderThickness="0" Background="Transparent" FontSize="14"/>
+                                                     BorderThickness="0" Background="Transparent" FontSize="14"
+                                                     utils:KeyboardNavigation.EnableArrowNavigation="True"/>
                                         </Border>
 
                                         <TextBlock Text="Дата рождения:" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
                                         <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1"
                                                 CornerRadius="4" Padding="6,4" Margin="0,0,0,15">
                                             <DatePicker SelectedDate="{Binding DateOfBirthPicker, UpdateSourceTrigger=PropertyChanged}"
-                                                        BorderThickness="0" Background="Transparent" FontSize="14">
+                                                        BorderThickness="0" Background="Transparent" FontSize="14"
+                                                        utils:KeyboardNavigation.EnableArrowFocusNavigation="True">
                                                 <DatePicker.Resources>
                                                     <Style TargetType="DatePickerTextBox">
                                                         <Setter Property="Background" Value="Transparent"/>
@@ -336,14 +341,16 @@
                                         <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1"
                                                 CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
                                             <TextBox Text="{Binding PlaceOfBirth, UpdateSourceTrigger=PropertyChanged}"
-                                                     BorderThickness="0" Background="Transparent" FontSize="14"/>
+                                                     BorderThickness="0" Background="Transparent" FontSize="14"
+                                                     utils:KeyboardNavigation.EnableArrowNavigation="True"/>
                                         </Border>
 
                                         <TextBlock Text="Паспорт:" FontWeight="Medium" Foreground="#333333" Margin="0,0,0,5"/>
                                         <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1"
                                                 CornerRadius="4" Padding="10,8" Margin="0,0,0,15">
                                             <TextBox Text="{Binding Passport, UpdateSourceTrigger=PropertyChanged}"
-                                                     BorderThickness="0" Background="Transparent" FontSize="14"/>
+                                                     BorderThickness="0" Background="Transparent" FontSize="14"
+                                                     utils:KeyboardNavigation.EnableArrowNavigation="True"/>
                                         </Border>
                                     </StackPanel>
                                 </ScrollViewer>
