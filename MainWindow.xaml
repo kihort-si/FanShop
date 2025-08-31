@@ -207,7 +207,7 @@
             
                     <Border Grid.Row="2" Background="White" Margin="20,20,20,20" CornerRadius="15">
                         <Border.Effect>
-                            <DropShadowEffect ShadowDepth="2" BlurRadius="10" Opacity="0.15"/>
+                            <DropShadowEffect ShadowDepth="2" BlurRadius="10" Opacity="0.15" RenderingBias="Quality"/>
                         </Border.Effect>
                         <Grid>
                             <Grid.RowDefinitions>
@@ -231,11 +231,13 @@
                                             </LinearGradientBrush>
                                         </Border.Background>
                                         <TextBlock Text="📊" FontSize="20" Foreground="White" 
-                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                   TextOptions.TextFormattingMode="Ideal"/>
                                     </Border>
                                     <TextBlock Text="{Binding FormattedMonthTitle}" 
                                                FontSize="20" FontWeight="Bold" FontFamily="Open Sans" Foreground="#0077B5" 
-                                               VerticalAlignment="Center"/>
+                                               VerticalAlignment="Center"
+                                               TextOptions.TextFormattingMode="Ideal"/>
                                 </StackPanel>
                             </Border>
                     
@@ -253,7 +255,8 @@
                     
                                     <TextBlock Grid.Row="0" Text="Общая статистика" 
                                                FontWeight="SemiBold" FontSize="16" FontFamily="Open Sans" 
-                                               Foreground="#333333" Margin="0,0,0,15"/>
+                                               Foreground="#333333" Margin="0,0,0,15"
+                                               TextOptions.TextFormattingMode="Ideal"/>
                     
                                     <ItemsControl Grid.Row="1">
                                         <ItemsControl.ItemsPanel>
@@ -265,7 +268,7 @@
                                         <Border Width="180" Height="90" Margin="0,0,15,15" CornerRadius="10" 
                                                 Background="White" BorderThickness="1" BorderBrush="#E0E0E0">
                                             <Border.Effect>
-                                                <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1"/>
+                                                <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1" RenderingBias="Quality"/>
                                             </Border.Effect>
                                             <Grid Margin="15,10">
                                                 <Grid.RowDefinitions>
@@ -281,20 +284,23 @@
                                                             </LinearGradientBrush>
                                                         </Border.Background>
                                                         <TextBlock Text="🏆" FontSize="12" Foreground="White" 
-                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                   TextOptions.TextFormattingMode="Ideal"/>
                                                     </Border>
                                                     <TextBlock Text="Матчи" FontSize="14" Foreground="#666666" 
-                                                               VerticalAlignment="Center"/>
+                                                               VerticalAlignment="Center"
+                                                               TextOptions.TextFormattingMode="Ideal"/>
                                                 </StackPanel>
                                                 <TextBlock Grid.Row="1" Text="{Binding MonthMatchesCount}" 
-                                                           FontSize="24" FontWeight="Bold" Foreground="#333333"/>
+                                                           FontSize="24" FontWeight="Bold" Foreground="#333333"
+                                                           TextOptions.TextFormattingMode="Ideal"/>
                                             </Grid>
                                         </Border>
                     
                                         <Border Width="180" Height="90" Margin="0,0,15,15" CornerRadius="10" 
                                                 Background="White" BorderThickness="1" BorderBrush="#E0E0E0">
                                             <Border.Effect>
-                                                <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1"/>
+                                                <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1" RenderingBias="Quality"/>
                                             </Border.Effect>
                                             <Grid Margin="15,10">
                                                 <Grid.RowDefinitions>
@@ -310,20 +316,23 @@
                                                             </LinearGradientBrush>
                                                         </Border.Background>
                                                         <TextBlock Text="👥" FontSize="12" Foreground="White" 
-                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                   TextOptions.TextFormattingMode="Ideal"/>
                                                     </Border>
                                                     <TextBlock Text="Сотрудники" FontSize="14" Foreground="#666666" 
-                                                               VerticalAlignment="Center"/>
+                                                               VerticalAlignment="Center"
+                                                               TextOptions.TextFormattingMode="Ideal"/>
                                                 </StackPanel>
                                                 <TextBlock Grid.Row="1" Text="{Binding TotalEmployeesCount}" 
-                                                           FontSize="24" FontWeight="Bold" Foreground="#333333"/>
+                                                           FontSize="24" FontWeight="Bold" Foreground="#333333"
+                                                           TextOptions.TextFormattingMode="Ideal"/>
                                             </Grid>
                                         </Border>
                     
                                         <Border Width="180" Height="90" Margin="0,0,15,15" CornerRadius="10" 
                                                 Background="White" BorderThickness="1" BorderBrush="#E0E0E0">
                                             <Border.Effect>
-                                                <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1"/>
+                                                <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1" RenderingBias="Quality"/>
                                             </Border.Effect>
                                             <Grid Margin="15,10">
                                                 <Grid.RowDefinitions>
@@ -339,20 +348,23 @@
                                                             </LinearGradientBrush>
                                                         </Border.Background>
                                                         <TextBlock Text="📅" FontSize="12" Foreground="White" 
-                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                   TextOptions.TextFormattingMode="Ideal"/>
                                                     </Border>
                                                     <TextBlock Text="Рабочие дни" FontSize="14" Foreground="#666666" 
-                                                               VerticalAlignment="Center"/>
+                                                               VerticalAlignment="Center"
+                                                               TextOptions.TextFormattingMode="Ideal"/>
                                                 </StackPanel>
                                                 <TextBlock Grid.Row="1" Text="{Binding WorkDaysCount}" 
-                                                           FontSize="24" FontWeight="Bold" Foreground="#333333"/>
+                                                           FontSize="24" FontWeight="Bold" Foreground="#333333"
+                                                           TextOptions.TextFormattingMode="Ideal"/>
                                             </Grid>
                                         </Border>
                     
                                         <Border Width="180" Height="90" Margin="0,0,15,15" CornerRadius="10" 
                                                 Background="White" BorderThickness="1" BorderBrush="#E0E0E0">
                                             <Border.Effect>
-                                                <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1"/>
+                                                <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1" RenderingBias="Quality"/>
                                             </Border.Effect>
                                             <Grid Margin="15,10">
                                                 <Grid.RowDefinitions>
@@ -368,20 +380,23 @@
                                                             </LinearGradientBrush>
                                                         </Border.Background>
                                                         <TextBlock Text="⏱" FontSize="12" Foreground="White" 
-                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                   TextOptions.TextFormattingMode="Ideal"/>
                                                     </Border>
                                                     <TextBlock Text="Смены" FontSize="14" Foreground="#666666" 
-                                                               VerticalAlignment="Center"/>
+                                                               VerticalAlignment="Center"
+                                                               TextOptions.TextFormattingMode="Ideal"/>
                                                 </StackPanel>
                                                 <TextBlock Grid.Row="1" Text="{Binding TotalShiftCount}" 
-                                                           FontSize="24" FontWeight="Bold" Foreground="#333333"/>
+                                                           FontSize="24" FontWeight="Bold" Foreground="#333333"
+                                                           TextOptions.TextFormattingMode="Ideal"/>
                                             </Grid>
                                         </Border>
                     
                                         <Border Width="180" Height="90" Margin="0,0,15,15" CornerRadius="10" 
                                                 Background="White" BorderThickness="1" BorderBrush="#E0E0E0">
                                             <Border.Effect>
-                                                <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1"/>
+                                                <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1" RenderingBias="Quality"/>
                                             </Border.Effect>
                                             <Grid Margin="15,10">
                                                 <Grid.RowDefinitions>
@@ -397,13 +412,16 @@
                                                             </LinearGradientBrush>
                                                         </Border.Background>
                                                         <TextBlock Text="💰" FontSize="12" Foreground="White" 
-                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                   TextOptions.TextFormattingMode="Ideal"/>
                                                     </Border>
                                                     <TextBlock Text="Зарплата" FontSize="14" Foreground="#666666" 
-                                                               VerticalAlignment="Center"/>
+                                                               VerticalAlignment="Center"
+                                                               TextOptions.TextFormattingMode="Ideal"/>
                                                 </StackPanel>
                                                 <TextBlock Grid.Row="1" Text="{Binding TotalSalary}" 
-                                                           FontSize="24" FontWeight="Bold" Foreground="#333333"/>
+                                                           FontSize="24" FontWeight="Bold" Foreground="#333333"
+                                                           TextOptions.TextFormattingMode="Ideal"/>
                                             </Grid>
                                         </Border>
                                     </ItemsControl>
@@ -425,11 +443,13 @@
                                                     </LinearGradientBrush>
                                                 </Border.Background>
                                                 <TextBlock Text="👤" FontSize="16" Foreground="White" 
-                                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                           TextOptions.TextFormattingMode="Ideal"/>
                                             </Border>
                                             <TextBlock Text="Статистика по сотрудникам" 
                                                        FontWeight="SemiBold" FontSize="16" FontFamily="Open Sans" 
-                                                       Foreground="#333333" VerticalAlignment="Center"/>
+                                                       Foreground="#333333" VerticalAlignment="Center"
+                                                       TextOptions.TextFormattingMode="Ideal"/>
                                         </StackPanel>
                     
                                         <Border Grid.Row="1" VerticalAlignment="Top" Background="#E3F2FD" 
@@ -441,11 +461,14 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
                                                 <TextBlock Grid.Column="0" Text="Имя" FontWeight="SemiBold" 
-                                                           FontSize="13" Foreground="#0077B5"/>
+                                                           FontSize="13" Foreground="#0077B5"
+                                                           TextOptions.TextFormattingMode="Ideal"/>
                                                 <TextBlock Grid.Column="1" Text="Смены" FontWeight="SemiBold" 
-                                                           FontSize="13" Foreground="#0077B5" Margin="10,0,25,0"/>
+                                                           FontSize="13" Foreground="#0077B5" Margin="10,0,25,0"
+                                                           TextOptions.TextFormattingMode="Ideal"/>
                                                 <TextBlock Grid.Column="2" Text="Зарплата" FontWeight="SemiBold" 
-                                                           FontSize="13" Foreground="#0077B5"/>
+                                                           FontSize="13" Foreground="#0077B5"
+                                                           TextOptions.TextFormattingMode="Ideal"/>
                                             </Grid>
                                         </Border>
                     
@@ -458,7 +481,7 @@
                                                                Background="White" CornerRadius="6" 
                                                                BorderThickness="1" BorderBrush="#E0E0E0">
                                                             <Border.Effect>
-                                                                <DropShadowEffect ShadowDepth="1" BlurRadius="3" Opacity="0.1"/>
+                                                                <DropShadowEffect ShadowDepth="1" BlurRadius="3" Opacity="0.1" RenderingBias="Quality"/>
                                                             </Border.Effect>
                                                             <Grid>
                                                                 <Grid.ColumnDefinitions>
@@ -472,23 +495,27 @@
                                                                             Background="#E3F2FD">
                                                                         <TextBlock Text="{Binding EmployeeName[0]}" FontSize="14" 
                                                                                    Foreground="#0077B5" FontWeight="SemiBold"
-                                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                                   TextOptions.TextFormattingMode="Ideal"/>
                                                                     </Border>
                                                                     <TextBlock Text="{Binding EmployeeName}" FontSize="14" 
-                                                                               Foreground="#333333" VerticalAlignment="Center"/>
+                                                                               Foreground="#333333" VerticalAlignment="Center"
+                                                                               TextOptions.TextFormattingMode="Ideal"/>
                                                                 </StackPanel>
                                                                 
                                                                 <Border Grid.Column="1" Background="#F0F7FF" CornerRadius="15" 
                                                                         Padding="8,3" Margin="0,0,0,0" HorizontalAlignment="Center">
                                                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
                                                                         <TextBlock Text="{Binding WorkDaysCount, Converter={x:Static converters:ShiftToRussian.Instance}}" FontSize="13" 
-                                                                                   Foreground="#0077B5" FontWeight="SemiBold"/>
+                                                                                   Foreground="#0077B5" FontWeight="SemiBold"
+                                                                                   TextOptions.TextFormattingMode="Ideal"/>
                                                                     </StackPanel>
                                                                 </Border>
                                                                 
                                                                 <TextBlock Grid.Column="2" Text="{Binding TotalSalary}" 
                                                                            FontSize="14" FontWeight="Bold" Foreground="#333333" 
-                                                                           VerticalAlignment="Center" TextAlignment="Center"/>
+                                                                           VerticalAlignment="Center" TextAlignment="Center"
+                                                                           TextOptions.TextFormattingMode="Ideal"/>
                                                             </Grid>
                                                         </Border>
                                                     </DataTemplate>
