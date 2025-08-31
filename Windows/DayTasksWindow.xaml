@@ -318,6 +318,8 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Content="Добавить" Style="{StaticResource ActionButton}"
                                 Command="{Binding AddTaskCommand}" Background="#009EE1"/>
+                        <Button Content="Экспорт в Excel" Width="120" Style="{StaticResource ActionButton}" 
+                                Command="{Binding ExportToExcelCommand}" Background="#28A745"/>
                         <Button Content="Удалить" Style="{StaticResource ActionButton}"
                                 Command="{Binding RemoveTaskCommand}" Background="#EB0004"/>
                         <Button Content="Закрыть" Style="{StaticResource ActionButton}"

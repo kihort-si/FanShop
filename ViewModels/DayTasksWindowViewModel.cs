@@ -102,6 +102,7 @@ namespace FanShop.ViewModels
         }
 
         public ICommand AddTaskCommand { get; }
+        public ICommand ExportToExcelCommand { get; }
         public ICommand RemoveTaskCommand { get; } 
         public ICommand CloseWindowCommand { get; }
 
@@ -110,6 +111,7 @@ namespace FanShop.ViewModels
             Date = date;
             
             AddTaskCommand = new RelayCommand(AddTask);
+            ExportToExcelCommand = new RelayCommand(ExportToExcel);
             RemoveTaskCommand = new RelayCommand(RemoveTask, CanEditTask);
             CloseWindowCommand = new RelayCommand(CloseWindow);
 
@@ -156,6 +158,13 @@ namespace FanShop.ViewModels
         private bool CanEditTask(object parameter)
         {
             return SelectedTask != null;
+        }
+        
+        private void ExportToExcel(object parameter)
+        {
+            DateTime startDate = Date.Date;
+            DateTime endDate = Date.Date;
+            TaskExportToExcel.ExportToExcel(startDate, endDate);
         }
 
         private void RemoveTask(object parameter)

@@ -295,6 +295,30 @@
 
                     <Border Grid.Row="3" Background="#F5F5F5" CornerRadius="0,0,8,8" Padding="10">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Content="Экспорт в Excel" Width="120" Height="36"
+                                    Background="#28A745" Foreground="White" 
+                                    BorderThickness="0" Cursor="Hand"
+                                    Command="{Binding ExportToExcelCommand}"
+                                    Margin="0,0,10,0">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}"
+                                                CornerRadius="4" Padding="12,6">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Button.Template>
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Opacity" Value="0.9"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                            
                             <Button Content="Закрыть" Width="120" Height="36"
                                     Background="#666666" Foreground="White" 
                                     BorderThickness="0" Cursor="Hand"

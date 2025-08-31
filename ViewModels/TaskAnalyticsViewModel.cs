@@ -100,6 +100,7 @@ namespace FanShop.ViewModels
         
         public ICommand CloseWindowCommand { get; }
         public ICommand UpdateAnalyticsCommand { get; }
+        public ICommand ExportToExcelCommand { get; }
         
         public TaskAnalyticsViewModel()
         {
@@ -108,6 +109,7 @@ namespace FanShop.ViewModels
             
             CloseWindowCommand = new RelayCommand(CloseWindow);
             UpdateAnalyticsCommand = new RelayCommand(UpdateAnalytics);
+            ExportToExcelCommand = new RelayCommand(ExportToExcel);
             
             UpdateAnalytics(null);
         }
@@ -497,6 +499,11 @@ namespace FanShop.ViewModels
             };
             
             HourOfDayXAxes = xAxis;
+        }
+
+        private void ExportToExcel(object? parameter)
+        {
+            TaskExportToExcel.ExportToExcel(StartDate, EndDate);
         }
         
         private string FormatTimeSpan(TimeSpan time)
