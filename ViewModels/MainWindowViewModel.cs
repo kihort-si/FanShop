@@ -250,7 +250,7 @@ namespace FanShop.ViewModels
             };
             employeeWindow.Owner = Application.Current.MainWindow;
             employeeWindow.ShowInTaskbar = false;
-            employeeWindow.ShowDialog();
+            employeeWindow.Show();
         }
 
         private void OpenTaskCategoriesWindow(object? parameter)
@@ -261,7 +261,7 @@ namespace FanShop.ViewModels
             };
             dayTasksWindow.Owner = Application.Current.MainWindow;
             dayTasksWindow.ShowInTaskbar = false;
-            dayTasksWindow.ShowDialog();
+            dayTasksWindow.Show();
         }
 
         private void OpenSettingsWindow(object? parameter)
@@ -277,7 +277,7 @@ namespace FanShop.ViewModels
             
             settingsWindow.Owner = Application.Current.MainWindow;
             settingsWindow.ShowInTaskbar = false;
-            settingsWindow.ShowDialog();
+            settingsWindow.Show();
         }
         private static readonly string MatchesFilePath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), 

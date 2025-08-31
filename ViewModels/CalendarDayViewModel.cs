@@ -134,7 +134,15 @@ namespace FanShop.ViewModels
                     mainViewModel.SetBlackoutMode(true);
                 }
                 dayDetailsWindow.ShowInTaskbar = false;
-                dayDetailsWindow.ShowDialog();
+                dayDetailsWindow.Show();
+                
+                dayDetailsWindow.Closed += (s, e) =>
+                {
+                    if (mainViewModel != null)
+                    {
+                        mainViewModel.SetBlackoutMode(false);
+                    }
+                };
             }
         }
 
@@ -257,7 +265,7 @@ namespace FanShop.ViewModels
                 DataContext = new DayTasksWindowViewModel(Date)
             };
             dayTasksWindow.Owner = Application.Current.MainWindow;
-            dayTasksWindow.ShowDialog();
+            dayTasksWindow.Show();
         }
 
         private void CloseWindow(object? parameter)

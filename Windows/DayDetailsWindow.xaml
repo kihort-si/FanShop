@@ -7,7 +7,7 @@
         xmlns:converters="clr-namespace:FanShop.Converters"
         mc:Ignorable="d"
         Title="Детали дня" Height="500" Width="800" 
-        WindowStyle="None" ResizeMode="NoResize" 
+        WindowStyle="None" ResizeMode="CanMinimize" 
         WindowStartupLocation="CenterOwner" Icon="/icon.ico" 
         ShowInTaskbar="False" BorderThickness="0" AllowsTransparency="True" Background="Transparent">
     

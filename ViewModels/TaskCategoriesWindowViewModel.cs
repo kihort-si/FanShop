@@ -278,7 +278,7 @@ public class TaskCategoriesWindowViewModel : BaseViewModel
             Owner = Application.Current.Windows.OfType<Window>()
                 .FirstOrDefault(w => w.GetType().Name == "TaskCategoriesWindow")
         };
-        analyticsWindow.ShowDialog();
+        analyticsWindow.Show();
     }
 
     private void CloseWindow(object? parameter)
