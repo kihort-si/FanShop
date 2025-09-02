@@ -8,6 +8,8 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles/ScrollBarStyles.xaml"/>
+                <ResourceDictionary Source="Styles/DatePickerStyles.xaml"/>
+                <ResourceDictionary Source="Styles/NonSelectableButton.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         
             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"></converters:BoolToVisibilityConverter>

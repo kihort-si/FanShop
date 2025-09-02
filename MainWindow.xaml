@@ -101,66 +101,84 @@
                                 HorizontalAlignment="Center" 
                                 Background="#FFFFFF"
                                 Margin="0,10,0,0">
-                        <Button
-                                Content="{Binding PreviousMonthName}"
-                                Command="{Binding PreviousMonthCommand}"
-                                Background="Transparent"
-                                BorderThickness="0"
-                                FontSize="14"
-                                FontFamily="Open Sans"
-                                Foreground="Gray"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center">
-                            <Button.Style>
-                                <Style TargetType="Button">
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="Button">
-                                                <Border Background="{TemplateBinding Background}">
-                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </Button.Style>
-                        </Button>
+                        <Grid Width="770">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel Grid.Column="0" HorizontalAlignment="Left" Orientation="Horizontal">
+                                <Button Width="36" Height="36" Margin="5,0" Background="Transparent" BorderThickness="0" 
+                                        ToolTip="Перейти к сегодняшнему дню" Command="{Binding GoToTodayCommand}"
+                                        Style="{StaticResource NonSelectableButton}">
+                                    <Border Width="30" Height="30" CornerRadius="15" Background="#E3F2FD">
+                                        <TextBlock Foreground="#009EE1" Text="📅" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </Button>
+    
+                                <Button Width="36" Height="36" Margin="5,0" Background="Transparent" BorderThickness="0" 
+                                        ToolTip="Выбрать месяц и год" Command="{Binding OpenDatePickerCommand}"
+                                        Style="{StaticResource NonSelectableButton}">
+                                    <Border Width="30" Height="30" CornerRadius="15" Background="#E3F2FD">
+                                        <TextBlock Foreground="#009EE1" Text="🔍" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </Button>
+                            </StackPanel>
+                            
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <Button Content="{Binding PreviousMonthName}"
+                                    Command="{Binding PreviousMonthCommand}"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    FontSize="14"
+                                    FontFamily="Open Sans"
+                                    Foreground="Gray"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Style="{StaticResource NonSelectableButton}">
+                                </Button>
 
-                        <TextBlock
-                                   Text="{Binding CurrentMonthName}"
-                                   FontSize="20"
-                                   FontWeight="Bold"
-                                   FontFamily="Open Sans"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   Margin="20, 0"/>
+                                <TextBlock Text="{Binding CurrentMonthName}"
+                                           FontSize="20"
+                                           FontWeight="Bold"
+                                           FontFamily="Open Sans"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Margin="20, 0"/>
 
-                        <Button
-                                Content="{Binding NextMonthName}"
-                                Command="{Binding NextMonthCommand}"
-                                Background="Transparent"
-                                BorderThickness="0"
-                                FontSize="14"
-                                FontFamily="Open Sans"
-                                Foreground="Gray"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center">
-                            <Button.Style>
-                                <Style TargetType="Button">
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="Button">
-                                                <Border Background="{TemplateBinding Background}">
-                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </Button.Style>
-                        </Button>
+                                <Button Content="{Binding NextMonthName}"
+                                        Command="{Binding NextMonthCommand}"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        FontSize="14"
+                                        FontFamily="Open Sans"
+                                        Foreground="Gray"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Style="{StaticResource NonSelectableButton}">
+                                </Button>
+                            </StackPanel>
+                            
+                            <StackPanel Grid.Column="2" HorizontalAlignment="Right">
+                                <Button Width="36" Height="36" Margin="5,0" Background="Transparent" BorderThickness="0" 
+                                        ToolTip="Переключить режим отображения" Command="{Binding ToggleCalendarViewModeCommand}"
+                                        Style="{StaticResource NonSelectableButton}">
+                                    <Border Width="30" Height="30" CornerRadius="15" Background="#E3F2FD">
+                                        <Grid>
+                                            <TextBlock x:Name="EmployeeIcon" Text="👥" FontSize="16" HorizontalAlignment="Center" 
+                                                       VerticalAlignment="Center" Foreground="#009EE1"
+                                                       Visibility="{Binding IsEmployeeView, Converter={x:Static converters:BoolToVisibilityConverter.Instance}}"/>
+                                            <TextBlock x:Name="TaskIcon" Text="📋" FontSize="16" HorizontalAlignment="Center" 
+                                                       VerticalAlignment="Center" Foreground="#009EE1"
+                                                       Visibility="{Binding IsEmployeeView, Converter={x:Static converters:InverseBoolToVisibilityConverter.Instance}}"/>
+                                        </Grid>
+                                    </Border>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
                     </StackPanel>
-
+                    
                     <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,0,0,0">
                         <Grid Width="770" Height="30" Margin="0,0,0,5">
                             <Grid.ColumnDefinitions>

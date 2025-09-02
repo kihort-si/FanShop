@@ -73,23 +73,6 @@ namespace FanShop.Windows
             return parent as T;
         }
         
-        private void TimeTextBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (sender is TextBox textBox)
-            {
-                textBox.SelectAll(); 
-            }
-        }
-        
-        private void TimeTextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (sender is TextBox textBox)
-            {
-                var bindingExpression = textBox.GetBindingExpression(TextBox.TextProperty);
-                bindingExpression?.UpdateSource();
-            }
-        }
-        
         private void TextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
