@@ -345,7 +345,8 @@ namespace FanShop.ViewModels
 
         private void CloseWindow(object? parameter)
         {
-            Application.Current.Windows[1]?.Close();
+            Application.Current.Windows.OfType<Window>()
+                .FirstOrDefault(w => w.GetType().Name == "EmployeeWindow")?.Close();
         }
     }
 }
