@@ -46,6 +46,27 @@ namespace FanShop.ViewModels
             set => SetProperty(ref _employees, value);
         }
         
+        private ObservableCollection<DayTask> _tasks;
+        
+        public ObservableCollection<DayTask> Tasks
+        {
+            get
+            {
+                if (_tasks == null)
+                {
+                    using var context = new AppDbContext();
+                    var tasks = context.DayTasks
+                        .Where(t => t.Date == Date)
+                        .OrderBy(t => t.StartHour)
+                        .ThenBy(t => t.StartMinute);
+                    
+                    _tasks = new ObservableCollection<DayTask>(tasks);
+                }
+                return _tasks;
+            }
+            set => SetProperty(ref _tasks, value);
+        }
+        
         private EmployeeWorkInfo _selectedEmployee;
         
         public EmployeeWorkInfo SelectedEmployee
@@ -318,7 +339,41 @@ namespace FanShop.ViewModels
                 return displayed;
             }
         }
+        
+        public string AdditionalTasksText { get; set; }
+        public bool IsAdditionalTasksTextVisible { get; set; }
 
+        public IEnumerable<object> DisplayedTasks
+        {
+            get
+            {
+                var displayed = Tasks.Take(4).Select(t => t.Title).ToList();
+
+                if (Tasks.Count > 4)
+                {
+                    AdditionalTasksText = $"+{Tasks.Count - 4} {GetTasksTextForm(Tasks.Count - 4)}";
+                    IsAdditionalTasksTextVisible = true;
+                }
+                else
+                {
+                    AdditionalTasksText = string.Empty;
+                    IsAdditionalTasksTextVisible = false;
+                }
+                
+                return displayed;
+            }
+        }
+
+        private string GetTasksTextForm(int count)
+        {
+            if (count % 10 == 1 && count % 100 != 11)
+                return "задача";
+            else if ((count % 10 >= 2 && count % 10 <= 4) && (count % 100 < 10 || count % 100 >= 20))
+                return "задачи";
+            else
+                return "задач";
+        }
+        
         private void NotifyMainWindowOfChanges()
         {
             var mainWindow = Application.Current.MainWindow;

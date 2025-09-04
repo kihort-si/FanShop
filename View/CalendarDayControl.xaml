@@ -58,7 +58,6 @@
                     </Grid>
                 </Border>
             </Grid>
-            
 
             <ItemsControl Grid.Row="1" ItemsSource="{Binding DisplayedEmployees}">
                 <ItemsControl.ItemTemplate>

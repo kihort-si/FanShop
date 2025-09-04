@@ -57,6 +57,8 @@ namespace FanShop.ViewModels
 
         public ICommand PreviousMonthCommand { get; }
         public ICommand NextMonthCommand { get; }
+        public ICommand GoToTodayCommand { get; }
+        public ICommand ToggleCalendarViewModeCommand { get; }
 
         private bool _isMenuOpen;
 
@@ -74,6 +76,14 @@ namespace FanShop.ViewModels
             set => SetProperty(ref _isBlackoutMode, value);
         }
 
+        private bool _isEmployeeView;
+        
+        public bool IsEmployeeView
+        {
+            get => _isEmployeeView;
+            set => SetProperty(ref _isEmployeeView, value);
+        }
+        
         public int TotalEmployeesCount => _statisticsService.GetTotalEmployeesCount(_currentYear, _currentMonth);
         public int WorkDaysCount => _statisticsService.GetWorkDaysCount(_currentYear, _currentMonth);
         public int TotalShiftCount => _statisticsService.GetTotalShiftCount(_currentYear, _currentMonth);
@@ -98,6 +108,8 @@ namespace FanShop.ViewModels
 
             _currentYear = DateTime.Now.Year;
             _currentMonth = DateTime.Now.Month;
+
+            GoToTodayCommand = new RelayCommand(GoToToday);
 
             PreviousMonthCommand = new RelayCommand(GoToPreviousMonth);
             NextMonthCommand = new RelayCommand(GoToNextMonth);
@@ -147,6 +159,18 @@ namespace FanShop.ViewModels
             OnPropertyChanged(nameof(FormattedMonthTitle));
         }
 
+        private async void GoToToday(object? parameter)
+        {
+            _currentYear = DateTime.Now.Year;
+            _currentMonth = DateTime.Now.Month;
+            await GenerateCalendar(_currentYear, _currentMonth);
+            OnPropertyChanged(nameof(CurrentMonthName));
+            OnPropertyChanged(nameof(PreviousMonthName));
+            OnPropertyChanged(nameof(NextMonthName));
+            RefreshStatistics();
+            OnPropertyChanged(nameof(FormattedMonthTitle));
+        }
+        
         public async Task LoadMatchesFromFirebase()
         {
             try

@@ -18,6 +18,7 @@
             <converters:DateToTodayColorConverter x:Key="DateToTodayColorConverter"></converters:DateToTodayColorConverter>
             <converters:TimeSpanFormatConverter x:Key="TimeSpanFormatConverter"></converters:TimeSpanFormatConverter>
             <converters:ShiftToRussian x:Key="ShiftToRussian"></converters:ShiftToRussian>
+            <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"></converters:InverseBoolToVisibilityConverter>
             
             <Style x:Key="ModernComboBoxToggleButton" TargetType="ToggleButton">
                 <Setter Property="Template">
