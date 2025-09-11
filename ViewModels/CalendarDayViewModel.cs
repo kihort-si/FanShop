@@ -52,16 +52,13 @@ namespace FanShop.ViewModels
         {
             get
             {
-                if (_tasks == null)
-                {
-                    using var context = new AppDbContext();
-                    var tasks = context.DayTasks
-                        .Where(t => t.Date == Date)
-                        .OrderBy(t => t.StartHour)
-                        .ThenBy(t => t.StartMinute);
+                using var context = new AppDbContext();
+                var tasks = context.DayTasks
+                    .Where(t => t.Date == Date)
+                    .OrderBy(t => t.StartHour)
+                    .ThenBy(t => t.StartMinute);
                     
-                    _tasks = new ObservableCollection<DayTask>(tasks);
-                }
+                _tasks = new ObservableCollection<DayTask>(tasks);
                 return _tasks;
             }
             set => SetProperty(ref _tasks, value);
@@ -122,6 +119,14 @@ namespace FanShop.ViewModels
             set => SetProperty(ref _isBlackoutMode, value);
         }
 
+        private bool _isEmployeeView;
+        
+        public bool IsEmployeeView
+        {
+            get => _isEmployeeView;
+            set => SetProperty(ref _isEmployeeView, value);
+        }
+
         public ICommand ShowDayDetailsCommand { get; }
         public ICommand AddEmployeesCommand { get; }
         public ICommand RemoveEmployeesCommand { get; }
@@ -137,6 +142,8 @@ namespace FanShop.ViewModels
             PrintPassCommand = new RelayCommand(PrintPass, CanPrintPass);
             DailyScheduleCommand = new RelayCommand(DaylySchedule);
             CloseWindowCommand = new RelayCommand(CloseWindow);
+            
+            IsEmployeeView = true;
         }
 
         private void ShowDayDetails(object? parameter)
@@ -286,6 +293,13 @@ namespace FanShop.ViewModels
                 DataContext = new DayTasksWindowViewModel(Date)
             };
             dayTasksWindow.Owner = Application.Current.MainWindow;
+            dayTasksWindow.Closed += (s, e) =>
+            {
+                
+                OnPropertyChanged(nameof(DisplayedTasks));
+                OnPropertyChanged(nameof(AdditionalTasksText));
+                OnPropertyChanged(nameof(IsAdditionalTasksTextVisible));
+            };
             dayTasksWindow.Show();
         }
 
@@ -328,7 +342,7 @@ namespace FanShop.ViewModels
 
                 if (Employees.Count > 4)
                 {
-                    AdditionalEmployeesText = $"Ещё {Employees.Count - 4}";
+                    AdditionalEmployeesText = $"Ещё {Employees.Count - 4} {GetEmployeesTextForm(Employees.Count - 4)}";
                     IsAdditionalEmployeesTextVisible = true;
                 }
                 else
@@ -339,6 +353,16 @@ namespace FanShop.ViewModels
 
                 return displayed;
             }
+        }
+        
+        private string GetEmployeesTextForm(int count)
+        {
+            if (count % 10 == 1 && count % 100 != 11)
+                return "сотрудник";
+            else if ((count % 10 >= 2 && count % 10 <= 4) && (count % 100 < 10 || count % 100 >= 20))
+                return "сотрудника";
+            else
+                return "сотрудников";
         }
         
         public string AdditionalTasksText { get; set; }

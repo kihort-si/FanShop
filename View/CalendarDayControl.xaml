@@ -59,32 +59,74 @@
                 </Border>
             </Grid>
 
-            <ItemsControl Grid.Row="1" ItemsSource="{Binding DisplayedEmployees}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border Background="#D9F1FB"
-                                Margin="0,2,0,0"
-                                Padding="2"
-                                CornerRadius="3">
-                            <TextBlock FontSize="8"
-                                       FontWeight="SemiBold"
-                                       FontFamily="Open Sans"
-                                       Text="{Binding}" />
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <Grid Grid.Row="1" Visibility="{Binding IsEmployeeView, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                </Grid.RowDefinitions>
+                
+                <ItemsControl Grid.Row="0" ItemsSource="{Binding DisplayedEmployees}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="#D9F1FB"
+                                    Margin="0,2,0,0"
+                                    Padding="2"
+                                    CornerRadius="3">
+                                <TextBlock FontSize="8"
+                                           FontWeight="SemiBold"
+                                           FontFamily="Open Sans"
+                                           Text="{Binding}" />
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             
-            <TextBlock Grid.Row="2" 
-                       Text="{Binding AdditionalEmployeesText}"
-                       Background="Transparent"
-                       Foreground="#009EE1"
-                       HorizontalAlignment="Center"
-                       Visibility="{Binding IsAdditionalEmployeesTextVisible, Converter={StaticResource BoolToVisibilityConverter}}"
-                       FontWeight="SemiBold"
-                       FontSize="8"
-                       FontFamily="Open Sans">
-            </TextBlock>
+                <TextBlock Grid.Row="1" 
+                           Text="{Binding AdditionalEmployeesText}"
+                           Background="Transparent"
+                           Foreground="#7D92FA"
+                           HorizontalAlignment="Center"
+                           Visibility="{Binding IsAdditionalEmployeesTextVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+                           FontWeight="SemiBold"
+                           FontSize="8"
+                           FontFamily="Open Sans">
+                </TextBlock>
+            </Grid>
+            
+            <Grid Grid.Row="1" Visibility="{Binding IsEmployeeView, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                </Grid.RowDefinitions>
+                
+                <ItemsControl Grid.Row="0" ItemsSource="{Binding DisplayedTasks}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="#003D75"
+                                    Margin="0,2,0,0"
+                                    Padding="2"
+                                    CornerRadius="3">
+                                <TextBlock FontSize="8"
+                                           FontWeight="SemiBold"
+                                           FontFamily="Open Sans"
+                                           Foreground="White"
+                                           Text="{Binding}" />
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            
+                <TextBlock Grid.Row="1" 
+                           Text="{Binding AdditionalTasksText}"
+                           Background="Transparent"
+                           Foreground="#003D75"
+                           HorizontalAlignment="Center"
+                           Visibility="{Binding IsAdditionalTasksTextVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+                           FontWeight="SemiBold"
+                           FontSize="8"
+                           FontFamily="Open Sans">
+                </TextBlock>
+            </Grid>
 
             <StackPanel Grid.Row="1" Orientation="Vertical"
                         Margin="0,8,0,0"

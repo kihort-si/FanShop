@@ -109,7 +109,10 @@ namespace FanShop.ViewModels
             _currentYear = DateTime.Now.Year;
             _currentMonth = DateTime.Now.Month;
 
+            IsEmployeeView = true;
+
             GoToTodayCommand = new RelayCommand(GoToToday);
+            ToggleCalendarViewModeCommand = new RelayCommand(ToggleCalendarViewMode);
 
             PreviousMonthCommand = new RelayCommand(GoToPreviousMonth);
             NextMonthCommand = new RelayCommand(GoToNextMonth);
@@ -169,6 +172,13 @@ namespace FanShop.ViewModels
             OnPropertyChanged(nameof(NextMonthName));
             RefreshStatistics();
             OnPropertyChanged(nameof(FormattedMonthTitle));
+        }
+        
+        private async void ToggleCalendarViewMode(object? parameter)
+        {
+            IsEmployeeView = !IsEmployeeView;
+            OnPropertyChanged(nameof(IsEmployeeView));
+            await GenerateCalendar(_currentYear, _currentMonth);
         }
         
         public async Task LoadMatchesFromFirebase()
@@ -247,7 +257,8 @@ namespace FanShop.ViewModels
                 var calendarDay = new CalendarDayViewModel
                 {
                     Date = date,
-                    IsCurrentMonth = date.Month == _currentMonth && date.Year == _currentYear
+                    IsCurrentMonth = date.Month == _currentMonth && date.Year == _currentYear,
+                    IsEmployeeView = IsEmployeeView
                 };
 
                 var matchForThisDay = matchesForMonth.FirstOrDefault(m => DateTime.Parse(m.Time).Date == date.Date);
