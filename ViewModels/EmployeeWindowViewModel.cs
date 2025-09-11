@@ -18,6 +18,14 @@ namespace FanShop.ViewModels
             set => SetProperty(ref _employees, value);
         }
         
+        private ObservableCollection<Employee> _employeesWithStats = new();
+
+        public ObservableCollection<Employee> EmployeesWithStats
+        {
+            get => _employeesWithStats; 
+            set => SetProperty(ref _employeesWithStats, value);
+        }
+        
         public ICommand AddEmployeeCommand { get; }
         public ICommand EditEmployeeCommand { get; }
         public ICommand RemoveEmployeeCommand { get; }
@@ -149,6 +157,16 @@ namespace FanShop.ViewModels
         {
             using var context = new AppDbContext();
             var allEmployees = context.Employees.ToList();
+            
+            var employeeSorted = allEmployees.Select(emp => new
+            {
+                Employee = emp
+            })
+            .OrderBy(x => x.Employee.Surname)
+            .ThenBy(x => x.Employee.FirstName)
+            .ThenBy(x => x.Employee.LastName)
+            .Select(x => x.Employee)
+            .ToList();
         
             var employeesWithStats = allEmployees.Select(emp => new
                 {
@@ -160,7 +178,8 @@ namespace FanShop.ViewModels
                 .Select(x => x.Employee)
                 .ToList();
 
-            Employees = new ObservableCollection<Employee>(employeesWithStats);
+            Employees = new ObservableCollection<Employee>(employeeSorted);
+            EmployeesWithStats = new ObservableCollection<Employee>(employeesWithStats);
             AddEmployeeCommand = new RelayCommand(AddEmployee);
             EditEmployeeCommand = new RelayCommand(EditEmployee, CanEditEmployee);
             RemoveEmployeeCommand = new RelayCommand(RemoveEmployee, CanEditEmployee);

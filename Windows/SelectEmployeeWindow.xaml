@@ -67,7 +67,7 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" Margin="15">
-                        <ListBox ItemsSource="{Binding Employees}"
+                        <ListBox ItemsSource="{Binding EmployeesWithStats}"
                                  SelectedItem="{Binding SelectedEmployee}"
                                  MouseDoubleClick="ListBox_MouseDoubleClick"
                                  BorderThickness="1" BorderBrush="#E0E0E0"
