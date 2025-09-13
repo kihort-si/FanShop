@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using FanShop.Models;
 using FanShop.Services;
+using FanShop.Utils;
 using FanShop.Windows;
 using Microsoft.EntityFrameworkCore;
 using Application = System.Windows.Application;
@@ -288,6 +289,8 @@ namespace FanShop.ViewModels
             employeeWindow.Owner = Application.Current.MainWindow;
             employeeWindow.ShowInTaskbar = false;
             employeeWindow.Show();
+            OpenWindowsController.Register(employeeWindow);
+            IsMenuOpen = false;
         }
 
         private void OpenTaskCategoriesWindow(object? parameter)
@@ -299,6 +302,8 @@ namespace FanShop.ViewModels
             dayTasksWindow.Owner = Application.Current.MainWindow;
             dayTasksWindow.ShowInTaskbar = false;
             dayTasksWindow.Show();
+            OpenWindowsController.Register(dayTasksWindow);
+            IsMenuOpen = false;
         }
 
         private void OpenSettingsWindow(object? parameter)
@@ -309,12 +314,15 @@ namespace FanShop.ViewModels
             viewModel.CloseRequested += () =>
             {
                 settingsWindow.Close();
+                OpenWindowsController.Unregister(settingsWindow);
                 RefreshStatistics();
             };
             
             settingsWindow.Owner = Application.Current.MainWindow;
             settingsWindow.ShowInTaskbar = false;
             settingsWindow.Show();
+            OpenWindowsController.Register(settingsWindow);
+            IsMenuOpen = false;
         }
         
         private void OpenFaqWindow(object? parameter)
@@ -323,6 +331,8 @@ namespace FanShop.ViewModels
             faqWindow.Owner = Application.Current.MainWindow;
             faqWindow.ShowInTaskbar = false;
             faqWindow.Show();
+            OpenWindowsController.Register(faqWindow);
+            IsMenuOpen = false;
         }
         
         private static readonly string MatchesFilePath = Path.Combine(

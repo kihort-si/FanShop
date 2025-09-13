@@ -17,7 +17,7 @@
         <vm:MainWindowViewModel />
     </Window.DataContext>
     
-    <Border Background="White">
+    <Border Background="White" PreviewMouseDown="ClickableArea_MouseDown">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="60"></RowDefinition>

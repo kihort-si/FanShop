@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Input;
 using FanShop.Models;
 using FanShop.Services;
+using FanShop.Utils;
 using Application = System.Windows.Application;
 
 namespace FanShop.ViewModels
@@ -364,8 +365,15 @@ namespace FanShop.ViewModels
 
         private void CloseWindow(object? parameter)
         {
-            Application.Current.Windows.OfType<Window>()
-                .FirstOrDefault(w => w.GetType().Name == "EmployeeWindow")?.Close();
+            var window = Application.Current.Windows
+                .OfType<Window>()
+                .FirstOrDefault(w => w.GetType().Name == "EmployeeWindow");
+
+            if (window != null)
+            {
+                OpenWindowsController.Unregister(window);
+                window.Close();
+            }
         }
     }
 }

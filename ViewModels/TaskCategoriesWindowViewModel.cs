@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 using FanShop.Models;
 using FanShop.Services;
+using FanShop.Utils;
 using FanShop.Windows;
 using Application = System.Windows.Application;
 
@@ -282,7 +283,14 @@ public class TaskCategoriesWindowViewModel : BaseViewModel
 
     private void CloseWindow(object? parameter)
     {
-        Application.Current.Windows.OfType<Window>()
-            .FirstOrDefault(w => w.GetType().Name == "TaskCategoriesWindow")?.Close();
+        var window = Application.Current.Windows
+            .OfType<Window>()
+            .FirstOrDefault(w => w.GetType().Name == "TaskCategoriesWindow");
+
+        if (window != null)
+        {
+            OpenWindowsController.Unregister(window);
+            window.Close();
+        }
     }
 }

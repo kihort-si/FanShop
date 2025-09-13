@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using FanShop.Models;
 using FanShop.Services;
+using FanShop.Utils;
 using FanShop.Windows;
 using Microsoft.EntityFrameworkCore;
 using Application = System.Windows.Application;
@@ -163,12 +164,13 @@ namespace FanShop.ViewModels
                 }
                 dayDetailsWindow.ShowInTaskbar = false;
                 dayDetailsWindow.Show();
+                OpenWindowsController.Register(dayDetailsWindow);
                 
                 dayDetailsWindow.Closed += (s, e) =>
                 {
                     if (mainViewModel != null)
                     {
-                        mainViewModel.SetBlackoutMode(false);
+                        OpenWindowsController.Unregister(dayDetailsWindow);
                     }
                 };
             }

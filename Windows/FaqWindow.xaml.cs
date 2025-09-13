@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using FanShop.Utils;
 
 namespace FanShop.Windows;
 
@@ -32,5 +33,6 @@ public partial class FaqWindow : Window
     private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
         Close();
+        OpenWindowsController.Unregister(this);
     }
 }
