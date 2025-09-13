@@ -99,6 +99,7 @@ namespace FanShop.ViewModels
         public ICommand LoadMatchesCommand { get; }
         public ICommand OpenTaskCategoriesWindowCommand { get; }
         public ICommand OpenSettingsWindowCommand { get; }
+        public ICommand OpenFaqWindowCommand { get; }
 
         public MainWindowViewModel()
         {
@@ -134,6 +135,7 @@ namespace FanShop.ViewModels
             LoadMatchesCommand = new RelayCommand(async _ => await LoadMatchesFromFirebase());
             OpenTaskCategoriesWindowCommand = new RelayCommand(OpenTaskCategoriesWindow);
             OpenSettingsWindowCommand = new RelayCommand(OpenSettingsWindow);
+            OpenFaqWindowCommand = new RelayCommand(OpenFaqWindow);
         }
 
         private async void GoToPreviousMonth(object? parameter)
@@ -314,6 +316,15 @@ namespace FanShop.ViewModels
             settingsWindow.ShowInTaskbar = false;
             settingsWindow.Show();
         }
+        
+        private void OpenFaqWindow(object? parameter)
+        {
+            var faqWindow = new FaqWindow();
+            faqWindow.Owner = Application.Current.MainWindow;
+            faqWindow.ShowInTaskbar = false;
+            faqWindow.Show();
+        }
+        
         private static readonly string MatchesFilePath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), 
             "FanShop", 

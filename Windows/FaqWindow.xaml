@@ -1,0 +1,400 @@
+﻿<Window x:Class="FanShop.Windows.FaqWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:FanShop.Windows"
+        mc:Ignorable="d"
+        Title="FaqWindow" Height="650" Width="700"
+        WindowStyle="None" ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen" Icon="/icon.ico"
+        ShowInTaskbar="False" AllowsTransparency="True"
+        Background="Transparent" BorderThickness="0">
+    <Grid>
+        <Border Background="Transparent" CornerRadius="8">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <Border Grid.Row="0" CornerRadius="8,8,0,0" MouseLeftButtonDown="Border_MouseLeftButtonDown">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="#009EE1" Offset="0.0"/>
+                            <GradientStop Color="#0077B5" Offset="1.0"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <Grid Height="40">
+                        <TextBlock Text="FAQ" FontSize="14" FontWeight="Bold" Foreground="White"
+                                   VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <Button Content="✕" HorizontalAlignment="Right" Width="40" Height="40"
+                                Background="Transparent" Foreground="White" BorderThickness="0"
+                                Click="CloseButton_Click" FontWeight="Bold" FontSize="14">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}" Padding="8">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#E81123"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </Grid>
+                </Border>
+                
+                <Border Grid.Row="1" CornerRadius="0, 0, 8, 8" BorderThickness="3, 0, 3, 3" Background="White">
+                    <Border.BorderBrush>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="#009EE1" Offset="0.0"/>
+                            <GradientStop Color="#0077B5" Offset="1.0"/>
+                        </LinearGradientBrush>
+                    </Border.BorderBrush>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        
+                        <Border Grid.Row="0" Background="#F2F9FF" Padding="15">
+                            <TextBlock Text="Самые популярные вопросы" FontSize="16" FontWeight="SemiBold"
+                                       Foreground="#333333" HorizontalAlignment="Center"/>
+                        </Border>
+                        
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="20">
+                                <ItemsControl>
+                                    <Expander Margin="0,0,0,10">
+                                        <Expander.Header>
+                                            <Border Background="#F8F9FA" BorderBrush="#E0E0E0" 
+                                                    BorderThickness="1" CornerRadius="4" 
+                                                    Padding="15,12" Width="610">
+                                                <TextBlock Text="Как добавить новго сотрудника?" 
+                                                         FontWeight="SemiBold" FontSize="14"/>
+                                            </Border>
+                                        </Expander.Header>
+                                        <Border Background="#F2F9FF" BorderBrush="#E0E0E0" 
+                                                BorderThickness="1" CornerRadius="4" 
+                                                Padding="15" Margin="0,5,0,10">
+                                            <TextBlock TextWrapping="Wrap" FontSize="13">
+                                                Для добавления нового сотрудника:
+                                                <LineBreak/>
+                                                1. Откройте меню "Сотрудники"
+                                                <LineBreak/>
+                                                2. В нижней части окна нажмите кнопку "Добавить"
+                                                <LineBreak/>
+                                                3. Введите все необходимые данные в появившуюся форму
+                                                <LineBreak/>
+                                                4. Нажмите "Сохранить" для завершения процесса
+                                            </TextBlock>
+                                        </Border>
+                                    </Expander>
+                                    
+                                    <Expander Margin="0,0,0,10">
+                                        <Expander.Header>
+                                            <Border Background="#F8F9FA" BorderBrush="#E0E0E0" 
+                                                    BorderThickness="1" CornerRadius="4" 
+                                                    Padding="15,12" Width="610">
+                                                <TextBlock Text="Как изменить данные существующего сотрудника?" 
+                                                           FontWeight="SemiBold" FontSize="14"/>
+                                            </Border>
+                                        </Expander.Header>
+                                        <Border Background="#F2F9FF" BorderBrush="#E0E0E0" 
+                                                BorderThickness="1" CornerRadius="4" 
+                                                Padding="15" Margin="0,5,0,10">
+                                            <TextBlock TextWrapping="Wrap" FontSize="13">
+                                                Для изменения данных существующего сотрудника:
+                                                <LineBreak/>
+                                                1. Откройте меню "Сотрудники"
+                                                <LineBreak/>
+                                                2. Выделите нужного сотрудника в списке
+                                                <LineBreak/>
+                                                3. В нижней части окна нажмите кнопку "Изменить"
+                                                <LineBreak/>
+                                                4. Измените все необходимые данные в появившейся форме
+                                                <LineBreak/>
+                                                5. Нажмите "Сохранить" для завершения процесса
+                                            </TextBlock>
+                                        </Border>
+                                    </Expander>
+                                    
+                                    <Expander Margin="0,0,0,10">
+                                        <Expander.Header>
+                                            <Border Background="#F8F9FA" BorderBrush="#E0E0E0" 
+                                                    BorderThickness="1" CornerRadius="4" 
+                                                    Padding="15,12" Width="610">
+                                                <TextBlock Text="Что делать если отображается некорректное расписание матчей?" 
+                                                           FontWeight="SemiBold" FontSize="14"/>
+                                            </Border>
+                                        </Expander.Header>
+                                        <Border Background="#F2F9FF" BorderBrush="#E0E0E0" 
+                                                BorderThickness="1" CornerRadius="4" 
+                                                Padding="15" Margin="0,5,0,10">
+                                            <TextBlock TextWrapping="Wrap" FontSize="13">
+                                                Если расписание матчей отображается некорректно или не обновляется:
+                                                <LineBreak/>
+                                                1. Воспользуйтесь кнопкой "Обновить расписание" в меню
+                                                <LineBreak/>
+                                                2. Провертьте подключение к интернету
+                                                <LineBreak/>
+                                                3. Если проблема сохраняется, обратитесь в техническую поддержку
+                                            </TextBlock>
+                                        </Border>
+                                    </Expander>
+                                    
+                                    <Expander Margin="0,0,0,10">
+                                        <Expander.Header>
+                                            <Border Background="#F8F9FA" BorderBrush="#E0E0E0" 
+                                                    BorderThickness="1" CornerRadius="4" 
+                                                    Padding="15,12" Width="610">
+                                                <TextBlock Text="Как добавить сотруднику смену в конкретный день?" 
+                                                           FontWeight="SemiBold" FontSize="14"/>
+                                            </Border>
+                                        </Expander.Header>
+                                        <Border Background="#F2F9FF" BorderBrush="#E0E0E0" 
+                                                BorderThickness="1" CornerRadius="4" 
+                                                Padding="15" Margin="0,5,0,10">
+                                            <TextBlock TextWrapping="Wrap" FontSize="13">
+                                                Для добавления смены сотрудника:
+                                                <LineBreak/>
+                                                1. На главном экране дважды кликните по нужному дню в календаре
+                                                <LineBreak/>
+                                                2. В нижней части появившегося окна нажмите кнопку "Добавить"
+                                                <LineBreak/>
+                                                3. Выберите сотрудника из списка и укажите время работы (по умолчанию "Целый день")
+                                                <LineBreak/>
+                                                4. Нажмите "Добавить" или дважды кликните по сотруднику в списке
+                                            </TextBlock>
+                                        </Border>
+                                    </Expander>
+                                    
+                                    <Expander Margin="0,0,0,10">
+                                        <Expander.Header>
+                                            <Border Background="#F8F9FA" BorderBrush="#E0E0E0" 
+                                                    BorderThickness="1" CornerRadius="4" 
+                                                    Padding="15,12" Width="610">
+                                                <TextBlock Text="Как удалить сотруднику смену в конкретный день?" 
+                                                           FontWeight="SemiBold" FontSize="14"/>
+                                            </Border>
+                                        </Expander.Header>
+                                        <Border Background="#F2F9FF" BorderBrush="#E0E0E0" 
+                                                BorderThickness="1" CornerRadius="4" 
+                                                Padding="15" Margin="0,5,0,10">
+                                            <TextBlock TextWrapping="Wrap" FontSize="13">
+                                                Если нужно удалить сотрудника из расписания на конкретный день:
+                                                <LineBreak/>
+                                                1. На главном экране дважды кликните по нужному дню в календаре
+                                                <LineBreak/>
+                                                2. Выделите нужного сотрудника в списке назначенных на этот день
+                                                <LineBreak/>
+                                                3. В нижней части окна нажмите кнопку "Удалить"
+                                            </TextBlock>
+                                        </Border>
+                                    </Expander>
+                                    
+                                    <Expander Margin="0,0,0,10">
+                                        <Expander.Header>
+                                            <Border Background="#F8F9FA" BorderBrush="#E0E0E0" 
+                                                    BorderThickness="1" CornerRadius="4" 
+                                                    Padding="15,12" Width="610">
+                                                <TextBlock Text="Как распечатать пропуск?" 
+                                                           FontWeight="SemiBold" FontSize="14"/>
+                                            </Border>
+                                        </Expander.Header>
+                                        <Border Background="#F2F9FF" BorderBrush="#E0E0E0" 
+                                                BorderThickness="1" CornerRadius="4" 
+                                                Padding="15" Margin="0,5,0,10">
+                                            <TextBlock TextWrapping="Wrap" FontSize="13">
+                                                Для печати пропуска на конкретный день:
+                                                <LineBreak/>
+                                                1. На главном экране дважды кликните по нужному дню в календаре
+                                                <LineBreak/>
+                                                2. Убедитесь, что нужные сотрудники добавлены в список назначенных на этот день
+                                                <LineBreak/>
+                                                3. В нижней части окна нажмите кнопку "Пропуск"
+                                                <LineBreak/>
+                                                4. Автоматически сгенерируется файл Microsoft Word с пропуском на выбранный день
+                                            </TextBlock>
+                                        </Border>
+                                    </Expander>
+                                    
+                                    <Expander Margin="0,0,0,10">
+                                        <Expander.Header>
+                                            <Border Background="#F8F9FA" BorderBrush="#E0E0E0" 
+                                                    BorderThickness="1" CornerRadius="4" 
+                                                    Padding="15,12" Width="610">
+                                                <TextBlock Text="Как изменить шаблон пропуска?" 
+                                                           FontWeight="SemiBold" FontSize="14"/>
+                                            </Border>
+                                        </Expander.Header>
+                                        <Border Background="#F2F9FF" BorderBrush="#E0E0E0" 
+                                                BorderThickness="1" CornerRadius="4" 
+                                                Padding="15" Margin="0,5,0,10">
+                                            <TextBlock x:Name="HelpPathTextBlock"  TextWrapping="Wrap" FontSize="13"/>
+                                        </Border>
+                                    </Expander>
+                                    
+                                    <Expander Margin="0,0,0,10">
+                                        <Expander.Header>
+                                            <Border Background="#F8F9FA" BorderBrush="#E0E0E0" 
+                                                    BorderThickness="1" CornerRadius="4" 
+                                                    Padding="15,12" Width="610">
+                                                <TextBlock Text="Как вести тайминг?" 
+                                                           FontWeight="SemiBold" FontSize="14"/>
+                                            </Border>
+                                        </Expander.Header>
+                                        <Border Background="#F2F9FF" BorderBrush="#E0E0E0" 
+                                                BorderThickness="1" CornerRadius="4" 
+                                                Padding="15" Margin="0,5,0,10">
+                                            <TextBlock TextWrapping="Wrap" FontSize="13">
+                                                Для наибольшей эффективности работы с таймингом:
+                                                <LineBreak/>
+                                                1. Откройте меню "Тайминг"
+                                                <LineBreak/>
+                                                2. В появившемся окне добавьте основные категории работы (например, "Довес", "Уборка", "Сборка товара" и т.д.) с помощью кнопки "Добавить" в нижней части окна
+                                                <LineBreak/>
+                                                3. В окне добавления категории введите название категории, опциональное описание и задачу по умолчанию (например, для категории "Довес" задача может быть "Довес товара перед матчем". Эта задача будет автоматически подставляться при добавлении нового тайминга).
+                                                <LineBreak/>
+                                                4. Сохраните категорию нажав "Сохранить"
+                                                <LineBreak/>
+                                                5. На главном экране дважды кликните по нужному дню
+                                                <LineBreak/>
+                                                6. В нижней части окна нажмите кнопку "Тайминг"
+                                                <LineBreak/>
+                                                7. В появившемся окне нажмите кнопку "Добавить" в нижней части окна
+                                                <LineBreak/>
+                                                8. Выберите категорию из выпадающего списка, введите задачу (по умолчанию подставится задача из категории, но её можно изменить), укажите время начала и окончания работы, дважды кликнув по ним. Обратите внимание, что если время окончания меньше времени начала, система автоматически добавит 1 день к времени окончания. Введите описание задачи, если необходимо.
+                                            </TextBlock>
+                                        </Border>
+                                    </Expander>
+                                    
+                                    <Expander Margin="0,0,0,10">
+                                        <Expander.Header>
+                                            <Border Background="#F8F9FA" BorderBrush="#E0E0E0" 
+                                                    BorderThickness="1" CornerRadius="4" 
+                                                    Padding="15,12" Width="610">
+                                                <TextBlock Text="Как изменить категорию задач?" 
+                                                           FontWeight="SemiBold" FontSize="14"/>
+                                            </Border>
+                                        </Expander.Header>
+                                        <Border Background="#F2F9FF" BorderBrush="#E0E0E0" 
+                                                BorderThickness="1" CornerRadius="4" 
+                                                Padding="15" Margin="0,5,0,10">
+                                            <TextBlock TextWrapping="Wrap" FontSize="13">
+                                                Для изменения категории задач:
+                                                <LineBreak/>
+                                                1. Откройте меню "Тайминг"
+                                                <LineBreak/>
+                                                2. В появившемся окне выделите нужную категорию в списке
+                                                <LineBreak/>
+                                                3. В нижней части окна нажмите кнопку "Изменить"
+                                                <LineBreak/>
+                                                4. В появившейся форме измените название категории, опциональное описание и задачу по умолчанию
+                                                <LineBreak/>
+                                                5. Сохраните категорию нажав "Сохранить"
+                                            </TextBlock>
+                                        </Border>
+                                    </Expander>
+                                    
+                                    <Expander Margin="0,0,0,10">
+                                        <Expander.Header>
+                                            <Border Background="#F8F9FA" BorderBrush="#E0E0E0" 
+                                                    BorderThickness="1" CornerRadius="4" 
+                                                    Padding="15,12" Width="610">
+                                                <TextBlock Text="Как посмотреть аналитику задач?" 
+                                                           FontWeight="SemiBold" FontSize="14"/>
+                                            </Border>
+                                        </Expander.Header>
+                                        <Border Background="#F2F9FF" BorderBrush="#E0E0E0" 
+                                                BorderThickness="1" CornerRadius="4" 
+                                                Padding="15" Margin="0,5,0,10">
+                                            <TextBlock TextWrapping="Wrap" FontSize="13">
+                                                Для просмотра аналитики задач:
+                                                <LineBreak/>
+                                                1. Откройте меню "Тайминг"
+                                                <LineBreak/>
+                                                2. В нижней части окна нажмите кнопку "Аналитика"
+                                                <LineBreak/>
+                                                3. В появившемся окне выберите период для анализа (по умолчанию выбраны последние 30 дней)
+                                            </TextBlock>
+                                        </Border>
+                                    </Expander>
+                                    
+                                    <Expander Margin="0,0,0,10">
+                                        <Expander.Header>
+                                            <Border Background="#F8F9FA" BorderBrush="#E0E0E0" 
+                                                    BorderThickness="1" CornerRadius="4" 
+                                                    Padding="15,12" Width="610">
+                                                <TextBlock Text="Как экспортировать тайминг в Excel?" 
+                                                           FontWeight="SemiBold" FontSize="14"/>
+                                            </Border>
+                                        </Expander.Header>
+                                        <Border Background="#F2F9FF" BorderBrush="#E0E0E0" 
+                                                BorderThickness="1" CornerRadius="4" 
+                                                Padding="15" Margin="0,5,0,10">
+                                            <TextBlock TextWrapping="Wrap" FontSize="13">
+                                                Для экспорта тайминга конкретного дня в Excel:
+                                                <LineBreak/>
+                                                1. На главном экране дважды кликните по нужному дню в календаре
+                                                <LineBreak/>
+                                                2. В нижней части окна нажмите кнопку "Тайминг"
+                                                <LineBreak/>
+                                                3. В появившемся окне нажмите кнопку "Экспорт в Excel"
+                                                <LineBreak/>
+                                                <LineBreak/>
+                                                Для экспорта тайминга за любой период в Excel:
+                                                <LineBreak/>
+                                                1. Откройте меню "Тайминг"
+                                                <LineBreak/>
+                                                2. В нижней части окна нажмите кнопку "Аналитика"
+                                                <LineBreak/>
+                                                3. В появившемся окне выберите период для анализа (по умолчанию выбраны последние 30 дней)
+                                                <LineBreak/>
+                                                4. Нажмите кнопку "Экспорт в Excel"
+                                            </TextBlock>
+                                        </Border>
+                                    </Expander>
+                                    
+                                    <Expander Margin="0,0,0,10">
+                                        <Expander.Header>
+                                            <Border Background="#F8F9FA" BorderBrush="#E0E0E0" 
+                                                    BorderThickness="1" CornerRadius="4" 
+                                                    Padding="15,12" Width="610">
+                                                <TextBlock Text="Как изменить режим отображения календаря?" 
+                                                           FontWeight="SemiBold" FontSize="14"/>
+                                            </Border>
+                                        </Expander.Header>
+                                        <Border Background="#F2F9FF" BorderBrush="#E0E0E0" 
+                                                BorderThickness="1" CornerRadius="4" 
+                                                Padding="15" Margin="0,5,0,10">
+                                            <TextBlock TextWrapping="Wrap" FontSize="13">
+                                                Для изменения режима отображения календаря:
+                                                <LineBreak/>
+                                                1. На главном экране нажмите кнопку в правом верхнем углу календаря
+                                                <LineBreak/>
+                                                2. Теперь в календаре отображаются задачи вместо сотрудников
+                                                <LineBreak/>
+                                                3. Для возврата к отображению сотрудников повторно нажмите эту же кнопку
+                                            </TextBlock>
+                                        </Border>
+                                    </Expander>
+                                </ItemsControl>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

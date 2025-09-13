@@ -781,6 +781,47 @@
                                     </Button.Style>
                                 </Button>
                             </Border>
+                            
+                            <Border CornerRadius="8" Margin="0,5" Background="Transparent">
+                                <Button Command="{Binding OpenFaqWindowCommand}">
+                                    <Button.Style>
+                                        <Style TargetType="Button">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border x:Name="border" CornerRadius="8" Padding="15" Background="Transparent">
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                    <ColumnDefinition Width="*"/>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                </Grid.ColumnDefinitions>
+                                                                
+                                                                <Border Grid.Column="0" Width="40" Height="40" CornerRadius="8" Background="#E3F2FD">
+                                                                    <TextBlock Text="❔" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                </Border>
+                                                                
+                                                                <StackPanel Grid.Column="1" Margin="15,0,0,0" VerticalAlignment="Center">
+                                                                    <TextBlock Text="FAQ" FontSize="16" FontWeight="SemiBold" Foreground="#333333"/>
+                                                                    <TextBlock Text="Самые популярные вопросы" FontSize="12" Foreground="#666666"/>
+                                                                </StackPanel>
+                                                                
+                                                                <TextBlock Grid.Column="2" Text="›" FontSize="20" FontWeight="Bold" Foreground="#009EE1" 
+                                                                          VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                                            </Grid>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter Property="Background" TargetName="border" Value="#F0F7FF"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                            </Border>
                         </StackPanel>
                     </ScrollViewer>
                     
