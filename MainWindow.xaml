@@ -11,13 +11,17 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         Title="FANSHOP" Height="800" Width="1000" 
-        WindowStartupLocation="CenterScreen" WindowState="Maximized"
+        WindowStartupLocation="CenterScreen" WindowStyle="None"
+        ResizeMode="CanResize"
+        SourceInitialized="Window_SourceInitialized"
+        Background="Transparent" AllowsTransparency="True"
+        WindowState="Maximized"
         Icon="icon.ico">
     <Window.DataContext>
         <vm:MainWindowViewModel />
     </Window.DataContext>
     
-    <Border Background="White" PreviewMouseDown="ClickableArea_MouseDown">
+    <Border Background="White" PreviewMouseDown="ClickableArea_MouseDown" CornerRadius="8" BorderThickness="0">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="60"></RowDefinition>
