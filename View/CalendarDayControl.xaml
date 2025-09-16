@@ -84,7 +84,7 @@
                 <TextBlock Grid.Row="1" 
                            Text="{Binding AdditionalEmployeesText}"
                            Background="Transparent"
-                           Foreground="#7D92FA"
+                           Foreground="#009EE1"
                            HorizontalAlignment="Center"
                            Visibility="{Binding IsAdditionalEmployeesTextVisible, Converter={StaticResource BoolToVisibilityConverter}}"
                            FontWeight="SemiBold"

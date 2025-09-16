@@ -378,7 +378,7 @@ namespace FanShop.ViewModels
 
                 if (Tasks.Count > 4)
                 {
-                    AdditionalTasksText = $"+{Tasks.Count - 4} {GetTasksTextForm(Tasks.Count - 4)}";
+                    AdditionalTasksText = $"Ещё {Tasks.Count - 4} {GetTasksTextForm(Tasks.Count - 4)}";
                     IsAdditionalTasksTextVisible = true;
                 }
                 else
