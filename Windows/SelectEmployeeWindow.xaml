@@ -66,83 +66,80 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" Margin="15">
-                        <ListBox ItemsSource="{Binding EmployeesWithStats}"
-                                 SelectedItem="{Binding SelectedEmployee}"
-                                 MouseDoubleClick="ListBox_MouseDoubleClick"
-                                 BorderThickness="1" BorderBrush="#E0E0E0"
-                                 Background="White">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Background="#F8F9FA" BorderBrush="#E9ECEF"
-                                            BorderThickness="1" CornerRadius="5"
-                                            Padding="15,10" Margin="0,2">
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="Auto"/>
-                                            </Grid.RowDefinitions>
+                    <ListBox Grid.Row="0" ItemsSource="{Binding EmployeesWithStats}"
+                             SelectedItem="{Binding SelectedEmployee}"
+                             MouseDoubleClick="ListBox_MouseDoubleClick"
+                             Margin="15" BorderThickness="1" BorderBrush="#E0E0E0">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#F8F9FA" BorderBrush="#E9ECEF"
+                                        BorderThickness="1" CornerRadius="5"
+                                        Padding="15,10" Margin="0,2">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        
+                                        <Grid Grid.Row="0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
                                             
-                                            <Grid Grid.Row="0">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                
-                                                <TextBlock Grid.Column="0" FontWeight="SemiBold" FontSize="14">
-                                                    <Run Text="{Binding FirstName}" />
-                                                    <Run Text="{Binding Surname}" />
-                                                </TextBlock>
-                                                
-                                                <Border Grid.Column="1" Background="#E3F2FD" 
-                                                        CornerRadius="4" Padding="8,4" 
-                                                        VerticalAlignment="Center">
-                                                    <TextBlock Text="Сотрудник" 
-                                                               Foreground="#0077B5" 
-                                                               FontWeight="Medium" 
-                                                               FontSize="12"/>
-                                                </Border>
-                                            </Grid>
+                                            <TextBlock Grid.Column="0" FontWeight="SemiBold" FontSize="14">
+                                                <Run Text="{Binding FirstName}" />
+                                                <Run Text="{Binding Surname}" />
+                                            </TextBlock>
                                             
-                                            <Grid Grid.Row="1" Margin="0,10,0,0">
-                                                <TextBlock Text="Время работы:" 
-                                                           VerticalAlignment="Center" 
-                                                           Margin="0,0,10,0"
-                                                           FontWeight="Medium"
-                                                           FontSize="12"
-                                                           Foreground="#555555"/>
-                                                <ComboBox Style="{StaticResource ModernComboBox}"
-                                                          SelectedValue="{Binding SelectedWorkDuration, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}"
-                                                          SelectedValuePath="Content"
-                                                          Width="140" HorizontalAlignment="Right"
-                                                          SelectionChanged="ComboBox_SelectionChanged"
-                                                          Padding="8,5">
-                                                    <ComboBoxItem Content="Целый день" />
-                                                    <ComboBoxItem Content="Полдня" />
-                                                </ComboBox>
-                                            </Grid>
+                                            <Border Grid.Column="1" Background="#E3F2FD" 
+                                                    CornerRadius="4" Padding="8,4" 
+                                                    VerticalAlignment="Center">
+                                                <TextBlock Text="Сотрудник" 
+                                                           Foreground="#0077B5" 
+                                                           FontWeight="Medium" 
+                                                           FontSize="12"/>
+                                            </Border>
                                         </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                            <ListBox.ItemContainerStyle>
-                                <Style TargetType="ListBoxItem">
-                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                    <Setter Property="Padding" Value="0"/>
-                                    <Setter Property="Margin" Value="0,4"/>
-                                    <Setter Property="Background" Value="Transparent"/>
-                                    <Style.Triggers>
-                                        <Trigger Property="IsSelected" Value="True">
-                                            <Setter Property="Background" Value="#E3F2FD"/>
-                                        </Trigger>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="#F0F7FF"/>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ListBox.ItemContainerStyle>
-                        </ListBox>
-                    </ScrollViewer>
+                                        
+                                        <Grid Grid.Row="1" Margin="0,10,0,0">
+                                            <TextBlock Text="Время работы:" 
+                                                       VerticalAlignment="Center" 
+                                                       Margin="0,0,10,0"
+                                                       FontWeight="Medium"
+                                                       FontSize="12"
+                                                       Foreground="#555555"/>
+                                            <ComboBox Style="{StaticResource ModernComboBox}"
+                                                      SelectedValue="{Binding SelectedWorkDuration, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}"
+                                                      SelectedValuePath="Content"
+                                                      Width="140" HorizontalAlignment="Right"
+                                                      SelectionChanged="ComboBox_SelectionChanged"
+                                                      Padding="8,5">
+                                                <ComboBoxItem Content="Целый день" />
+                                                <ComboBoxItem Content="Полдня" />
+                                            </ComboBox>
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Margin" Value="0,4"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="#E3F2FD"/>
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#F0F7FF"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
 
                     <Border Grid.Row="1" Background="#F5F5F5" CornerRadius="0,0,8,8" Padding="10">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">

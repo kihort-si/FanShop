@@ -181,11 +181,11 @@ namespace FanShop.ViewModels
             using var context = new AppDbContext();
             var employeeWindowViewModel = new EmployeeWindowViewModel();
 
-            var availableEmployees = employeeWindowViewModel.Employees
+            var availableEmployees = employeeWindowViewModel.EmployeesWithStats
                 .Where(e => !Employees.Any(existing => existing.Employee.EmployeeID == e.EmployeeID))
                 .ToList();
 
-            employeeWindowViewModel.Employees = new ObservableCollection<Employee>(availableEmployees);
+            employeeWindowViewModel.EmployeesWithStats = new ObservableCollection<Employee>(availableEmployees);
 
             var selectEmployeeWindow = new SelectEmployeeWindow
             {

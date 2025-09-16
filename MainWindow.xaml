@@ -110,8 +110,15 @@
                             
                             <StackPanel Grid.Column="0" HorizontalAlignment="Left" Orientation="Horizontal">
                                 <Button Width="36" Height="36" Margin="5,0" Background="Transparent" BorderThickness="0" 
-                                        ToolTip="Перейти к сегодняшнему дню" Command="{Binding GoToTodayCommand}"
+                                        Command="{Binding GoToTodayCommand}"
                                         Style="{StaticResource NonSelectableButton}">
+                                    <Button.ToolTip>
+                                        <ToolTip Background="#333333" Foreground="White" Padding="8,4">
+                                            <TextBlock Text="Перейти к сегодняшнему дню" 
+                                                       FontFamily="Open Sans"
+                                                       FontSize="11" />
+                                        </ToolTip>
+                                    </Button.ToolTip>
                                     <Border Width="30" Height="30" CornerRadius="15" Background="#E3F2FD">
                                         <TextBlock Foreground="#009EE1" Text="📅" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Border>
@@ -154,8 +161,15 @@
                             
                             <StackPanel Grid.Column="2" HorizontalAlignment="Right">
                                 <Button Width="36" Height="36" Margin="5,0" Background="Transparent" BorderThickness="0"
-                                        ToolTip="Переключить режим отображения" Command="{Binding ToggleCalendarViewModeCommand}"
+                                        Command="{Binding ToggleCalendarViewModeCommand}"
                                         Style="{StaticResource NonSelectableButton}">
+                                    <Button.ToolTip>
+                                        <ToolTip Background="#333333" Foreground="White" Padding="8,4">
+                                            <TextBlock Text="Переключить режим отображения" 
+                                                       FontFamily="Open Sans"
+                                                       FontSize="11" />
+                                        </ToolTip>
+                                    </Button.ToolTip>
                                     <Border Width="30" Height="30" CornerRadius="15" Background="#E3F2FD">
                                         <Grid>
                                             <TextBlock x:Name="EmployeeIcon" Text="👥" FontSize="16" HorizontalAlignment="Center"
