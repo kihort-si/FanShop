@@ -10,7 +10,6 @@ using FanShop.Models;
 using FanShop.Services;
 using FanShop.Utils;
 using FanShop.Windows;
-using Microsoft.EntityFrameworkCore;
 using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
 
@@ -98,6 +97,8 @@ namespace FanShop.ViewModels
             _statisticsService.GetEmployeeStatistics(_currentYear, _currentMonth);
 
         public int MonthMatchesCount => GetMonthMatchesCount();
+        
+        private bool isMatchesLoaded = false;
         public ICommand ToggleMenuCommand { get; }
         public ICommand CloseMenuCommand { get; }
         public ICommand OpenEmployeeWindowCommand { get; }
@@ -137,8 +138,19 @@ namespace FanShop.ViewModels
             _lastCalendarUpdateDate = DateTime.Today;
 
             OpenEmployeeWindowCommand = new RelayCommand(OpenEmployeeWindow);
-            LoadMatchesCommand = new RelayCommand(async _ => await LoadMatchesFromFirebase());
-            OpenTaskCategoriesWindowCommand = new RelayCommand(OpenTaskCategoriesWindow);
+            LoadMatchesCommand = new RelayCommand(async _ => 
+            {
+                await LoadMatchesFromFirebase();
+                if (isMatchesLoaded)
+                {
+                    MessageBox.Show("Расписание матчей успешно обновлено.", 
+                        "Обновление завершено", 
+                        MessageBoxButton.OK, 
+                        MessageBoxImage.Information);
+                }
+            });
+
+        OpenTaskCategoriesWindowCommand = new RelayCommand(OpenTaskCategoriesWindow);
             OpenSettingsWindowCommand = new RelayCommand(OpenSettingsWindow);
             OpenFaqWindowCommand = new RelayCommand(OpenFaqWindow);
         }
@@ -216,6 +228,8 @@ namespace FanShop.ViewModels
                 
                 SaveMatchesToLocalFile(matches);
 
+                isMatchesLoaded = true;
+                
                 await GenerateCalendar(_currentYear, _currentMonth);
 
                 OnPropertyChanged(nameof(AllMatches));
@@ -223,11 +237,18 @@ namespace FanShop.ViewModels
             }
             catch (Exception e)
             {
+                isMatchesLoaded = false;
+                
                 if (LoadMatchesFromLocalFile())
                 {
                     await GenerateCalendar(_currentYear, _currentMonth);
                     OnPropertyChanged(nameof(AllMatches));
                     OnPropertyChanged(nameof(MonthMatchesCount));
+                    MessageBox.Show(
+                        "Не удалось установить соединение с интернетом, расписание матчей загружено из локальной копии.",
+                        "Ошибка загрузки данных",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
                 }
                 else
                 {
@@ -235,7 +256,7 @@ namespace FanShop.ViewModels
                         "Не удалось установить соединение с интернетом, расписание матчей не загрузилось. Локальная копия данных также недоступна.",
                         "Ошибка загрузки данных",
                         MessageBoxButton.OK,
-                        MessageBoxImage.Information);
+                        MessageBoxImage.Error);
                 }
             }
         }
