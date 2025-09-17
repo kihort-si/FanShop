@@ -14,6 +14,8 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+        VersionTextBlock.Text = $"Версия {version?.Major}.{version?.Minor}.{version?.Build}";
     }
     
     protected override async void OnActivated(EventArgs e)

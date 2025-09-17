@@ -47,6 +47,8 @@ namespace FanShop.ViewModels
             }
         }
 
+        public string PreviousMonthNameWithArrow => $"◀ {PreviousMonthName}";
+
         public string NextMonthName
         {
             get
@@ -55,6 +57,8 @@ namespace FanShop.ViewModels
                 return nextMonth.ToString("MMMM yyyy", new CultureInfo("ru-RU")).ToUpper();
             }
         }
+        
+        public string NextMonthNameWithArrow => $"{NextMonthName} ▶";
 
         public ICommand PreviousMonthCommand { get; }
         public ICommand NextMonthCommand { get; }
@@ -148,6 +152,8 @@ namespace FanShop.ViewModels
             OnPropertyChanged(nameof(CurrentMonthName));
             OnPropertyChanged(nameof(PreviousMonthName));
             OnPropertyChanged(nameof(NextMonthName));
+            OnPropertyChanged(nameof(PreviousMonthNameWithArrow));
+            OnPropertyChanged(nameof(NextMonthNameWithArrow));
             RefreshStatistics();
             OnPropertyChanged(nameof(FormattedMonthTitle));
         }
@@ -161,6 +167,8 @@ namespace FanShop.ViewModels
             OnPropertyChanged(nameof(CurrentMonthName));
             OnPropertyChanged(nameof(PreviousMonthName));
             OnPropertyChanged(nameof(NextMonthName));
+            OnPropertyChanged(nameof(PreviousMonthNameWithArrow));
+            OnPropertyChanged(nameof(NextMonthNameWithArrow));
             RefreshStatistics();
             OnPropertyChanged(nameof(FormattedMonthTitle));
         }
@@ -173,6 +181,8 @@ namespace FanShop.ViewModels
             OnPropertyChanged(nameof(CurrentMonthName));
             OnPropertyChanged(nameof(PreviousMonthName));
             OnPropertyChanged(nameof(NextMonthName));
+            OnPropertyChanged(nameof(PreviousMonthNameWithArrow));
+            OnPropertyChanged(nameof(NextMonthNameWithArrow));
             RefreshStatistics();
             OnPropertyChanged(nameof(FormattedMonthTitle));
         }
@@ -268,6 +278,7 @@ namespace FanShop.ViewModels
                 if (matchForThisDay != null)
                 {
                     calendarDay.Match = matchForThisDay;
+                    calendarDay.ClearEmployees();
                 }
 
                 CalendarDays.Add(calendarDay);
@@ -416,6 +427,8 @@ namespace FanShop.ViewModels
                 OnPropertyChanged(nameof(CurrentMonthName));
                 OnPropertyChanged(nameof(PreviousMonthName));
                 OnPropertyChanged(nameof(NextMonthName));
+                OnPropertyChanged(nameof(PreviousMonthNameWithArrow));
+                OnPropertyChanged(nameof(NextMonthNameWithArrow));
                 OnPropertyChanged(nameof(FormattedMonthTitle));
             }
         }

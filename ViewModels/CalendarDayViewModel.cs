@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Text.Json.Serialization;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
@@ -260,6 +257,27 @@ namespace FanShop.ViewModels
                 Employees.Remove(SelectedEmployee);
                 SelectedEmployee = null;
 
+                NotifyMainWindowOfChanges();
+
+                OnPropertyChanged(nameof(Employees));
+                OnPropertyChanged(nameof(DisplayedEmployees));
+                (PrintPassCommand as RelayCommand)?.RaiseCanExecuteChanged();
+            }
+        }
+
+        protected internal void ClearEmployees()
+        {
+            using var context = new AppDbContext();
+            
+            var workDay = context.WorkDays
+                .Include(w => w.WorkDayEmployees)
+                .FirstOrDefault(w => w.Date == Date);
+
+            if (workDay != null)
+            {
+                context.RemoveRange(workDay.WorkDayEmployees);
+                context.SaveChanges();
+                
                 NotifyMainWindowOfChanges();
 
                 OnPropertyChanged(nameof(Employees));

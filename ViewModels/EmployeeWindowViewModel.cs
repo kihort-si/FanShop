@@ -156,30 +156,9 @@ namespace FanShop.ViewModels
 
         public EmployeeWindowViewModel()
         {
-            using var context = new AppDbContext();
-            var allEmployees = context.Employees.ToList();
-            
-            var employeeSorted = allEmployees.Select(emp => new
-            {
-                Employee = emp
-            })
-            .OrderBy(x => x.Employee.Surname)
-            .ThenBy(x => x.Employee.FirstName)
-            .ThenBy(x => x.Employee.LastName)
-            .Select(x => x.Employee)
-            .ToList();
-        
-            var employeesWithStats = allEmployees.Select(emp => new
-                {
-                    Employee = emp,
-                    WorkDaysCount = GetWorkDaysCount(emp.EmployeeID, context)
-                })
-                .OrderByDescending(x => x.WorkDaysCount)
-                .ThenBy(x => x.Employee.Surname)
-                .Select(x => x.Employee)
-                .ToList();
+            var (employeesSorted, employeesWithStats) = RefreshEmployees();
 
-            Employees = new ObservableCollection<Employee>(employeeSorted);
+            Employees = new ObservableCollection<Employee>(employeesSorted);
             EmployeesWithStats = new ObservableCollection<Employee>(employeesWithStats);
             AddEmployeeCommand = new RelayCommand(AddEmployee);
             EditEmployeeCommand = new RelayCommand(EditEmployee, CanEditEmployee);
@@ -275,7 +254,15 @@ namespace FanShop.ViewModels
                 context.SaveChanges();
                 IsEditOverlayVisible = false;
             
-                RefreshEmployeesSorting();
+                var (employeesSorted, employeesWithStats) = RefreshEmployees();
+                
+                Employees.Clear();
+                foreach (var employee in employeesSorted)
+                    Employees.Add(employee);
+            
+                EmployeesWithStats.Clear();
+                foreach (var employee in employeesWithStats)
+                    EmployeesWithStats.Add(employee);
             }
         }
 
@@ -295,6 +282,7 @@ namespace FanShop.ViewModels
                     context.Employees.Remove(employee);
                     context.SaveChanges();
                     Employees.Remove(SelectedEmployee);
+                    EmployeesWithStats.Remove(SelectedEmployee);
                 }
             }
         }
@@ -341,12 +329,22 @@ namespace FanShop.ViewModels
             }
         }
 
-        private void RefreshEmployeesSorting()
+        private (List<Employee> employeesSorted, List<Employee> employeesWithStats) RefreshEmployees()
         {
             using var context = new AppDbContext();
-            var allEmployees = context.Employees.ToList();
-        
-            var employeesWithStats = allEmployees.Select(emp => new
+            List<Employee> allEmployees = context.Employees.ToList();
+            
+            List<Employee> employeeSorted = allEmployees.Select(emp => new
+                {
+                    Employee = emp
+                })
+                .OrderBy(x => x.Employee.Surname)
+                .ThenBy(x => x.Employee.FirstName)
+                .ThenBy(x => x.Employee.LastName)
+                .Select(x => x.Employee)
+                .ToList();
+            
+            List<Employee> employeesWithStats = allEmployees.Select(emp => new
                 {
                     Employee = emp,
                     WorkDaysCount = GetWorkDaysCount(emp.EmployeeID, context)
@@ -355,12 +353,8 @@ namespace FanShop.ViewModels
                 .ThenBy(x => x.Employee.Surname)
                 .Select(x => x.Employee)
                 .ToList();
-
-            Employees.Clear();
-            foreach (var employee in employeesWithStats)
-            {
-                Employees.Add(employee);
-            }
+            
+            return (employeeSorted, employeesWithStats);
         }
 
         private void CloseWindow(object? parameter)
