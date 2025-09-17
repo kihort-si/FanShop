@@ -73,7 +73,7 @@ namespace FanShop.Controls
             {
                 Text = item.Content.ToString();
                 _suggestionsPopup.IsOpen = false;
-                CaretIndex = Text.Length;
+                if (Text != null) CaretIndex = Text.Length;
                 Focus();
             }
         }
@@ -83,7 +83,7 @@ namespace FanShop.Controls
             if (_suggestionsList.SelectedItem != null)
             {
                 Text = _suggestionsList.SelectedItem.ToString();
-                CaretIndex = Text.Length;
+                if (Text != null) CaretIndex = Text.Length;
             }
         }
 

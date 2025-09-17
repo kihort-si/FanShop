@@ -33,6 +33,7 @@
 
     <ItemGroup>
       <None Remove="Resources\fanshop_logo.png" />
+      <Content Include=".github\workflows\release.yml" />
       <Content Include="Resources\fanshop_logo.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>

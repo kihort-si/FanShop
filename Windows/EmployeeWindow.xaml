@@ -12,6 +12,10 @@
         ShowInTaskbar="False" AllowsTransparency="True"
         Background="Transparent" BorderThickness="0">
 
+    <Window.InputBindings>
+        <KeyBinding Key="Enter" Command="{Binding SaveEditedEmployeeCommand}"/>
+    </Window.InputBindings>
+    
     <Border Background="Transparent" CornerRadius="8">
         <Grid>
             <Grid.RowDefinitions>

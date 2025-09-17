@@ -1,0 +1,59 @@
+﻿name: Release Workflow
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Get latest release tag
+        id: get_latest_release
+        run: |
+          latest_release_tag=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r .tag_name)
+          echo "Latest release tag: $latest_release_tag"
+          echo "latest_release_tag=$latest_release_tag" >> $GITHUB_ENV
+      
+      - name: Get version from AssemblyInfo.cs
+        id: get_assembly_version
+        run: |
+          version=$(grep -oP '(?<=\[assembly: AssemblyVersion\(")[^"]+' AssemblyInfo.cs)
+          echo "Assembly version: $version"
+          echo "assembly_version=$version" >> $GITHUB_ENV
+      
+      - name: Compare versions
+        id: compare_versions
+        run: |
+          if [ "$(echo -e "${{ env.assembly_version }}\n${{ env.latest_release_tag }}" | sort -V | head -n1)" != "${{ env.assembly_version }}" ]; then
+            echo "Assembly version is not greater than the latest release tag. Exiting..."
+            exit 1
+          fi
+          echo "Assembly version is greater than the latest release tag."
+      
+      - name: Build project
+        run: |
+          dotnet build --configuration Release
+      
+      - name: Run program
+        run: |
+          dotnet run --configuration Release
+      
+      - name: Archive Release files
+        run: |
+          archive_name="FanShop${{ env.assembly_version }}.zip"
+          zip -r $archive_name bin/Release/
+          echo "Archive name: $archive_name"
+          echo "archive_name=$archive_name" >> $GITHUB_ENV
+          
+      - name: Create a new release and upload the archive
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ env.archive_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
