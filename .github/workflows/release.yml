@@ -45,10 +45,6 @@ jobs:
         run: |
           dotnet build --configuration Release
 
-      - name: Run program
-        run: |
-          dotnet run --configuration Release
-
       - name: Archive Release files
         run: |
           $archive_name = "FanShop$env:assembly_version.zip"
