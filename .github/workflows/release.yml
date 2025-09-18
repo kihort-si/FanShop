@@ -40,6 +40,20 @@ jobs:
             exit 1
           }
           Write-Host "Assembly version is greater than the latest release tag."
+          
+      - name: Create and push tag if not exists
+        run: |
+          $version = $env:assembly_version
+          $tag = "v$version"
+          git fetch --tags
+          if (-not (git tag -l $tag)) {
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git tag $tag
+            git push origin $tag
+          } else {
+            Write-Host "Tag $tag already exists."
+          }
 
       - name: Build project
         run: |
