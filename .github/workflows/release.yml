@@ -32,6 +32,9 @@ jobs:
         run: |
           $verA = $env:assembly_version
           $verB = $env:latest_release_tag
+          if ($verB.StartsWith('v')) {
+            $verB = $verB.Substring(1)
+          }
           if (([Version]$verA) -le ([Version]$verB)) {
             Write-Host "Assembly version is not greater than the latest release tag. Exiting..."
             exit 1
