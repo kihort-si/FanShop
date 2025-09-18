@@ -7,7 +7,7 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     
     steps:
       - name: Checkout repository
@@ -16,41 +16,43 @@ jobs:
       - name: Get latest release tag
         id: get_latest_release
         run: |
-          latest_release_tag=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r .tag_name)
+          $latest_release_tag = (Invoke-RestMethod "https://api.github.com/repos/${{ github.repository }}/releases/latest").tag_name
           echo "Latest release tag: $latest_release_tag"
-          echo "latest_release_tag=$latest_release_tag" >> $GITHUB_ENV
-      
+          echo "latest_release_tag=$latest_release_tag" | Out-File -FilePath $env:GITHUB_ENV -Append
+
       - name: Get version from AssemblyInfo.cs
         id: get_assembly_version
         run: |
-          version=$(grep -oP '(?<=\[assembly: AssemblyVersion\(")[^"]+' AssemblyInfo.cs)
+          $version = Select-String -Path AssemblyInfo.cs -Pattern '\[assembly: AssemblyVersion\("([^"]+)"\)\]' | ForEach-Object { $_.Matches[0].Groups[1].Value }
           echo "Assembly version: $version"
-          echo "assembly_version=$version" >> $GITHUB_ENV
-      
+          echo "assembly_version=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
+
       - name: Compare versions
         id: compare_versions
         run: |
-          if [ "$(echo -e "${{ env.assembly_version }}\n${{ env.latest_release_tag }}" | sort -V | head -n1)" != "${{ env.assembly_version }}" ]; then
-            echo "Assembly version is not greater than the latest release tag. Exiting..."
+          $verA = $env:assembly_version
+          $verB = $env:latest_release_tag
+          if (([Version]$verA) -le ([Version]$verB)) {
+            Write-Host "Assembly version is not greater than the latest release tag. Exiting..."
             exit 1
-          fi
-          echo "Assembly version is greater than the latest release tag."
-      
+          }
+          Write-Host "Assembly version is greater than the latest release tag."
+
       - name: Build project
         run: |
           dotnet build --configuration Release
-      
+
       - name: Run program
         run: |
           dotnet run --configuration Release
-      
+
       - name: Archive Release files
         run: |
-          archive_name="FanShop${{ env.assembly_version }}.zip"
-          zip -r $archive_name bin/Release/
+          $archive_name = "FanShop$env:assembly_version.zip"
+          Compress-Archive -Path .\bin\Release\* -DestinationPath $archive_name
           echo "Archive name: $archive_name"
-          echo "archive_name=$archive_name" >> $GITHUB_ENV
-          
+          echo "archive_name=$archive_name" | Out-File -FilePath $env:GITHUB_ENV -Append
+
       - name: Create a new release and upload the archive
         uses: softprops/action-gh-release@v1
         with:
