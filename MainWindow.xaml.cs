@@ -49,7 +49,6 @@ public partial class MainWindow : Window
 
     private static void WmGetMinMaxInfo(IntPtr hwnd, IntPtr lParam)
     {
-        // Получаем рабочую область экрана (без панели задач)
         var monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
 
         if (monitor != IntPtr.Zero)
@@ -63,7 +62,6 @@ public partial class MainWindow : Window
 
             MINMAXINFO mmi = Marshal.PtrToStructure<MINMAXINFO>(lParam);
 
-            // Устанавливаем максимальный размер и позицию, чтобы не перекрывать панель задач
             mmi.ptMaxPosition.x = workArea.Left - monitorArea.Left;
             mmi.ptMaxPosition.y = workArea.Top - monitorArea.Top;
             mmi.ptMaxSize.x = workArea.Right - workArea.Left;

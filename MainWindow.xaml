@@ -21,575 +21,36 @@
         <vm:MainWindowViewModel />
     </Window.DataContext>
     
-    <Border Background="White" PreviewMouseDown="ClickableArea_MouseDown" CornerRadius="8" BorderThickness="0">
+    <Border Background="Transparent" PreviewMouseDown="ClickableArea_MouseDown" CornerRadius="8" BorderThickness="0">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="60"></RowDefinition>
+                <RowDefinition Height="40"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
             
-            <Grid Grid.Row="0">
-                <Grid.Background>
+            <Border Grid.Row="0" CornerRadius="8, 8,0,0">
+                <Border.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                         <GradientStop Color="#009EE1" Offset="0.0"/>
                         <GradientStop Color="#0077B5" Offset="1.0"/>
                     </LinearGradientBrush>
-                </Grid.Background>
+                </Border.Background>
                 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <Image Grid.Column="0"
-                       Source="pack://application:,,,/Resources/fanshop_logo.png"
-                       Width="100"
-                       HorizontalAlignment="Left"
-                       VerticalAlignment="Center"
-                       Margin="24,12,0,12"
-                       RenderOptions.BitmapScalingMode="HighQuality"
-                       RenderOptions.EdgeMode="Aliased"
-                       Stretch="Uniform"/>
-
-                <Button Grid.Column="2"
-                        Command="{Binding ToggleMenuCommand}"
-                        Width="40"
-                        Height="40"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
-                        Margin="0,12,24,12">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Content">
-                                <Setter.Value>
-                                    <Image Source="pack://application:,,,/Resources/menu_icon.png" Width="24" Height="24"/>
-                                </Setter.Value>
-                            </Setter>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border Background="{TemplateBinding Background}">
-                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                        </Border>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsMenuOpen}" Value="True">
-                                    <Setter Property="Content">
-                                        <Setter.Value>
-                                            <Image Source="pack://application:,,,/Resources/close_icon.png" Width="24" Height="24"/>
-                                        </Setter.Value>
-                                    </Setter>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
-            </Grid>
-
-            <ScrollViewer Grid.Row="1" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto">
                 <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    
-                    <StackPanel Grid.Row="0" 
-                                Orientation="Horizontal" 
-                                VerticalAlignment="Center" 
-                                HorizontalAlignment="Center" 
-                                Background="#FFFFFF"
-                                Margin="0,10,0,0">
-                        <Grid Width="770">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
-                                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            
-                            <StackPanel Grid.Column="0" HorizontalAlignment="Left" Orientation="Horizontal">
-                                <Button Width="36" Height="36" Margin="5,0" Background="Transparent" BorderThickness="0" 
-                                        ToolTip="Перейти к сегодняшнему дню" Command="{Binding GoToTodayCommand}"
-                                        Style="{StaticResource NonSelectableButton}">
-                                    <Border Width="30" Height="30" CornerRadius="15" Background="#E3F2FD">
-                                        <TextBlock Foreground="#009EE1" Text="📅" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    </Border>
-                                </Button>
-                            </StackPanel>
-                            
-                            <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                <Button Content="{Binding PreviousMonthName}"
-                                    Command="{Binding PreviousMonthCommand}"
-                                    Background="Transparent"
-                                    BorderThickness="0"
-                                    FontSize="14"
-                                    FontFamily="Open Sans"
-                                    Foreground="Gray"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Style="{StaticResource NonSelectableButton}">
-                                </Button>
-
-                                <TextBlock Text="{Binding CurrentMonthName}"
-                                           FontSize="20"
-                                           FontWeight="Bold"
-                                           FontFamily="Open Sans"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"
-                                           Margin="20, 0"/>
-
-                                <Button Content="{Binding NextMonthName}"
-                                        Command="{Binding NextMonthCommand}"
-                                        Background="Transparent"
-                                        BorderThickness="0"
-                                        FontSize="14"
-                                        FontFamily="Open Sans"
-                                        Foreground="Gray"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        Style="{StaticResource NonSelectableButton}">
-                                </Button>
-                            </StackPanel>
-                            
-                            <StackPanel Grid.Column="2" HorizontalAlignment="Right">
-                                <Button Width="36" Height="36" Margin="5,0" Background="Transparent" BorderThickness="0"
-                                        ToolTip="Переключить режим отображения" Command="{Binding ToggleCalendarViewModeCommand}"
-                                        Style="{StaticResource NonSelectableButton}">
-                                    <Border Width="30" Height="30" CornerRadius="15" Background="#E3F2FD">
-                                        <Grid>
-                                            <TextBlock x:Name="EmployeeIcon" Text="👥" FontSize="16" HorizontalAlignment="Center"
-                                                       VerticalAlignment="Center" Foreground="#009EE1"
-                                                       Visibility="{Binding IsEmployeeView, Converter={x:Static converters:BoolToVisibilityConverter.Instance}}"/>
-                                            <TextBlock x:Name="TaskIcon" Text="📋" FontSize="16" HorizontalAlignment="Center"
-                                                       VerticalAlignment="Center" Foreground="#009EE1"
-                                                       Visibility="{Binding IsEmployeeView, Converter={x:Static converters:InverseBoolToVisibilityConverter.Instance}}"/>
-                                        </Grid>
-                                    </Border>
-                                </Button>
-                            </StackPanel>
-                        </Grid>
-                    </StackPanel>
-                    
-                    <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,0,0,0">
-                        <Grid Width="770" Height="30" Margin="0,0,0,5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                    
-                            <TextBlock Grid.Column="0" Text="ПН" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                                       FontWeight="Bold" FontSize="14" FontFamily="Open Sans" Foreground="#656565"/>
-                            <TextBlock Grid.Column="1" Text="ВТ" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                                       FontWeight="Bold" FontSize="14" FontFamily="Open Sans" Foreground="#656565"/>
-                            <TextBlock Grid.Column="2" Text="СР" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                                       FontWeight="Bold" FontSize="14" FontFamily="Open Sans" Foreground="#656565"/>
-                            <TextBlock Grid.Column="3" Text="ЧТ" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                                       FontWeight="Bold" FontSize="14" FontFamily="Open Sans" Foreground="#656565"/>
-                            <TextBlock Grid.Column="4" Text="ПТ" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                                       FontWeight="Bold" FontSize="14" FontFamily="Open Sans" Foreground="#656565"/>
-                            <TextBlock Grid.Column="5" Text="СБ" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                                       FontWeight="Bold" FontSize="14" FontFamily="Open Sans" Foreground="#995B5B"/>
-                            <TextBlock Grid.Column="6" Text="ВС" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                                       FontWeight="Bold" FontSize="14" FontFamily="Open Sans" Foreground="#995B5B"/>
-                        </Grid>
-                    
-                        <ItemsControl ItemsSource="{Binding CalendarDays}" BorderBrush="LightGray" BorderThickness="0.5">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <UniformGrid Columns="7" Rows="{Binding CalendarRows}"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Width="110" Height="125" BorderBrush="LightGray" BorderThickness="0.5">
-                                        <view:CalendarDayControl/>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-            
-                    <Border Grid.Row="2" Background="White" Margin="20,20,20,20" CornerRadius="15">
-                        <Border.Effect>
-                            <DropShadowEffect ShadowDepth="2" BlurRadius="10" Opacity="0.15" RenderingBias="Quality"/>
-                        </Border.Effect>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                    
-                            <Border Grid.Row="0" CornerRadius="15,15,0,0" Padding="20,15">
-                                <Border.Background>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                        <GradientStop Color="#E3F2FD" Offset="0.0"/>
-                                        <GradientStop Color="#F0F7FF" Offset="1.0"/>
-                                    </LinearGradientBrush>
-                                </Border.Background>
-                                <StackPanel Orientation="Horizontal">
-                                    <Border Width="40" Height="40" CornerRadius="20" Margin="0,0,15,0">
-                                        <Border.Background>
-                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                <GradientStop Color="#009EE1" Offset="0.0"/>
-                                                <GradientStop Color="#0077B5" Offset="1.0"/>
-                                            </LinearGradientBrush>
-                                        </Border.Background>
-                                        <TextBlock Text="📊" FontSize="20" Foreground="White" 
-                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                   TextOptions.TextFormattingMode="Ideal"/>
-                                    </Border>
-                                    <TextBlock Text="{Binding FormattedMonthTitle}" 
-                                               FontSize="20" FontWeight="Bold" FontFamily="Open Sans" Foreground="#0077B5" 
-                                               VerticalAlignment="Center"
-                                               TextOptions.TextFormattingMode="Ideal"/>
-                                </StackPanel>
-                            </Border>
-                    
-                            <Grid Grid.Row="1" Margin="20">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                    
-                                <Grid Grid.Column="0" Margin="0,0,15,0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="*"/>
-                                    </Grid.RowDefinitions>
-                    
-                                    <TextBlock Grid.Row="0" Text="Общая статистика" 
-                                               FontWeight="SemiBold" FontSize="16" FontFamily="Open Sans" 
-                                               Foreground="#333333" Margin="0,0,0,15"
-                                               TextOptions.TextFormattingMode="Ideal"/>
-                    
-                                    <ItemsControl Grid.Row="1">
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <WrapPanel Orientation="Horizontal"/>
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-                                        
-                                        <Border Width="180" Height="90" Margin="0,0,15,15" CornerRadius="10" 
-                                                Background="White" BorderThickness="1" BorderBrush="#E0E0E0">
-                                            <Border.Effect>
-                                                <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1" RenderingBias="Quality"/>
-                                            </Border.Effect>
-                                            <Grid Margin="15,10">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="Auto"/>
-                                                    <RowDefinition Height="*"/>
-                                                </Grid.RowDefinitions>
-                                                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
-                                                    <Border Width="24" Height="24" CornerRadius="12" Margin="0,0,8,0">
-                                                        <Border.Background>
-                                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                                <GradientStop Color="#009EE1" Offset="0.0"/>
-                                                                <GradientStop Color="#0077B5" Offset="1.0"/>
-                                                            </LinearGradientBrush>
-                                                        </Border.Background>
-                                                        <TextBlock Text="🏆" FontSize="12" Foreground="White" 
-                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                                   TextOptions.TextFormattingMode="Ideal"/>
-                                                    </Border>
-                                                    <TextBlock Text="Матчи" FontSize="14" Foreground="#666666" 
-                                                               VerticalAlignment="Center"
-                                                               TextOptions.TextFormattingMode="Ideal"/>
-                                                </StackPanel>
-                                                <TextBlock Grid.Row="1" Text="{Binding MonthMatchesCount}" 
-                                                           FontSize="24" FontWeight="Bold" Foreground="#333333"
-                                                           TextOptions.TextFormattingMode="Ideal"/>
-                                            </Grid>
-                                        </Border>
-                    
-                                        <Border Width="180" Height="90" Margin="0,0,15,15" CornerRadius="10" 
-                                                Background="White" BorderThickness="1" BorderBrush="#E0E0E0">
-                                            <Border.Effect>
-                                                <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1" RenderingBias="Quality"/>
-                                            </Border.Effect>
-                                            <Grid Margin="15,10">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="Auto"/>
-                                                    <RowDefinition Height="*"/>
-                                                </Grid.RowDefinitions>
-                                                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
-                                                    <Border Width="24" Height="24" CornerRadius="12" Margin="0,0,8,0">
-                                                        <Border.Background>
-                                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                                <GradientStop Color="#4CAF50" Offset="0.0"/>
-                                                                <GradientStop Color="#2E7D32" Offset="1.0"/>
-                                                            </LinearGradientBrush>
-                                                        </Border.Background>
-                                                        <TextBlock Text="👥" FontSize="12" Foreground="White" 
-                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                                   TextOptions.TextFormattingMode="Ideal"/>
-                                                    </Border>
-                                                    <TextBlock Text="Сотрудники" FontSize="14" Foreground="#666666" 
-                                                               VerticalAlignment="Center"
-                                                               TextOptions.TextFormattingMode="Ideal"/>
-                                                </StackPanel>
-                                                <TextBlock Grid.Row="1" Text="{Binding TotalEmployeesCount}" 
-                                                           FontSize="24" FontWeight="Bold" Foreground="#333333"
-                                                           TextOptions.TextFormattingMode="Ideal"/>
-                                            </Grid>
-                                        </Border>
-                    
-                                        <Border Width="180" Height="90" Margin="0,0,15,15" CornerRadius="10" 
-                                                Background="White" BorderThickness="1" BorderBrush="#E0E0E0">
-                                            <Border.Effect>
-                                                <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1" RenderingBias="Quality"/>
-                                            </Border.Effect>
-                                            <Grid Margin="15,10">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="Auto"/>
-                                                    <RowDefinition Height="*"/>
-                                                </Grid.RowDefinitions>
-                                                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
-                                                    <Border Width="24" Height="24" CornerRadius="12" Margin="0,0,8,0">
-                                                        <Border.Background>
-                                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                                <GradientStop Color="#FF9800" Offset="0.0"/>
-                                                                <GradientStop Color="#F57C00" Offset="1.0"/>
-                                                            </LinearGradientBrush>
-                                                        </Border.Background>
-                                                        <TextBlock Text="📅" FontSize="12" Foreground="White" 
-                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                                   TextOptions.TextFormattingMode="Ideal"/>
-                                                    </Border>
-                                                    <TextBlock Text="Рабочие дни" FontSize="14" Foreground="#666666" 
-                                                               VerticalAlignment="Center"
-                                                               TextOptions.TextFormattingMode="Ideal"/>
-                                                </StackPanel>
-                                                <TextBlock Grid.Row="1" Text="{Binding WorkDaysCount}" 
-                                                           FontSize="24" FontWeight="Bold" Foreground="#333333"
-                                                           TextOptions.TextFormattingMode="Ideal"/>
-                                            </Grid>
-                                        </Border>
-                    
-                                        <Border Width="180" Height="90" Margin="0,0,15,15" CornerRadius="10" 
-                                                Background="White" BorderThickness="1" BorderBrush="#E0E0E0">
-                                            <Border.Effect>
-                                                <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1" RenderingBias="Quality"/>
-                                            </Border.Effect>
-                                            <Grid Margin="15,10">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="Auto"/>
-                                                    <RowDefinition Height="*"/>
-                                                </Grid.RowDefinitions>
-                                                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
-                                                    <Border Width="24" Height="24" CornerRadius="12" Margin="0,0,8,0">
-                                                        <Border.Background>
-                                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                                <GradientStop Color="#9C27B0" Offset="0.0"/>
-                                                                <GradientStop Color="#7B1FA2" Offset="1.0"/>
-                                                            </LinearGradientBrush>
-                                                        </Border.Background>
-                                                        <TextBlock Text="⏱" FontSize="12" Foreground="White" 
-                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                                   TextOptions.TextFormattingMode="Ideal"/>
-                                                    </Border>
-                                                    <TextBlock Text="Смены" FontSize="14" Foreground="#666666" 
-                                                               VerticalAlignment="Center"
-                                                               TextOptions.TextFormattingMode="Ideal"/>
-                                                </StackPanel>
-                                                <TextBlock Grid.Row="1" Text="{Binding TotalShiftCount}" 
-                                                           FontSize="24" FontWeight="Bold" Foreground="#333333"
-                                                           TextOptions.TextFormattingMode="Ideal"/>
-                                            </Grid>
-                                        </Border>
-                    
-                                        <Border Width="180" Height="90" Margin="0,0,15,15" CornerRadius="10" 
-                                                Background="White" BorderThickness="1" BorderBrush="#E0E0E0">
-                                            <Border.Effect>
-                                                <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1" RenderingBias="Quality"/>
-                                            </Border.Effect>
-                                            <Grid Margin="15,10">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="Auto"/>
-                                                    <RowDefinition Height="*"/>
-                                                </Grid.RowDefinitions>
-                                                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
-                                                    <Border Width="24" Height="24" CornerRadius="12" Margin="0,0,8,0">
-                                                        <Border.Background>
-                                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                                <GradientStop Color="#F44336" Offset="0.0"/>
-                                                                <GradientStop Color="#D32F2F" Offset="1.0"/>
-                                                            </LinearGradientBrush>
-                                                        </Border.Background>
-                                                        <TextBlock Text="💰" FontSize="12" Foreground="White" 
-                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                                   TextOptions.TextFormattingMode="Ideal"/>
-                                                    </Border>
-                                                    <TextBlock Text="Зарплата" FontSize="14" Foreground="#666666" 
-                                                               VerticalAlignment="Center"
-                                                               TextOptions.TextFormattingMode="Ideal"/>
-                                                </StackPanel>
-                                                <TextBlock Grid.Row="1" Text="{Binding TotalSalary}" 
-                                                           FontSize="24" FontWeight="Bold" Foreground="#333333"
-                                                           TextOptions.TextFormattingMode="Ideal"/>
-                                            </Grid>
-                                        </Border>
-                                    </ItemsControl>
-                                </Grid>
-                    
-                                <Border Grid.Column="1" Background="#F8F9FA" CornerRadius="12" Padding="20">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="*"/>
-                                        </Grid.RowDefinitions>
-                    
-                                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
-                                            <Border Width="30" Height="30" CornerRadius="15" Margin="0,0,10,0">
-                                                <Border.Background>
-                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                        <GradientStop Color="#009EE1" Offset="0.0"/>
-                                                        <GradientStop Color="#0077B5" Offset="1.0"/>
-                                                    </LinearGradientBrush>
-                                                </Border.Background>
-                                                <TextBlock Text="👤" FontSize="16" Foreground="White" 
-                                                           HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                           TextOptions.TextFormattingMode="Ideal"/>
-                                            </Border>
-                                            <TextBlock Text="Статистика по сотрудникам" 
-                                                       FontWeight="SemiBold" FontSize="16" FontFamily="Open Sans" 
-                                                       Foreground="#333333" VerticalAlignment="Center"
-                                                       TextOptions.TextFormattingMode="Ideal"/>
-                                        </StackPanel>
-                    
-                                        <Border Grid.Row="1" VerticalAlignment="Top" Background="#E3F2FD" 
-                                                CornerRadius="6" Padding="10,8" Margin="0,0,0,10">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="2*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="Имя" FontWeight="SemiBold" 
-                                                           FontSize="13" Foreground="#0077B5"
-                                                           TextOptions.TextFormattingMode="Ideal"/>
-                                                <TextBlock Grid.Column="1" Text="Смены" FontWeight="SemiBold" 
-                                                           FontSize="13" Foreground="#0077B5" Margin="10,0,25,0"
-                                                           TextOptions.TextFormattingMode="Ideal"/>
-                                                <TextBlock Grid.Column="2" Text="Зарплата" FontWeight="SemiBold" 
-                                                           FontSize="13" Foreground="#0077B5"
-                                                           TextOptions.TextFormattingMode="Ideal"/>
-                                            </Grid>
-                                        </Border>
-                    
-                                        <ScrollViewer Grid.Row="1" Margin="0,35,0,0" VerticalScrollBarVisibility="Auto" 
-                                                     MaxHeight="200">
-                                            <ItemsControl ItemsSource="{Binding EmployeeStatistics}">
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <Border Padding="10,8" Margin="0,0,0,8" 
-                                                               Background="White" CornerRadius="6" 
-                                                               BorderThickness="1" BorderBrush="#E0E0E0">
-                                                            <Border.Effect>
-                                                                <DropShadowEffect ShadowDepth="1" BlurRadius="3" Opacity="0.1" RenderingBias="Quality"/>
-                                                            </Border.Effect>
-                                                            <Grid>
-                                                                <Grid.ColumnDefinitions>
-                                                                    <ColumnDefinition Width="2*"/>
-                                                                    <ColumnDefinition Width="65"/>
-                                                                    <ColumnDefinition Width="65"/>
-                                                                </Grid.ColumnDefinitions>
-                                                                
-                                                                <StackPanel Grid.Column="0" Orientation="Horizontal">
-                                                                    <Border Width="30" Height="30" CornerRadius="15" Margin="0,0,10,0" 
-                                                                            Background="#E3F2FD">
-                                                                        <TextBlock Text="{Binding EmployeeName[0]}" FontSize="14" 
-                                                                                   Foreground="#0077B5" FontWeight="SemiBold"
-                                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                                                   TextOptions.TextFormattingMode="Ideal"/>
-                                                                    </Border>
-                                                                    <TextBlock Text="{Binding EmployeeName}" FontSize="14" 
-                                                                               Foreground="#333333" VerticalAlignment="Center"
-                                                                               TextOptions.TextFormattingMode="Ideal"/>
-                                                                </StackPanel>
-                                                                
-                                                                <Border Grid.Column="1" Background="#F0F7FF" CornerRadius="15" 
-                                                                        Padding="8,3" Margin="0,0,0,0" HorizontalAlignment="Center">
-                                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                                                                        <TextBlock Text="{Binding WorkDaysCount, Converter={x:Static converters:ShiftToRussian.Instance}}" FontSize="13" 
-                                                                                   Foreground="#0077B5" FontWeight="SemiBold"
-                                                                                   TextOptions.TextFormattingMode="Ideal"/>
-                                                                    </StackPanel>
-                                                                </Border>
-                                                                
-                                                                <TextBlock Grid.Column="2" Text="{Binding TotalSalary}" 
-                                                                           FontSize="14" FontWeight="Bold" Foreground="#333333" 
-                                                                           VerticalAlignment="Center" TextAlignment="Center"
-                                                                           TextOptions.TextFormattingMode="Ideal"/>
-                                                            </Grid>
-                                                        </Border>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
-                                        </ScrollViewer>
-                                    </Grid>
-                                </Border>
-                            </Grid>
-                        </Grid>
-                    </Border>
-                </Grid>
-            </ScrollViewer>
-            <Border Grid.Row="0" Grid.RowSpan="2" Background="Black" Opacity="0.5"
-                    Visibility="{Binding IsBlackoutMode, Converter={x:Static converters:BoolToVisibilityConverter.Instance}}"
-                    Panel.ZIndex="10">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseLeftButtonDown">
-                        <i:InvokeCommandAction Command="{Binding CloseMenuCommand}"/>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </Border>
-            
-            <Border Grid.Row="0" Grid.RowSpan="2" Background="White" Width="300" HorizontalAlignment="Right"
-                    Visibility="{Binding IsMenuOpen, Converter={x:Static converters:BoolToVisibilityConverter.Instance}}"
-                    Panel.ZIndex="11">
-                <Border.Effect>
-                    <DropShadowEffect ShadowDepth="5" BlurRadius="10" Opacity="0.3"/>
-                </Border.Effect>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    
-                    <Grid Grid.Row="0">
-                        <Grid.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                <GradientStop Color="#0580B4" Offset="0.0"/>
-                                <GradientStop Color="#0077B5" Offset="1.0"/>
-                            </LinearGradientBrush>
-                        </Grid.Background>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        
-                        <TextBlock Grid.Column="1" Text="МЕНЮ" FontFamily="OpenSans" FontSize="20" Margin="48,12,0,8"
-                                   Foreground="White" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <Button Grid.Column="2"
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="150"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0"
                             Command="{Binding ToggleMenuCommand}"
                             Width="40"
                             Height="40"
                             Background="Transparent"
                             BorderThickness="0"
-                            HorizontalAlignment="Right"
+                            HorizontalAlignment="Left"
                             VerticalAlignment="Center"
-                            Margin="0,12,24,8">
+                            Margin="24,12,0,12">
                         <Button.Style>
                             <Style TargetType="Button">
                                 <Setter Property="Content">
@@ -618,235 +79,877 @@
                             </Style>
                         </Button.Style>
                     </Button>
+                    
+                    <Image Grid.Column="1"
+                           Source="pack://application:,,,/Resources/fanshop_logo.png"
+                           Width="100"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Margin="0,12,0,12"
+                           RenderOptions.BitmapScalingMode="HighQuality"
+                           RenderOptions.EdgeMode="Aliased"
+                           Stretch="Uniform"/>
+                    
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button HorizontalAlignment="Right" Width="48" Height="40"
+                                Background="Transparent" Foreground="White" BorderThickness="0" FontWeight="Bold" FontSize="14">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="border" Background="{TemplateBinding Background}" Padding="8">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="border" Property="Background" Value="#174D7B"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                            <Button.Content>
+                                <Image Height="15" Source="../Resources/minimize.png"></Image>
+                            </Button.Content>
+                        </Button>
+                        
+                        <Button HorizontalAlignment="Right" Width="48" Height="40"
+                                Background="Transparent" Foreground="White" BorderThickness="0" FontWeight="Bold" FontSize="14">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="border" Background="{TemplateBinding Background}" Padding="8">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="border" Property="Background" Value="#174D7B"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                            <Button.Content>
+                                <Image Height="15" Source="../Resources/expand-window.png"></Image>
+                            </Button.Content>
+                        </Button>
+                        
+                        <Button HorizontalAlignment="Right" Width="48" Height="40"
+                                Background="Transparent" Foreground="White" BorderThickness="0" FontWeight="Bold" FontSize="14">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="border" Background="{TemplateBinding Background}" Padding="8" CornerRadius="0, 8,0, 0">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="border" Property="Background" Value="#E81123"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                            <Button.Content>
+                                <Image Height="15" Source="../Resources/close-window.png"></Image>
+                            </Button.Content>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="1" Background="White" CornerRadius="0, 0, 8, 8" BorderThickness="3, 0, 3, 3">
+                <Border.BorderBrush>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#009EE1" Offset="0.0"/>
+                        <GradientStop Color="#0077B5" Offset="1.0"/>
+                    </LinearGradientBrush>
+                </Border.BorderBrush>
+                
+                <ScrollViewer VerticalScrollBarVisibility="Auto" PreviewMouseDown="ClickableArea_MouseDown">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        
+                        <StackPanel Grid.Row="0" 
+                                    Orientation="Horizontal" 
+                                    VerticalAlignment="Center" 
+                                    HorizontalAlignment="Center" 
+                                    Margin="0,10,0,0">
+                            <Grid Width="770">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                
+                                <StackPanel Grid.Column="0" HorizontalAlignment="Left" Orientation="Horizontal">
+                                    <Button Width="36" Height="36" Margin="5,0" Background="Transparent" BorderThickness="0" 
+                                            ToolTip="Перейти к сегодняшнему дню" Command="{Binding GoToTodayCommand}"
+                                            Style="{StaticResource NonSelectableButton}">
+                                        <Border Width="30" Height="30" CornerRadius="15" Background="#E3F2FD">
+                                            <TextBlock Foreground="#009EE1" Text="📅" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </Button>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <Button Content="{Binding PreviousMonthName}"
+                                        Command="{Binding PreviousMonthCommand}"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        FontSize="14"
+                                        FontFamily="Open Sans"
+                                        Foreground="Gray"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Style="{StaticResource NonSelectableButton}">
+                                    </Button>
+
+                                    <TextBlock Text="{Binding CurrentMonthName}"
+                                               FontSize="20"
+                                               FontWeight="Bold"
+                                               FontFamily="Open Sans"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Margin="20, 0"/>
+
+                                    <Button Content="{Binding NextMonthName}"
+                                            Command="{Binding NextMonthCommand}"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            FontSize="14"
+                                            FontFamily="Open Sans"
+                                            Foreground="Gray"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Style="{StaticResource NonSelectableButton}">
+                                    </Button>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Column="2" HorizontalAlignment="Right">
+                                    <Button Width="36" Height="36" Margin="5,0" Background="Transparent" BorderThickness="0"
+                                            ToolTip="Переключить режим отображения" Command="{Binding ToggleCalendarViewModeCommand}"
+                                            Style="{StaticResource NonSelectableButton}">
+                                        <Border Width="30" Height="30" CornerRadius="15" Background="#E3F2FD">
+                                            <Grid>
+                                                <TextBlock x:Name="EmployeeIcon" Text="👥" FontSize="16" HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center" Foreground="#009EE1"
+                                                           Visibility="{Binding IsEmployeeView, Converter={x:Static converters:BoolToVisibilityConverter.Instance}}"/>
+                                                <TextBlock x:Name="TaskIcon" Text="📋" FontSize="16" HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center" Foreground="#009EE1"
+                                                           Visibility="{Binding IsEmployeeView, Converter={x:Static converters:InverseBoolToVisibilityConverter.Instance}}"/>
+                                            </Grid>
+                                        </Border>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                        
+                        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,0,0,0">
+                            <Grid Width="770" Height="30" Margin="0,0,0,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                        
+                                <TextBlock Grid.Column="0" Text="ПН" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                           FontWeight="Bold" FontSize="14" FontFamily="Open Sans" Foreground="#656565"/>
+                                <TextBlock Grid.Column="1" Text="ВТ" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                           FontWeight="Bold" FontSize="14" FontFamily="Open Sans" Foreground="#656565"/>
+                                <TextBlock Grid.Column="2" Text="СР" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                           FontWeight="Bold" FontSize="14" FontFamily="Open Sans" Foreground="#656565"/>
+                                <TextBlock Grid.Column="3" Text="ЧТ" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                           FontWeight="Bold" FontSize="14" FontFamily="Open Sans" Foreground="#656565"/>
+                                <TextBlock Grid.Column="4" Text="ПТ" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                           FontWeight="Bold" FontSize="14" FontFamily="Open Sans" Foreground="#656565"/>
+                                <TextBlock Grid.Column="5" Text="СБ" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                           FontWeight="Bold" FontSize="14" FontFamily="Open Sans" Foreground="#995B5B"/>
+                                <TextBlock Grid.Column="6" Text="ВС" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                           FontWeight="Bold" FontSize="14" FontFamily="Open Sans" Foreground="#995B5B"/>
+                            </Grid>
+                        
+                            <ItemsControl ItemsSource="{Binding CalendarDays}" BorderBrush="LightGray" BorderThickness="0.5">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="7" Rows="{Binding CalendarRows}"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Width="110" Height="125" BorderBrush="LightGray" BorderThickness="0.5">
+                                            <view:CalendarDayControl/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                
+                        <Border Grid.Row="2" Background="White" Margin="20,20,20,20" CornerRadius="15">
+                            <Border.Effect>
+                                <DropShadowEffect ShadowDepth="2" BlurRadius="10" Opacity="0.15" RenderingBias="Quality"/>
+                            </Border.Effect>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                        
+                                <Border Grid.Row="0" CornerRadius="15,15,0,0" Padding="20,15">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="#E3F2FD" Offset="0.0"/>
+                                            <GradientStop Color="#F0F7FF" Offset="1.0"/>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Border Width="40" Height="40" CornerRadius="20" Margin="0,0,15,0">
+                                            <Border.Background>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                    <GradientStop Color="#009EE1" Offset="0.0"/>
+                                                    <GradientStop Color="#0077B5" Offset="1.0"/>
+                                                </LinearGradientBrush>
+                                            </Border.Background>
+                                            <TextBlock Text="📊" FontSize="20" Foreground="White" 
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                       TextOptions.TextFormattingMode="Ideal"/>
+                                        </Border>
+                                        <TextBlock Text="{Binding FormattedMonthTitle}" 
+                                                   FontSize="20" FontWeight="Bold" FontFamily="Open Sans" Foreground="#0077B5" 
+                                                   VerticalAlignment="Center"
+                                                   TextOptions.TextFormattingMode="Ideal"/>
+                                    </StackPanel>
+                                </Border>
+                        
+                                <Grid Grid.Row="1" Margin="20">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                        
+                                    <Grid Grid.Column="0" Margin="0,0,15,0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                        
+                                        <TextBlock Grid.Row="0" Text="Общая статистика" 
+                                                   FontWeight="SemiBold" FontSize="16" FontFamily="Open Sans" 
+                                                   Foreground="#333333" Margin="0,0,0,15"
+                                                   TextOptions.TextFormattingMode="Ideal"/>
+                        
+                                        <ItemsControl Grid.Row="1">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <WrapPanel Orientation="Horizontal"/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            
+                                            <Border Width="180" Height="90" Margin="0,0,15,15" CornerRadius="10" 
+                                                    Background="White" BorderThickness="1" BorderBrush="#E0E0E0">
+                                                <Border.Effect>
+                                                    <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1" RenderingBias="Quality"/>
+                                                </Border.Effect>
+                                                <Grid Margin="15,10">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="*"/>
+                                                    </Grid.RowDefinitions>
+                                                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                                                        <Border Width="24" Height="24" CornerRadius="12" Margin="0,0,8,0">
+                                                            <Border.Background>
+                                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                                    <GradientStop Color="#009EE1" Offset="0.0"/>
+                                                                    <GradientStop Color="#0077B5" Offset="1.0"/>
+                                                                </LinearGradientBrush>
+                                                            </Border.Background>
+                                                            <TextBlock Text="🏆" FontSize="12" Foreground="White" 
+                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                       TextOptions.TextFormattingMode="Ideal"/>
+                                                        </Border>
+                                                        <TextBlock Text="Матчи" FontSize="14" Foreground="#666666" 
+                                                                   VerticalAlignment="Center"
+                                                                   TextOptions.TextFormattingMode="Ideal"/>
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Row="1" Text="{Binding MonthMatchesCount}" 
+                                                               FontSize="24" FontWeight="Bold" Foreground="#333333"
+                                                               TextOptions.TextFormattingMode="Ideal"/>
+                                                </Grid>
+                                            </Border>
+                        
+                                            <Border Width="180" Height="90" Margin="0,0,15,15" CornerRadius="10" 
+                                                    Background="White" BorderThickness="1" BorderBrush="#E0E0E0">
+                                                <Border.Effect>
+                                                    <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1" RenderingBias="Quality"/>
+                                                </Border.Effect>
+                                                <Grid Margin="15,10">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="*"/>
+                                                    </Grid.RowDefinitions>
+                                                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                                                        <Border Width="24" Height="24" CornerRadius="12" Margin="0,0,8,0">
+                                                            <Border.Background>
+                                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                                    <GradientStop Color="#4CAF50" Offset="0.0"/>
+                                                                    <GradientStop Color="#2E7D32" Offset="1.0"/>
+                                                                </LinearGradientBrush>
+                                                            </Border.Background>
+                                                            <TextBlock Text="👥" FontSize="12" Foreground="White" 
+                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                       TextOptions.TextFormattingMode="Ideal"/>
+                                                        </Border>
+                                                        <TextBlock Text="Сотрудники" FontSize="14" Foreground="#666666" 
+                                                                   VerticalAlignment="Center"
+                                                                   TextOptions.TextFormattingMode="Ideal"/>
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Row="1" Text="{Binding TotalEmployeesCount}" 
+                                                               FontSize="24" FontWeight="Bold" Foreground="#333333"
+                                                               TextOptions.TextFormattingMode="Ideal"/>
+                                                </Grid>
+                                            </Border>
+                        
+                                            <Border Width="180" Height="90" Margin="0,0,15,15" CornerRadius="10" 
+                                                    Background="White" BorderThickness="1" BorderBrush="#E0E0E0">
+                                                <Border.Effect>
+                                                    <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1" RenderingBias="Quality"/>
+                                                </Border.Effect>
+                                                <Grid Margin="15,10">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="*"/>
+                                                    </Grid.RowDefinitions>
+                                                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                                                        <Border Width="24" Height="24" CornerRadius="12" Margin="0,0,8,0">
+                                                            <Border.Background>
+                                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                                    <GradientStop Color="#FF9800" Offset="0.0"/>
+                                                                    <GradientStop Color="#F57C00" Offset="1.0"/>
+                                                                </LinearGradientBrush>
+                                                            </Border.Background>
+                                                            <TextBlock Text="📅" FontSize="12" Foreground="White" 
+                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                       TextOptions.TextFormattingMode="Ideal"/>
+                                                        </Border>
+                                                        <TextBlock Text="Рабочие дни" FontSize="14" Foreground="#666666" 
+                                                                   VerticalAlignment="Center"
+                                                                   TextOptions.TextFormattingMode="Ideal"/>
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Row="1" Text="{Binding WorkDaysCount}" 
+                                                               FontSize="24" FontWeight="Bold" Foreground="#333333"
+                                                               TextOptions.TextFormattingMode="Ideal"/>
+                                                </Grid>
+                                            </Border>
+                        
+                                            <Border Width="180" Height="90" Margin="0,0,15,15" CornerRadius="10" 
+                                                    Background="White" BorderThickness="1" BorderBrush="#E0E0E0">
+                                                <Border.Effect>
+                                                    <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1" RenderingBias="Quality"/>
+                                                </Border.Effect>
+                                                <Grid Margin="15,10">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="*"/>
+                                                    </Grid.RowDefinitions>
+                                                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                                                        <Border Width="24" Height="24" CornerRadius="12" Margin="0,0,8,0">
+                                                            <Border.Background>
+                                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                                    <GradientStop Color="#9C27B0" Offset="0.0"/>
+                                                                    <GradientStop Color="#7B1FA2" Offset="1.0"/>
+                                                                </LinearGradientBrush>
+                                                            </Border.Background>
+                                                            <TextBlock Text="⏱" FontSize="12" Foreground="White" 
+                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                       TextOptions.TextFormattingMode="Ideal"/>
+                                                        </Border>
+                                                        <TextBlock Text="Смены" FontSize="14" Foreground="#666666" 
+                                                                   VerticalAlignment="Center"
+                                                                   TextOptions.TextFormattingMode="Ideal"/>
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Row="1" Text="{Binding TotalShiftCount}" 
+                                                               FontSize="24" FontWeight="Bold" Foreground="#333333"
+                                                               TextOptions.TextFormattingMode="Ideal"/>
+                                                </Grid>
+                                            </Border>
+                        
+                                            <Border Width="180" Height="90" Margin="0,0,15,15" CornerRadius="10" 
+                                                    Background="White" BorderThickness="1" BorderBrush="#E0E0E0">
+                                                <Border.Effect>
+                                                    <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1" RenderingBias="Quality"/>
+                                                </Border.Effect>
+                                                <Grid Margin="15,10">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="*"/>
+                                                    </Grid.RowDefinitions>
+                                                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                                                        <Border Width="24" Height="24" CornerRadius="12" Margin="0,0,8,0">
+                                                            <Border.Background>
+                                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                                    <GradientStop Color="#F44336" Offset="0.0"/>
+                                                                    <GradientStop Color="#D32F2F" Offset="1.0"/>
+                                                                </LinearGradientBrush>
+                                                            </Border.Background>
+                                                            <TextBlock Text="💰" FontSize="12" Foreground="White" 
+                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                       TextOptions.TextFormattingMode="Ideal"/>
+                                                        </Border>
+                                                        <TextBlock Text="Зарплата" FontSize="14" Foreground="#666666" 
+                                                                   VerticalAlignment="Center"
+                                                                   TextOptions.TextFormattingMode="Ideal"/>
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Row="1" Text="{Binding TotalSalary}" 
+                                                               FontSize="24" FontWeight="Bold" Foreground="#333333"
+                                                               TextOptions.TextFormattingMode="Ideal"/>
+                                                </Grid>
+                                            </Border>
+                                        </ItemsControl>
+                                    </Grid>
+                        
+                                    <Border Grid.Column="1" Background="#F8F9FA" CornerRadius="12" Padding="20">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="*"/>
+                                            </Grid.RowDefinitions>
+                        
+                                            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
+                                                <Border Width="30" Height="30" CornerRadius="15" Margin="0,0,10,0">
+                                                    <Border.Background>
+                                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                            <GradientStop Color="#009EE1" Offset="0.0"/>
+                                                            <GradientStop Color="#0077B5" Offset="1.0"/>
+                                                        </LinearGradientBrush>
+                                                    </Border.Background>
+                                                    <TextBlock Text="👤" FontSize="16" Foreground="White" 
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                               TextOptions.TextFormattingMode="Ideal"/>
+                                                </Border>
+                                                <TextBlock Text="Статистика по сотрудникам" 
+                                                           FontWeight="SemiBold" FontSize="16" FontFamily="Open Sans" 
+                                                           Foreground="#333333" VerticalAlignment="Center"
+                                                           TextOptions.TextFormattingMode="Ideal"/>
+                                            </StackPanel>
+                        
+                                            <Border Grid.Row="1" VerticalAlignment="Top" Background="#E3F2FD" 
+                                                    CornerRadius="6" Padding="10,8" Margin="0,0,0,10">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="2*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Text="Имя" FontWeight="SemiBold" 
+                                                               FontSize="13" Foreground="#0077B5"
+                                                               TextOptions.TextFormattingMode="Ideal"/>
+                                                    <TextBlock Grid.Column="1" Text="Смены" FontWeight="SemiBold" 
+                                                               FontSize="13" Foreground="#0077B5" Margin="10,0,25,0"
+                                                               TextOptions.TextFormattingMode="Ideal"/>
+                                                    <TextBlock Grid.Column="2" Text="Зарплата" FontWeight="SemiBold" 
+                                                               FontSize="13" Foreground="#0077B5"
+                                                               TextOptions.TextFormattingMode="Ideal"/>
+                                                </Grid>
+                                            </Border>
+                        
+                                            <ScrollViewer Grid.Row="1" Margin="0,35,0,0" VerticalScrollBarVisibility="Auto" 
+                                                         MaxHeight="200">
+                                                <ItemsControl ItemsSource="{Binding EmployeeStatistics}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Border Padding="10,8" Margin="0,0,0,8" 
+                                                                   Background="White" CornerRadius="6" 
+                                                                   BorderThickness="1" BorderBrush="#E0E0E0">
+                                                                <Border.Effect>
+                                                                    <DropShadowEffect ShadowDepth="1" BlurRadius="3" Opacity="0.1" RenderingBias="Quality"/>
+                                                                </Border.Effect>
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="2*"/>
+                                                                        <ColumnDefinition Width="65"/>
+                                                                        <ColumnDefinition Width="65"/>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    
+                                                                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                                                        <Border Width="30" Height="30" CornerRadius="15" Margin="0,0,10,0" 
+                                                                                Background="#E3F2FD">
+                                                                            <TextBlock Text="{Binding EmployeeName[0]}" FontSize="14" 
+                                                                                       Foreground="#0077B5" FontWeight="SemiBold"
+                                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                                       TextOptions.TextFormattingMode="Ideal"/>
+                                                                        </Border>
+                                                                        <TextBlock Text="{Binding EmployeeName}" FontSize="14" 
+                                                                                   Foreground="#333333" VerticalAlignment="Center"
+                                                                                   TextOptions.TextFormattingMode="Ideal"/>
+                                                                    </StackPanel>
+                                                                    
+                                                                    <Border Grid.Column="1" Background="#F0F7FF" CornerRadius="15" 
+                                                                            Padding="8,3" Margin="0,0,0,0" HorizontalAlignment="Center">
+                                                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                                            <TextBlock Text="{Binding WorkDaysCount, Converter={x:Static converters:ShiftToRussian.Instance}}" FontSize="13" 
+                                                                                       Foreground="#0077B5" FontWeight="SemiBold"
+                                                                                       TextOptions.TextFormattingMode="Ideal"/>
+                                                                        </StackPanel>
+                                                                    </Border>
+                                                                    
+                                                                    <TextBlock Grid.Column="2" Text="{Binding TotalSalary}" 
+                                                                               FontSize="14" FontWeight="Bold" Foreground="#333333" 
+                                                                               VerticalAlignment="Center" TextAlignment="Center"
+                                                                               TextOptions.TextFormattingMode="Ideal"/>
+                                                                </Grid>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </ScrollViewer>
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+                            </Grid>
+                        </Border>
                     </Grid>
+                </ScrollViewer>
+            </Border>
+            
+            <Border Grid.Row="1" Grid.RowSpan="1" Background="Black" Opacity="0.5" CornerRadius="0, 0, 8, 8"
+                    Visibility="{Binding IsBlackoutMode, Converter={x:Static converters:BoolToVisibilityConverter.Instance}}"
+                    Panel.ZIndex="10" BorderThickness="3, 0, 3, 3">
+                <Border.BorderBrush>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#009EE1" Offset="0.0"/>
+                        <GradientStop Color="#0077B5" Offset="1.0"/>
+                    </LinearGradientBrush>
+                </Border.BorderBrush>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                        <i:InvokeCommandAction Command="{Binding CloseMenuCommand}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Border>
+            
+            <Border Grid.Row="0" Grid.RowSpan="2" Background="Transparent"  Width="300" HorizontalAlignment="Left"
+                    Visibility="{Binding IsMenuOpen, Converter={x:Static converters:BoolToVisibilityConverter.Instance}}"
+                    Panel.ZIndex="11" CornerRadius="8, 0, 0, 8">
+                <Grid Background="Transparent" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
                     
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                        <StackPanel Margin="10">
-                            <Border CornerRadius="8" Margin="0,10,0,5" Background="Transparent">
-                                <Button Command="{Binding OpenEmployeeWindowCommand}">
-                                    <Button.Style>
-                                        <Style TargetType="Button">
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="Button">
-                                                        <Border x:Name="border" CornerRadius="8" Padding="15" Background="Transparent">
-                                                            <Grid>
-                                                                <Grid.ColumnDefinitions>
-                                                                    <ColumnDefinition Width="Auto"/>
-                                                                    <ColumnDefinition Width="*"/>
-                                                                    <ColumnDefinition Width="Auto"/>
-                                                                </Grid.ColumnDefinitions>
-                                                                
-                                                                <Border Grid.Column="0" Width="40" Height="40" CornerRadius="8" Background="#E3F2FD">
-                                                                    <TextBlock Text="👥" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                                </Border>
-                                                                
-                                                                <StackPanel Grid.Column="1" Margin="15,0,0,0" VerticalAlignment="Center">
-                                                                    <TextBlock Text="Сотрудники" FontSize="16" FontWeight="SemiBold" Foreground="#333333"/>
-                                                                    <TextBlock Text="Управление персоналом" FontSize="12" Foreground="#666666"/>
-                                                                </StackPanel>
-                                                                
-                                                                <TextBlock Grid.Column="2" Text="›" FontSize="20" FontWeight="Bold" Foreground="#009EE1" 
-                                                                          VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                                            </Grid>
-                                                        </Border>
-                                                        <ControlTemplate.Triggers>
-                                                            <Trigger Property="IsMouseOver" Value="True">
-                                                                <Setter Property="Background" TargetName="border" Value="#F0F7FF"/>
-                                                            </Trigger>
-                                                        </ControlTemplate.Triggers>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-                                    </Button.Style>
-                                </Button>
-                            </Border>
+                    <Border Background="Transparent" Grid.Row="0" CornerRadius="8, 0, 0, 0">
+                        <Grid Background="Transparent">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
                             
-                            <Border CornerRadius="8" Margin="0,5" Background="Transparent">
-                                <Button Command="{Binding LoadMatchesCommand}">
-                                    <Button.Style>
-                                        <Style TargetType="Button">
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="Button">
-                                                        <Border x:Name="border" CornerRadius="8" Padding="15" Background="Transparent">
-                                                            <Grid>
-                                                                <Grid.ColumnDefinitions>
-                                                                    <ColumnDefinition Width="Auto"/>
-                                                                    <ColumnDefinition Width="*"/>
-                                                                    <ColumnDefinition Width="Auto"/>
-                                                                </Grid.ColumnDefinitions>
-                                                                
-                                                                <Border Grid.Column="0" Width="40" Height="40" CornerRadius="8" Background="#E3F2FD">
-                                                                    <TextBlock Text="🔄" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                                </Border>
-                                                                
-                                                                <StackPanel Grid.Column="1" Margin="15,0,0,0" VerticalAlignment="Center">
-                                                                    <TextBlock Text="Обновить расписание" FontSize="16" FontWeight="SemiBold" Foreground="#333333"/>
-                                                                    <TextBlock Text="Загрузить актуальные данные" FontSize="12" Foreground="#666666"/>
-                                                                </StackPanel>
-                                                                
-                                                                <TextBlock Grid.Column="2" Text="›" FontSize="20" FontWeight="Bold" Foreground="#009EE1" 
-                                                                          VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                                            </Grid>
-                                                        </Border>
-                                                        <ControlTemplate.Triggers>
-                                                            <Trigger Property="IsMouseOver" Value="True">
-                                                                <Setter Property="Background" TargetName="border" Value="#F0F7FF"/>
-                                                            </Trigger>
-                                                        </ControlTemplate.Triggers>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-                                    </Button.Style>
-                                </Button>
-                            </Border>
+                            <Button Grid.Column="0"
+                                    Command="{Binding ToggleMenuCommand}"
+                                    Width="40"
+                                    Height="40"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    Margin="24,0,0,0">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Content">
+                                            <Setter.Value>
+                                                <Image Source="pack://application:,,,/Resources/menu_icon.png" Width="20" Height="20"/>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border Background="{TemplateBinding Background}">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsMenuOpen}" Value="True">
+                                                <Setter Property="Content">
+                                                    <Setter.Value>
+                                                        <Image Source="pack://application:,,,/Resources/close_icon.png" Width="24" Height="24"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
                             
-                            <Border CornerRadius="8" Margin="0,5" Background="Transparent">
-                                <Button Command="{Binding OpenTaskCategoriesWindowCommand}">
-                                    <Button.Style>
-                                        <Style TargetType="Button">
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="Button">
-                                                        <Border x:Name="border" CornerRadius="8" Padding="15" Background="Transparent">
-                                                            <Grid>
-                                                                <Grid.ColumnDefinitions>
-                                                                    <ColumnDefinition Width="Auto"/>
-                                                                    <ColumnDefinition Width="*"/>
-                                                                    <ColumnDefinition Width="Auto"/>
-                                                                </Grid.ColumnDefinitions>
-                                                                
-                                                                <Border Grid.Column="0" Width="40" Height="40" CornerRadius="8" Background="#E3F2FD">
-                                                                    <TextBlock Text="⏱" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                                </Border>
-                                                                
-                                                                <StackPanel Grid.Column="1" Margin="15,0,0,0" VerticalAlignment="Center">
-                                                                    <TextBlock Text="Тайминг" FontSize="16" FontWeight="SemiBold" Foreground="#333333"/>
-                                                                    <TextBlock Text="Категории задач и аналитика" FontSize="12" Foreground="#666666"/>
-                                                                </StackPanel>
-                                                                
-                                                                <TextBlock Grid.Column="2" Text="›" FontSize="20" FontWeight="Bold" Foreground="#009EE1" 
-                                                                          VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                                            </Grid>
-                                                        </Border>
-                                                        <ControlTemplate.Triggers>
-                                                            <Trigger Property="IsMouseOver" Value="True">
-                                                                <Setter Property="Background" TargetName="border" Value="#F0F7FF"/>
-                                                            </Trigger>
-                                                        </ControlTemplate.Triggers>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-                                    </Button.Style>
-                                </Button>
-                            </Border>
-                            
-                            <Border CornerRadius="8" Margin="0,5" Background="Transparent">
-                                <Button Command="{Binding OpenSettingsWindowCommand}">
-                                    <Button.Style>
-                                        <Style TargetType="Button">
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="Button">
-                                                        <Border x:Name="border" CornerRadius="8" Padding="15" Background="Transparent">
-                                                            <Grid>
-                                                                <Grid.ColumnDefinitions>
-                                                                    <ColumnDefinition Width="Auto"/>
-                                                                    <ColumnDefinition Width="*"/>
-                                                                    <ColumnDefinition Width="Auto"/>
-                                                                </Grid.ColumnDefinitions>
-                                                                
-                                                                <Border Grid.Column="0" Width="40" Height="40" CornerRadius="8" Background="#E3F2FD">
-                                                                    <TextBlock Text="⚙️" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                                </Border>
-                                                                
-                                                                <StackPanel Grid.Column="1" Margin="15,0,0,0" VerticalAlignment="Center">
-                                                                    <TextBlock Text="Настройки" FontSize="16" FontWeight="SemiBold" Foreground="#333333"/>
-                                                                    <TextBlock Text="Параметры приложения" FontSize="12" Foreground="#666666"/>
-                                                                </StackPanel>
-                                                                
-                                                                <TextBlock Grid.Column="2" Text="›" FontSize="20" FontWeight="Bold" Foreground="#009EE1" 
-                                                                          VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                                            </Grid>
-                                                        </Border>
-                                                        <ControlTemplate.Triggers>
-                                                            <Trigger Property="IsMouseOver" Value="True">
-                                                                <Setter Property="Background" TargetName="border" Value="#F0F7FF"/>
-                                                            </Trigger>
-                                                        </ControlTemplate.Triggers>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-                                    </Button.Style>
-                                </Button>
-                            </Border>
-                            
-                            <Border CornerRadius="8" Margin="0,5" Background="Transparent">
-                                <Button Command="{Binding OpenFaqWindowCommand}">
-                                    <Button.Style>
-                                        <Style TargetType="Button">
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="Button">
-                                                        <Border x:Name="border" CornerRadius="8" Padding="15" Background="Transparent">
-                                                            <Grid>
-                                                                <Grid.ColumnDefinitions>
-                                                                    <ColumnDefinition Width="Auto"/>
-                                                                    <ColumnDefinition Width="*"/>
-                                                                    <ColumnDefinition Width="Auto"/>
-                                                                </Grid.ColumnDefinitions>
-                                                                
-                                                                <Border Grid.Column="0" Width="40" Height="40" CornerRadius="8" Background="#E3F2FD">
-                                                                    <TextBlock Text="❔" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                                </Border>
-                                                                
-                                                                <StackPanel Grid.Column="1" Margin="15,0,0,0" VerticalAlignment="Center">
-                                                                    <TextBlock Text="FAQ" FontSize="16" FontWeight="SemiBold" Foreground="#333333"/>
-                                                                    <TextBlock Text="Самые популярные вопросы" FontSize="12" Foreground="#666666"/>
-                                                                </StackPanel>
-                                                                
-                                                                <TextBlock Grid.Column="2" Text="›" FontSize="20" FontWeight="Bold" Foreground="#009EE1" 
-                                                                          VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                                            </Grid>
-                                                        </Border>
-                                                        <ControlTemplate.Triggers>
-                                                            <Trigger Property="IsMouseOver" Value="True">
-                                                                <Setter Property="Background" TargetName="border" Value="#F0F7FF"/>
-                                                            </Trigger>
-                                                        </ControlTemplate.Triggers>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-                                    </Button.Style>
-                                </Button>
-                            </Border>
-                        </StackPanel>
-                    </ScrollViewer>
+                            <TextBlock Grid.Column="1" Text="МЕНЮ" FontFamily="OpenSans" FontSize="16" Margin="0,6,48,4"
+                                       Foreground="White" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Grid>
+                    </Border>
                     
-                    <Border Grid.Row="2" Padding="15" Background="#F8F9FA">
-                        <StackPanel>
-                            <TextBlock Text="FANSHOP" 
-                                       FontWeight="Bold" 
-                                       FontSize="16" 
-                                       Foreground="#0077B5" 
-                                       HorizontalAlignment="Center"/>
-                            <TextBlock Text="Версия 1.3.0" 
-                                       FontSize="12" 
-                                       Foreground="#666666" 
-                                       HorizontalAlignment="Center"
-                                       Margin="0,5,0,0"/>
-                            <TextBlock Text="Разработка: Васильев Никита" 
-                                       FontSize="10" 
-                                       Foreground="#9D9D9D" 
-                                       HorizontalAlignment="Center"
-                                       Margin="0,5,0,0"/>
-                        </StackPanel>
+                    <Border Background="White" Grid.Row="1" BorderThickness="3, 0, 0, 0">
+                        <Border.BorderBrush>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="#009EE1" Offset="0.0"/>
+                                <GradientStop Color="#0096D8" Offset="1.0"/>
+                            </LinearGradientBrush>
+                        </Border.BorderBrush>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="10">
+                                <Border CornerRadius="8" Margin="0,10,0,5" Background="Transparent">
+                                    <Button Command="{Binding OpenEmployeeWindowCommand}">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border x:Name="border" CornerRadius="8" Padding="15" Background="Transparent">
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    
+                                                                    <Border Grid.Column="0" Width="40" Height="40" CornerRadius="8" Background="#E3F2FD">
+                                                                        <TextBlock Text="👥" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                    </Border>
+                                                                    
+                                                                    <StackPanel Grid.Column="1" Margin="15,0,0,0" VerticalAlignment="Center">
+                                                                        <TextBlock Text="Сотрудники" FontSize="16" FontWeight="SemiBold" Foreground="#333333"/>
+                                                                        <TextBlock Text="Управление персоналом" FontSize="12" Foreground="#666666"/>
+                                                                    </StackPanel>
+                                                                    
+                                                                    <TextBlock Grid.Column="2" Text="›" FontSize="20" FontWeight="Bold" Foreground="#009EE1" 
+                                                                              VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                                                </Grid>
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter Property="Background" TargetName="border" Value="#F0F7FF"/>
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </Border>
+                                
+                                <Border CornerRadius="8" Margin="0,5" Background="Transparent">
+                                    <Button Command="{Binding LoadMatchesCommand}">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border x:Name="border" CornerRadius="8" Padding="15" Background="Transparent">
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    
+                                                                    <Border Grid.Column="0" Width="40" Height="40" CornerRadius="8" Background="#E3F2FD">
+                                                                        <TextBlock Text="🔄" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                    </Border>
+                                                                    
+                                                                    <StackPanel Grid.Column="1" Margin="15,0,0,0" VerticalAlignment="Center">
+                                                                        <TextBlock Text="Обновить расписание" FontSize="16" FontWeight="SemiBold" Foreground="#333333"/>
+                                                                        <TextBlock Text="Загрузить актуальные данные" FontSize="12" Foreground="#666666"/>
+                                                                    </StackPanel>
+                                                                    
+                                                                    <TextBlock Grid.Column="2" Text="›" FontSize="20" FontWeight="Bold" Foreground="#009EE1" 
+                                                                              VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                                                </Grid>
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter Property="Background" TargetName="border" Value="#F0F7FF"/>
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </Border>
+                                
+                                <Border CornerRadius="8" Margin="0,5" Background="Transparent">
+                                    <Button Command="{Binding OpenTaskCategoriesWindowCommand}">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border x:Name="border" CornerRadius="8" Padding="15" Background="Transparent">
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    
+                                                                    <Border Grid.Column="0" Width="40" Height="40" CornerRadius="8" Background="#E3F2FD">
+                                                                        <TextBlock Text="⏱" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                    </Border>
+                                                                    
+                                                                    <StackPanel Grid.Column="1" Margin="15,0,0,0" VerticalAlignment="Center">
+                                                                        <TextBlock Text="Тайминг" FontSize="16" FontWeight="SemiBold" Foreground="#333333"/>
+                                                                        <TextBlock Text="Категории задач и аналитика" FontSize="12" Foreground="#666666"/>
+                                                                    </StackPanel>
+                                                                    
+                                                                    <TextBlock Grid.Column="2" Text="›" FontSize="20" FontWeight="Bold" Foreground="#009EE1" 
+                                                                              VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                                                </Grid>
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter Property="Background" TargetName="border" Value="#F0F7FF"/>
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </Border>
+                                
+                                <Border CornerRadius="8" Margin="0,5" Background="Transparent">
+                                    <Button Command="{Binding OpenSettingsWindowCommand}">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border x:Name="border" CornerRadius="8" Padding="15" Background="Transparent">
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    
+                                                                    <Border Grid.Column="0" Width="40" Height="40" CornerRadius="8" Background="#E3F2FD">
+                                                                        <TextBlock Text="⚙️" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                    </Border>
+                                                                    
+                                                                    <StackPanel Grid.Column="1" Margin="15,0,0,0" VerticalAlignment="Center">
+                                                                        <TextBlock Text="Настройки" FontSize="16" FontWeight="SemiBold" Foreground="#333333"/>
+                                                                        <TextBlock Text="Параметры приложения" FontSize="12" Foreground="#666666"/>
+                                                                    </StackPanel>
+                                                                    
+                                                                    <TextBlock Grid.Column="2" Text="›" FontSize="20" FontWeight="Bold" Foreground="#009EE1" 
+                                                                              VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                                                </Grid>
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter Property="Background" TargetName="border" Value="#F0F7FF"/>
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </Border>
+                                
+                                <Border CornerRadius="8" Margin="0,5" Background="Transparent">
+                                    <Button Command="{Binding OpenFaqWindowCommand}">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border x:Name="border" CornerRadius="8" Padding="15" Background="Transparent">
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    
+                                                                    <Border Grid.Column="0" Width="40" Height="40" CornerRadius="8" Background="#E3F2FD">
+                                                                        <TextBlock Text="❔" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                    </Border>
+                                                                    
+                                                                    <StackPanel Grid.Column="1" Margin="15,0,0,0" VerticalAlignment="Center">
+                                                                        <TextBlock Text="FAQ" FontSize="16" FontWeight="SemiBold" Foreground="#333333"/>
+                                                                        <TextBlock Text="Самые популярные вопросы" FontSize="12" Foreground="#666666"/>
+                                                                    </StackPanel>
+                                                                    
+                                                                    <TextBlock Grid.Column="2" Text="›" FontSize="20" FontWeight="Bold" Foreground="#009EE1" 
+                                                                              VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                                                </Grid>
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter Property="Background" TargetName="border" Value="#F0F7FF"/>
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+                    
+                    <Border Grid.Row="2" CornerRadius="0, 0, 0, 8" BorderThickness="3, 0, 0, 3">
+                        <Border.BorderBrush>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="#009EE1" Offset="0.0"/>
+                                <GradientStop Color="#0096D8" Offset="1.0"/>
+                            </LinearGradientBrush>
+                        </Border.BorderBrush>
+                        <Border Background="#F8F9FA" Padding="15" CornerRadius="0, 0, 0, 8">
+                            <StackPanel Background="#F8F9FA">
+                                <TextBlock Text="FANSHOP" 
+                                           FontWeight="Bold" 
+                                           FontSize="16" 
+                                           Foreground="#0077B5" 
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock Text="Версия 1.3.0" 
+                                           FontSize="12" 
+                                           Foreground="#666666" 
+                                           HorizontalAlignment="Center"
+                                           Margin="0,5,0,0"/>
+                                <TextBlock Text="Разработка: Васильев Никита" 
+                                           FontSize="10" 
+                                           Foreground="#9D9D9D" 
+                                           HorizontalAlignment="Center"
+                                           Margin="0,5,0,0"/>
+                            </StackPanel>
+                        </Border>
                     </Border>
                 </Grid>
             </Border>
