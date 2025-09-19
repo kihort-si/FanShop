@@ -92,6 +92,7 @@
                     
                     <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button HorizontalAlignment="Right" Width="48" Height="40"
+                                Click="MinimizeButton_Click"
                                 Background="Transparent" Foreground="White" BorderThickness="0" FontWeight="Bold" FontSize="14">
                             <Button.Style>
                                 <Style TargetType="Button">
@@ -117,6 +118,7 @@
                         </Button>
                         
                         <Button HorizontalAlignment="Right" Width="48" Height="40"
+                                Click="MaximizeButton_Click"
                                 Background="Transparent" Foreground="White" BorderThickness="0" FontWeight="Bold" FontSize="14">
                             <Button.Style>
                                 <Style TargetType="Button">
@@ -142,6 +144,7 @@
                         </Button>
                         
                         <Button HorizontalAlignment="Right" Width="48" Height="40"
+                                Click="CloseButton_Click"
                                 Background="Transparent" Foreground="White" BorderThickness="0" FontWeight="Bold" FontSize="14">
                             <Button.Style>
                                 <Style TargetType="Button">

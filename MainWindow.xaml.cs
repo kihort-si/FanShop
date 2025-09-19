@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using FanShop.Utils;
 using FanShop.ViewModels;
+using System.Windows.Media.Animation;
 
 namespace FanShop;
 
@@ -13,9 +14,34 @@ namespace FanShop;
 /// </summary>
 public partial class MainWindow : Window
 {
+    private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
+    }
+    
+    private void MaximizeButton_Click(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+    }
+    
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    {
+        var animation = new DoubleAnimation
+        {
+            From = 1.0,
+            To = 0.0,
+            Duration = TimeSpan.FromMilliseconds(200)
+        };
+        
+        animation.Completed += (s, _) => Close();
+        BeginAnimation(OpacityProperty, animation);
+    }
+    
     public MainWindow()
     {
         InitializeComponent();
+        
+        DataContext = this;
     }
     
     protected override async void OnActivated(EventArgs e)
