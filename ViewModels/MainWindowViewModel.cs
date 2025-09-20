@@ -9,6 +9,7 @@ using System.Windows.Media.Imaging;
 using FanShop.Models;
 using FanShop.Services;
 using FanShop.Utils;
+using FanShop.View;
 using FanShop.Windows;
 using Microsoft.EntityFrameworkCore;
 using Application = System.Windows.Application;
@@ -102,8 +103,30 @@ namespace FanShop.ViewModels
         public ICommand OpenSettingsWindowCommand { get; }
         public ICommand OpenFaqWindowCommand { get; }
 
+        private ObservableCollection<TabItem> _openWindows;
+        private TabItem _selectedWindow;
+        
+        public ObservableCollection<TabItem> OpenWindows
+        {
+            get => _openWindows;
+            set => SetProperty(ref _openWindows, value);
+        }
+    
+        public TabItem SelectedWindow
+        {
+            get => _selectedWindow;
+            set => SetProperty(ref _selectedWindow, value);
+        }
+        
+        public bool HasOpenWindows => OpenWindows.Any();
+    
+        public ICommand CloseTabCommand { get; }
+        
         public MainWindowViewModel()
         {
+            OpenWindows = new ObservableCollection<TabItem>();
+            OpenMainWindowTab();
+            CloseTabCommand = new RelayCommand(CloseTab);
             _firebaseService =
                 new FirebaseService("https://fanshop-11123-default-rtdb.europe-west1.firebasedatabase.app/");
             _statisticsService = new StatisticsService();
@@ -428,6 +451,35 @@ namespace FanShop.ViewModels
             OnPropertyChanged(nameof(TotalShiftCount));
             OnPropertyChanged(nameof(TotalSalary));
             OnPropertyChanged(nameof(EmployeeStatistics));
+        }
+
+                private void OpenMainWindowTab()
+        {
+            var mainWindowTab = new MainView
+            {
+                DataContext = this
+            };
+            
+            var tabItem = new TabItem
+            {
+                Title = "Главная",
+                Content = mainWindowTab
+            };
+            
+            OpenWindows.Add(tabItem);
+            SelectedWindow = tabItem;
+            OnPropertyChanged(nameof(HasOpenWindows));
+            
+            IsMenuOpen = false;
+        }
+        
+        private void CloseTab(object? parameter)
+        {
+            if (parameter is TabItem tab)
+            {
+                OpenWindows.Remove(tab);
+                OnPropertyChanged(nameof(HasOpenWindows));
+            }
         }
     }
     
