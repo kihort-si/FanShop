@@ -8,6 +8,7 @@ using System.Windows.Media.Imaging;
 using FanShop.Models;
 using FanShop.Services;
 using FanShop.Utils;
+using FanShop.View;
 using FanShop.Windows;
 using Microsoft.EntityFrameworkCore;
 using Application = System.Windows.Application;
@@ -127,6 +128,9 @@ namespace FanShop.ViewModels
             get => _isEmployeeView;
             set => SetProperty(ref _isEmployeeView, value);
         }
+        
+        public MainViewModel MainViewModel { get; set; }
+
 
         public ICommand ShowDayDetailsCommand { get; }
         public ICommand AddEmployeesCommand { get; }
@@ -227,7 +231,7 @@ namespace FanShop.ViewModels
                     WorkDuration = selectedWorkDuration
                 });
 
-                NotifyMainWindowOfChanges();
+                NotifyMainControlOfChanges();
 
                 OnPropertyChanged(nameof(Employees));
                 OnPropertyChanged(nameof(DisplayedEmployees));
@@ -260,7 +264,7 @@ namespace FanShop.ViewModels
                 Employees.Remove(SelectedEmployee);
                 SelectedEmployee = null;
 
-                NotifyMainWindowOfChanges();
+                NotifyMainControlOfChanges();
 
                 OnPropertyChanged(nameof(Employees));
                 OnPropertyChanged(nameof(DisplayedEmployees));
@@ -401,13 +405,9 @@ namespace FanShop.ViewModels
                 return "задач";
         }
         
-        private void NotifyMainWindowOfChanges()
+        private void NotifyMainControlOfChanges()
         {
-            var mainWindow = Application.Current.MainWindow;
-            if (mainWindow?.DataContext is MainWindowViewModel mainViewModel)
-            {
-                mainViewModel.RefreshStatistics();
-            }
+            MainViewModel?.RefreshStatistics();
         }
     }
 

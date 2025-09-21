@@ -218,7 +218,8 @@
                                         Command="{Binding DataContext.CloseTabCommand, 
                         RelativeSource={RelativeSource AncestorType=Window}}"
                                         CommandParameter="{Binding}"
-                                        Style="{StaticResource TabCloseButtonStyle}"/>
+                                        Style="{StaticResource TabCloseButtonStyle}"
+                                        Visibility="{Binding IsClosable, Converter={StaticResource BoolToVisibilityConverter}}"/>
                             </Grid>
                         </DataTemplate>
                     </TabControl.ItemTemplate>

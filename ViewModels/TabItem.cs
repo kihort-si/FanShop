@@ -6,6 +6,7 @@ public class TabItem : BaseViewModel
 {
     private string _title;
     private UserControl _content;
+    private bool _isClosable = true;
     
     public string Title
     {
@@ -17,5 +18,11 @@ public class TabItem : BaseViewModel
     {
         get => _content;
         set => SetProperty(ref _content, value);
+    }
+    
+    public bool IsClosable
+    {
+        get => _isClosable;
+        set => SetProperty(ref _isClosable, value);
     }
 }

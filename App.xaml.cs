@@ -19,7 +19,7 @@ public partial class App : Application
     }
     
     private SplashScreenWindow _splashScreen;
-    private MainWindowViewModel _mainViewModel;
+    private MainWindowViewModel _mainWindowViewModel;
     
     private async void Application_Startup(object sender, StartupEventArgs e)
     {
@@ -50,7 +50,9 @@ public partial class App : Application
             _splashScreen.ViewModel.UpdateProgress(10);
             await Task.Delay(100); 
     
-            _mainViewModel = new MainWindowViewModel();
+            _mainWindowViewModel = new MainWindowViewModel();
+            _mainWindowViewModel.OpenMainWindowTab(); 
+            
             using (var db = new AppDbContext())
             {
                 db.Database.Migrate();
@@ -58,28 +60,33 @@ public partial class App : Application
 
             _splashScreen.ViewModel.UpdateProgress(30);
             await Task.Delay(100); 
+            
+            var mainViewModel = _mainWindowViewModel.GetMainViewModel();
+            if (mainViewModel != null)
+            {
+                await mainViewModel.GenerateCalendar(mainViewModel
+                    ._currentYear, mainViewModel._currentMonth);
+                _splashScreen.ViewModel.UpdateProgress(80);
+                await Task.Delay(100); 
     
-            await _mainViewModel.LoadMatchesFromFirebase();
+                await mainViewModel.CheckAndUpdateCalendarAsync();
+                _splashScreen.ViewModel.UpdateProgress(95);
+                await Task.Delay(100); 
+            }
+    
+            await _mainWindowViewModel.LoadMatchesFromFirebase();
             _splashScreen.ViewModel.UpdateProgress(60);
             await Task.Delay(100);
     
-            await _mainViewModel.GenerateCalendar(_mainViewModel._currentYear, _mainViewModel._currentMonth);
-            _splashScreen.ViewModel.UpdateProgress(80);
-            await Task.Delay(100); 
-    
-            await _mainViewModel.CheckAndUpdateCalendarAsync();
-            _splashScreen.ViewModel.UpdateProgress(95);
-            await Task.Delay(100); 
-    
             DbInitializer.Initialize();
-            _mainViewModel.RefreshStatistics();
+            _mainWindowViewModel.RefreshStatistics();
             
             _splashScreen.ViewModel.UpdateProgress(100);
             await Task.Delay(100); 
     
             _splashScreen.ViewModel.Stop();
     
-            var mainWindow = new MainWindow { DataContext = _mainViewModel };
+            var mainWindow = new MainWindow { DataContext = _mainWindowViewModel };
             Application.Current.MainWindow = mainWindow;
             mainWindow.Show();
         }
@@ -87,6 +94,7 @@ public partial class App : Application
         {
             MessageBox.Show($"Ошибка при запуске: {ex.Message}", "Ошибка", 
                 MessageBoxButton.OK, MessageBoxImage.Error);
+            Console.WriteLine(ex);
         }
         finally
         {

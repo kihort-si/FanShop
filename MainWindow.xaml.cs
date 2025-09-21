@@ -14,6 +14,8 @@ namespace FanShop;
 /// </summary>
 public partial class MainWindow : Window
 {
+    private MainWindowViewModel _mainWindowViewModel;
+    
     private void MinimizeButton_Click(object sender, RoutedEventArgs e)
     {
         WindowState = WindowState.Minimized;
@@ -48,9 +50,9 @@ public partial class MainWindow : Window
     {
         base.OnActivated(e);
 
-        if (DataContext is MainWindowViewModel vm)
+        if (_mainWindowViewModel?.GetMainViewModel() is MainViewModel mainViewModel)
         {
-            await vm.CheckAndUpdateCalendarAsync();
+            await mainViewModel.CheckAndUpdateCalendarAsync();
         }
     }
     

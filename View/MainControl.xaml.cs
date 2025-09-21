@@ -2,9 +2,9 @@
 
 namespace FanShop.View;
 
-public partial class MainView : UserControl
+public partial class MainControl : UserControl
 {
-    public MainView()
+    public MainControl()
     {
         InitializeComponent();
     }
