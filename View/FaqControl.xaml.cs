@@ -1,13 +1,11 @@
 ﻿using System.IO;
-using System.Windows;
-using System.Windows.Input;
-using FanShop.Utils;
+using UserControl = System.Windows.Controls.UserControl;
 
-namespace FanShop.Windows;
+namespace FanShop.View;
 
-public partial class FaqWindow : Window
+public partial class FaqControl : UserControl
 {
-    public FaqWindow()
+    public FaqControl()
     {
         InitializeComponent();
         
@@ -20,19 +18,5 @@ public partial class FaqWindow : Window
             "3. Нажмите \"Сохранить\" для применения изменений\n\n" +
             $"Примечание: Для более глубокой кастомизации шаблона пропуска можно отредактировать файл \"болванка.docx\", находящийся по пути: {docPath}.";
 
-    }
-    
-    private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-        if (e.LeftButton == MouseButtonState.Pressed)
-        {
-            DragMove();
-        }
-    }
-    
-    private void CloseButton_Click(object sender, RoutedEventArgs e)
-    {
-        Close();
-        OpenWindowsController.Unregister(this);
     }
 }

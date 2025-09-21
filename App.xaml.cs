@@ -60,7 +60,11 @@ public partial class App : Application
 
             _splashScreen.ViewModel.UpdateProgress(30);
             await Task.Delay(100); 
-            
+    
+            await _mainWindowViewModel.LoadMatchesFromFirebase();
+            _splashScreen.ViewModel.UpdateProgress(60);
+            await Task.Delay(100);
+    
             var mainViewModel = _mainWindowViewModel.GetMainViewModel();
             if (mainViewModel != null)
             {
@@ -73,11 +77,7 @@ public partial class App : Application
                 _splashScreen.ViewModel.UpdateProgress(95);
                 await Task.Delay(100); 
             }
-    
-            await _mainWindowViewModel.LoadMatchesFromFirebase();
-            _splashScreen.ViewModel.UpdateProgress(60);
-            await Task.Delay(100);
-    
+            
             DbInitializer.Initialize();
             _mainWindowViewModel.RefreshStatistics();
             

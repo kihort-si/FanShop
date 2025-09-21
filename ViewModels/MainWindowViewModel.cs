@@ -73,7 +73,7 @@ namespace FanShop.ViewModels
             LoadMatchesCommand = new RelayCommand(async _ => await LoadMatchesFromFirebase());
             OpenTaskCategoriesWindowCommand = new RelayCommand(OpenTaskCategoriesWindow);
             OpenSettingsWindowCommand = new RelayCommand(OpenSettingsWindow);
-            OpenFaqWindowCommand = new RelayCommand(OpenFaqWindow);
+            OpenFaqWindowCommand = new RelayCommand(OpenFaqWindowTab);
         }
         
         public void SetBlackoutMode(bool isBlackout)
@@ -127,14 +127,18 @@ namespace FanShop.ViewModels
             IsMenuOpen = false;
         }
         
-        private void OpenFaqWindow(object? parameter)
+        private void OpenFaqWindowTab(object? parameter)
         {
-            var faqWindow = new FaqWindow();
-            faqWindow.Owner = Application.Current.MainWindow;
-            faqWindow.ShowInTaskbar = false;
-            faqWindow.Show();
-            OpenWindowsController.Register(faqWindow);
-            IsMenuOpen = false;
+            var faqWindowTab = new FaqControl();
+            
+            var tabItem = new TabItem
+            {
+                Title = "FAQ",
+                Content = faqWindowTab,
+                IsClosable = true
+            };
+            
+            OpenWindowTab(tabItem);
         }
 
         public void OpenMainWindowTab()
@@ -164,6 +168,7 @@ namespace FanShop.ViewModels
             OnPropertyChanged(nameof(HasOpenWindows));
             
             IsMenuOpen = false;
+            IsBlackoutMode = false;
         }
         
         private void CloseTab(object? parameter)
