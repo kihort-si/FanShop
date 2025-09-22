@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Input;
 using FanShop.Utils;
 using FanShop.View;
@@ -72,7 +73,7 @@ namespace FanShop.ViewModels
             OpenEmployeeWindowCommand = new RelayCommand(OpenEmployeeWindow);
             LoadMatchesCommand = new RelayCommand(async _ => await LoadMatchesFromFirebase());
             OpenTaskCategoriesWindowCommand = new RelayCommand(OpenTaskCategoriesWindow);
-            OpenSettingsWindowCommand = new RelayCommand(OpenSettingsWindow);
+            OpenSettingsWindowCommand = new RelayCommand(OpenSettingsWindowTab);
             OpenFaqWindowCommand = new RelayCommand(OpenFaqWindowTab);
         }
         
@@ -107,24 +108,22 @@ namespace FanShop.ViewModels
             OpenWindowsController.Register(dayTasksWindow);
             IsMenuOpen = false;
         }
-
-        private void OpenSettingsWindow(object? parameter)
+        
+        public void OpenMainWindowTab()
         {
-            var settingsWindow = new SettingsWindow();
-            var viewModel = (SettingsWindowViewModel)settingsWindow.DataContext;
-
-            viewModel.CloseRequested += () =>
+            var mainWindowTab = new MainControl
             {
-                settingsWindow.Close();
-                OpenWindowsController.Unregister(settingsWindow);
-                RefreshStatistics();
+                DataContext = new MainViewModel()
             };
             
-            settingsWindow.Owner = Application.Current.MainWindow;
-            settingsWindow.ShowInTaskbar = false;
-            settingsWindow.Show();
-            OpenWindowsController.Register(settingsWindow);
-            IsMenuOpen = false;
+            var tabItem = new TabItem
+            {
+                Title = "Главная",
+                Content = mainWindowTab,
+                IsClosable = false
+            };
+            
+            OpenWindowTab(tabItem);
         }
         
         private void OpenFaqWindowTab(object? parameter)
@@ -141,18 +140,18 @@ namespace FanShop.ViewModels
             OpenWindowTab(tabItem);
         }
 
-        public void OpenMainWindowTab()
+        public void OpenSettingsWindowTab(object? parameter)
         {
-            var mainWindowTab = new MainControl
+            var settingsWindowTab = new SettingsControl
             {
-                DataContext = new MainViewModel()
+                DataContext = new SettingsViewModel(this)
             };
-            
+
             var tabItem = new TabItem
             {
-                Title = "Главная",
-                Content = mainWindowTab,
-                IsClosable = false
+                Title = "Настройки",
+                Content = settingsWindowTab,
+                IsClosable = true
             };
             
             OpenWindowTab(tabItem);
@@ -177,6 +176,17 @@ namespace FanShop.ViewModels
             {
                 OpenWindows.Remove(tab);
                 OnPropertyChanged(nameof(HasOpenWindows));
+            }
+        }
+
+        public void CloseTabRequest(object? viewModel)
+        {
+            var tabToClose = OpenWindows.FirstOrDefault(tab =>
+                tab.Content is FrameworkElement element && element.DataContext == viewModel);
+
+            if (tabToClose != null)
+            {
+                CloseTab(tabToClose);
             }
         }
 

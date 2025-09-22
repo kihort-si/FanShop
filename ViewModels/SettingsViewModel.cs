@@ -4,8 +4,9 @@ using FanShop.Models;
 
 namespace FanShop.ViewModels
 {
-    public class SettingsWindowViewModel : BaseViewModel
+    public class SettingsViewModel : BaseViewModel
     {
+        private readonly MainWindowViewModel _mainWindowViewModel;
         private Settings _settings;
 
         public string Head
@@ -73,8 +74,9 @@ namespace FanShop.ViewModels
 
         public event Action? CloseRequested;
 
-        public SettingsWindowViewModel()
+        public SettingsViewModel(MainWindowViewModel mainWindowViewModel)
         {
+            _mainWindowViewModel = mainWindowViewModel;
             _settings = Settings.Load();
             SaveCommand = new RelayCommand(Save);
             CancelCommand = new RelayCommand(Cancel);
@@ -83,12 +85,14 @@ namespace FanShop.ViewModels
         private void Save(object? parameter)
         {
             _settings.Save();
+            _mainWindowViewModel.RefreshStatistics();
+            _mainWindowViewModel.CloseTabRequest(this);
             CloseRequested?.Invoke();
         }
 
         private void Cancel(object? parameter)
         {
-            CloseRequested?.Invoke();
+            _mainWindowViewModel.CloseTabRequest(this);
         }
     }
 }
