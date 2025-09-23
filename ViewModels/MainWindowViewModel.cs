@@ -5,6 +5,7 @@ using FanShop.Utils;
 using FanShop.View;
 using FanShop.Windows;
 using Application = System.Windows.Application;
+using UserControl = System.Windows.Controls.UserControl;
 
 namespace FanShop.ViewModels
 
@@ -70,7 +71,7 @@ namespace FanShop.ViewModels
                 IsBlackoutMode = false;
             });
 
-            OpenEmployeeWindowCommand = new RelayCommand(OpenEmployeeWindow);
+            OpenEmployeeWindowCommand = new RelayCommand(OpenEmployeeWindowTab);
             LoadMatchesCommand = new RelayCommand(async _ => await LoadMatchesFromFirebase());
             OpenTaskCategoriesWindowCommand = new RelayCommand(OpenTaskCategoriesWindow);
             OpenSettingsWindowCommand = new RelayCommand(OpenSettingsWindowTab);
@@ -81,19 +82,6 @@ namespace FanShop.ViewModels
         {
             IsBlackoutMode = isBlackout;
             OnPropertyChanged(nameof(IsBlackoutMode));
-        }
-
-        private void OpenEmployeeWindow(object? parameter)
-        {
-            var employeeWindow = new EmployeeWindow
-            {
-                DataContext = new EmployeeWindowViewModel()
-            };
-            employeeWindow.Owner = Application.Current.MainWindow;
-            employeeWindow.ShowInTaskbar = false;
-            employeeWindow.Show();
-            OpenWindowsController.Register(employeeWindow);
-            IsMenuOpen = false;
         }
 
         private void OpenTaskCategoriesWindow(object? parameter)
@@ -125,6 +113,23 @@ namespace FanShop.ViewModels
             
             OpenWindowTab(tabItem);
         }
+
+        private void OpenEmployeeWindowTab(object? parameter)
+        {
+            var employeeWindowTab = new EmployeeControl
+            {
+                DataContext = new EmployeeViewModel(this)
+            };
+            
+            var tabItem = new TabItem
+            {
+                Title = "Сотрудники",
+                Content = employeeWindowTab,
+                IsClosable = true
+            };
+            
+            OpenWindowTab(tabItem);
+        }
         
         private void OpenFaqWindowTab(object? parameter)
         {
@@ -140,7 +145,7 @@ namespace FanShop.ViewModels
             OpenWindowTab(tabItem);
         }
 
-        public void OpenSettingsWindowTab(object? parameter)
+        private void OpenSettingsWindowTab(object? parameter)
         {
             var settingsWindowTab = new SettingsControl
             {
@@ -175,6 +180,35 @@ namespace FanShop.ViewModels
             if (parameter is TabItem tab)
             {
                 OpenWindows.Remove(tab);
+                OnPropertyChanged(nameof(HasOpenWindows));
+            }
+        }
+        
+        public void OpenTabRequest(object? viewModel, UserControl userControl, string title, bool isClosable = true)
+        {
+            var existingTab = OpenWindows.FirstOrDefault(tab =>
+                tab.Content is FrameworkElement element && element.DataContext == viewModel);
+
+            if (existingTab != null)
+            {
+                SelectedWindow = existingTab;
+            }
+            else
+            {
+                var newTab = new TabItem
+                {
+                    Title = title,
+                    Content = userControl,
+                    IsClosable = isClosable
+                };
+
+                if (newTab.Content is FrameworkElement element)
+                {
+                    element.DataContext = viewModel;
+                }
+
+                OpenWindows.Add(newTab);
+                SelectedWindow = newTab;
                 OnPropertyChanged(nameof(HasOpenWindows));
             }
         }

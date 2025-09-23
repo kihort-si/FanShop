@@ -1,26 +1,17 @@
 ﻿using System.Globalization;
-using System.Windows;
 using System.Windows.Data;
-using System.Windows.Input;
+using UserControl = System.Windows.Controls.UserControl;
 
-namespace FanShop.Windows
+namespace FanShop.View
 {
-    public partial class EmployeeWindow : Window
+    public partial class EditEmployeeControl : UserControl
     {
-        public EmployeeWindow()
+        public EditEmployeeControl()
         {
             InitializeComponent();
         }
-        
-        private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                DragMove();
-            }
-        }
     }
-
+    
     public class EmployeeTitleConverter : IValueConverter
     {
         public static EmployeeTitleConverter Instance { get; } = new EmployeeTitleConverter();

@@ -12,7 +12,6 @@
         mc:Ignorable="d"
         Title="FANSHOP" Height="800" Width="1000" 
         WindowStartupLocation="CenterScreen" WindowStyle="None"
-        ResizeMode="CanResize"
         SourceInitialized="Window_SourceInitialized"
         Background="Transparent" AllowsTransparency="True"
         WindowState="Maximized"

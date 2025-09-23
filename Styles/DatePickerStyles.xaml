@@ -116,7 +116,7 @@
                                        Background="{TemplateBinding Background}"
                                        BorderThickness="0"
                                        HorizontalContentAlignment="Stretch"
-                                       Padding="4,2"
+                                       Padding="2,2"
                                        VerticalContentAlignment="Center" />
 
                     <Button x:Name="PART_Button"
