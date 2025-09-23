@@ -1,25 +1,25 @@
 ﻿using System.Globalization;
-using System.Windows;
 using System.Windows.Data;
 using UserControl = System.Windows.Controls.UserControl;
 
 namespace FanShop.View
+
 {
-    public partial class EmployeeControl : UserControl
+    public partial class EditTaskCategoriesControl : UserControl
     {
-        public EmployeeControl()
+        public EditTaskCategoriesControl()
         {
             InitializeComponent();
         }
     }
     
-    public class StringToVisibilityConverter : IValueConverter
+    public class CategoryTitleConverter : IValueConverter
     {
-        public static readonly StringToVisibilityConverter Instance = new();
+        public static readonly CategoryTitleConverter Instance = new();
         
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return string.IsNullOrWhiteSpace(value as string) ? Visibility.Collapsed : Visibility.Visible;
+            return value == null ? "Добавить категорию" : "Редактировать категорию";
         }
         
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

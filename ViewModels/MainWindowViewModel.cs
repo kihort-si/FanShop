@@ -118,18 +118,21 @@ namespace FanShop.ViewModels
             OpenTab(tabItem);
         }
         
-        private void OpenFaqWindowTab(object? parameter)
+        private void OpenTaskCategoriesTab(object? parameter)
         {
-            var faqWindowTab = new FaqControl();
+            var taskCategoriesWindowTab = new TaskCategoriesControl
+            {
+                DataContext = new TaskCategoriesViewModel(this)
+            };
             
             var tabItem = new TabItem
             {
-                Title = "FAQ",
-                Content = faqWindowTab,
+                Title = "Категории задач",
+                Content = taskCategoriesWindowTab,
                 IsClosable = true
             };
             
-            OpenWindowTab(tabItem);
+            OpenTab(tabItem);
         }
         
         private void OpenSettingsTab(object? parameter)

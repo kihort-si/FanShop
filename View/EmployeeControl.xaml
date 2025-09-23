@@ -46,11 +46,11 @@
                                            FontSize="12" Foreground="#666666"/>
                                 
                                 <TextBlock Text=" | " FontSize="12" Foreground="#999999"
-                                           Visibility="{Binding PlaceOfBirth, Converter={x:Static windows:StringToVisibilityConverter.Instance}}"/>
+                                           Visibility="{Binding PlaceOfBirth, Converter={x:Static local:StringToVisibilityConverter.Instance}}"/>
                                 
                                 <TextBlock Text="{Binding PlaceOfBirth, StringFormat='Место рождения: {0}'}"
                                            FontSize="12" Foreground="#666666"
-                                           Visibility="{Binding PlaceOfBirth, Converter={x:Static windows:StringToVisibilityConverter.Instance}}"/>
+                                           Visibility="{Binding PlaceOfBirth, Converter={x:Static local:StringToVisibilityConverter.Instance}}"/>
                             </StackPanel>
 
                             <Border Grid.RowSpan="2" Grid.Column="1" Background="#E3F2FD"
@@ -163,7 +163,7 @@
                 <Button Content="Закрыть" Width="100" Height="36"
                         Background="#666666" Foreground="White" Margin="6,0"
                         BorderThickness="0" Cursor="Hand"
-                        Command="{Binding CloseWindowCommand}">
+                        Command="{Binding CloseCommand}">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
                             <Border Background="{TemplateBinding Background}"

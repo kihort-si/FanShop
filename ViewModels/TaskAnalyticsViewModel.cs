@@ -15,6 +15,7 @@ namespace FanShop.ViewModels
 {
     public class TaskAnalyticsViewModel : BaseViewModel
     {
+        private readonly MainWindowViewModel _mainWindowViewModel;
         private DateTime _startDate;
         public DateTime StartDate
         {
@@ -98,26 +99,27 @@ namespace FanShop.ViewModels
             set => SetProperty(ref _interruptions, value);
         }
         
-        public ICommand CloseWindowCommand { get; }
+        public ICommand CloseCommand { get; }
         public ICommand UpdateAnalyticsCommand { get; }
         public ICommand ExportToExcelCommand { get; }
         
-        public TaskAnalyticsViewModel()
+        public TaskAnalyticsViewModel(MainWindowViewModel mainWindowViewModel)
         {
+            _mainWindowViewModel = mainWindowViewModel;
+            
             EndDate = DateTime.Today;
             StartDate = EndDate.AddMonths(-1);
             
-            CloseWindowCommand = new RelayCommand(CloseWindow);
+            CloseCommand = new RelayCommand(Close);
             UpdateAnalyticsCommand = new RelayCommand(UpdateAnalytics);
             ExportToExcelCommand = new RelayCommand(ExportToExcel);
             
             UpdateAnalytics(null);
         }
         
-        private void CloseWindow(object? parameter)
+        private void Close(object? parameter)
         {
-            Application.Current.Windows.OfType<Window>()
-                .FirstOrDefault(w => w.GetType().Name == "TaskAnalyticsWindow")?.Close();
+            _mainWindowViewModel.CloseTabRequest(this);
         }
         
         private void UpdateAnalytics(object? parameter)
