@@ -51,7 +51,7 @@ public partial class App : Application
             await Task.Delay(100); 
     
             _mainWindowViewModel = new MainWindowViewModel();
-            _mainWindowViewModel.OpenMainWindowTab(); 
+            _mainWindowViewModel.OpenMainTab(); 
             
             using (var db = new AppDbContext())
             {

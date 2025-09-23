@@ -30,11 +30,11 @@ namespace FanShop.ViewModels
         
         public ICommand ToggleMenuCommand { get; }
         public ICommand CloseMenuCommand { get; }
-        public ICommand OpenEmployeeWindowCommand { get; }
+        public ICommand OpenEmployeeTabCommand { get; }
         public ICommand LoadMatchesCommand { get; }
-        public ICommand OpenTaskCategoriesWindowCommand { get; }
-        public ICommand OpenSettingsWindowCommand { get; }
-        public ICommand OpenFaqWindowCommand { get; }
+        public ICommand OpenTaskCategoriesTabCommand { get; }
+        public ICommand OpenSettingsTabCommand { get; }
+        public ICommand OpenFaqTabCommand { get; }
 
         private ObservableCollection<TabItem> _openWindows;
         private TabItem _selectedWindow;
@@ -71,11 +71,11 @@ namespace FanShop.ViewModels
                 IsBlackoutMode = false;
             });
 
-            OpenEmployeeWindowCommand = new RelayCommand(OpenEmployeeWindowTab);
+            OpenEmployeeTabCommand = new RelayCommand(OpenEmployeeTab);
             LoadMatchesCommand = new RelayCommand(async _ => await LoadMatchesFromFirebase());
-            OpenTaskCategoriesWindowCommand = new RelayCommand(OpenTaskCategoriesWindow);
-            OpenSettingsWindowCommand = new RelayCommand(OpenSettingsWindowTab);
-            OpenFaqWindowCommand = new RelayCommand(OpenFaqWindowTab);
+            OpenTaskCategoriesTabCommand = new RelayCommand(OpenTaskCategoriesTab);
+            OpenSettingsTabCommand = new RelayCommand(OpenSettingsTab);
+            OpenFaqTabCommand = new RelayCommand(OpenFaqTab);
         }
         
         public void SetBlackoutMode(bool isBlackout)
@@ -83,21 +83,8 @@ namespace FanShop.ViewModels
             IsBlackoutMode = isBlackout;
             OnPropertyChanged(nameof(IsBlackoutMode));
         }
-
-        private void OpenTaskCategoriesWindow(object? parameter)
-        {
-            var dayTasksWindow = new TaskCategoriesWindow
-            {
-                DataContext = new TaskCategoriesWindowViewModel()
-            };
-            dayTasksWindow.Owner = Application.Current.MainWindow;
-            dayTasksWindow.ShowInTaskbar = false;
-            dayTasksWindow.Show();
-            OpenWindowsController.Register(dayTasksWindow);
-            IsMenuOpen = false;
-        }
         
-        public void OpenMainWindowTab()
+        public void OpenMainTab()
         {
             var mainWindowTab = new MainControl
             {
@@ -111,10 +98,10 @@ namespace FanShop.ViewModels
                 IsClosable = false
             };
             
-            OpenWindowTab(tabItem);
+            OpenTab(tabItem);
         }
 
-        private void OpenEmployeeWindowTab(object? parameter)
+        private void OpenEmployeeTab(object? parameter)
         {
             var employeeWindowTab = new EmployeeControl
             {
@@ -128,7 +115,7 @@ namespace FanShop.ViewModels
                 IsClosable = true
             };
             
-            OpenWindowTab(tabItem);
+            OpenTab(tabItem);
         }
         
         private void OpenFaqWindowTab(object? parameter)
@@ -144,8 +131,8 @@ namespace FanShop.ViewModels
             
             OpenWindowTab(tabItem);
         }
-
-        private void OpenSettingsWindowTab(object? parameter)
+        
+        private void OpenSettingsTab(object? parameter)
         {
             var settingsWindowTab = new SettingsControl
             {
@@ -159,10 +146,24 @@ namespace FanShop.ViewModels
                 IsClosable = true
             };
             
-            OpenWindowTab(tabItem);
+            OpenTab(tabItem);
         }
         
-        private void OpenWindowTab(TabItem tabItem)
+        private void OpenFaqTab(object? parameter)
+        {
+            var faqWindowTab = new FaqControl();
+            
+            var tabItem = new TabItem
+            {
+                Title = "FAQ",
+                Content = faqWindowTab,
+                IsClosable = true
+            };
+            
+            OpenTab(tabItem);
+        }
+        
+        private void OpenTab(TabItem tabItem)
         {
             if (!OpenWindows.Contains(tabItem))
             {

@@ -318,7 +318,7 @@
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="10">
                                 <Border CornerRadius="8" Margin="0,10,0,5" Background="Transparent">
-                                    <Button Command="{Binding OpenEmployeeWindowCommand}">
+                                    <Button Command="{Binding OpenEmployeeTabCommand}">
                                         <Button.Style>
                                             <Style TargetType="Button">
                                                 <Setter Property="Template">
@@ -400,7 +400,7 @@
                                 </Border>
                                 
                                 <Border CornerRadius="8" Margin="0,5" Background="Transparent">
-                                    <Button Command="{Binding OpenTaskCategoriesWindowCommand}">
+                                    <Button Command="{Binding OpenTaskCategoriesTabCommand}">
                                         <Button.Style>
                                             <Style TargetType="Button">
                                                 <Setter Property="Template">
@@ -441,7 +441,7 @@
                                 </Border>
                                 
                                 <Border CornerRadius="8" Margin="0,5" Background="Transparent">
-                                    <Button Command="{Binding OpenSettingsWindowCommand}">
+                                    <Button Command="{Binding OpenSettingsTabCommand}">
                                         <Button.Style>
                                             <Style TargetType="Button">
                                                 <Setter Property="Template">
@@ -482,7 +482,7 @@
                                 </Border>
                                 
                                 <Border CornerRadius="8" Margin="0,5" Background="Transparent">
-                                    <Button Command="{Binding OpenFaqWindowCommand}">
+                                    <Button Command="{Binding OpenFaqTabCommand}">
                                         <Button.Style>
                                             <Style TargetType="Button">
                                                 <Setter Property="Template">
