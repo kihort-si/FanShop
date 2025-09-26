@@ -1,71 +1,13 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using FanShop.Models;
 using FanShop.Services;
-using FanShop.Utils;
-using FanShop.Windows;
-using Application = System.Windows.Application;
 
 namespace FanShop.ViewModels;
 
-public class TaskCategoriesWindowViewModel : BaseViewModel
+public class EditTaskCategoriesViewModel : BaseViewModel
 {
-    private ObservableCollection<TaskCategory> _taskCategories = new();
-
-    public ObservableCollection<TaskCategory> TaskCategories
-    {
-        get => _taskCategories;
-        set => SetProperty(ref _taskCategories, value);
-    }
-
-    public ICommand AddCategoryCommand { get; }
-    public ICommand EditCategoryCommand { get; }
-    public ICommand RemoveCategoryCommand { get; }
-    public ICommand OpenAnalyticsCommand { get; }
-    public ICommand CloseWindowCommand { get; }
-    public ICommand SaveEditedCategoryCommand { get; }
-    public ICommand CancelEditCommand { get; }
-    public ICommand GenerateRandomColorCommand { get; }
-    public ICommand OpenColorPickerCommand { get; }
-
-    private bool _isEditOverlayVisible;
-
-    public bool IsEditOverlayVisible
-    {
-        get => _isEditOverlayVisible;
-        set => SetProperty(ref _isEditOverlayVisible, value);
-    }
-
-    private TaskCategory? _editableCategory;
-
-    public TaskCategory? EditableCategory
-    {
-        get => _editableCategory;
-        set
-        {
-            if (SetProperty(ref _editableCategory, value))
-            {
-                OnPropertyChanged(nameof(CanSaveCategory));
-            }
-        }
-    }
-
-    private TaskCategory? _selectedCategory;
-
-    public TaskCategory? SelectedCategory
-    {
-        get => _selectedCategory;
-        set
-        {
-            _selectedCategory = value;
-            OnPropertyChanged(nameof(SelectedCategory));
-            OnPropertyChanged(nameof(CanSaveCategory));
-            (RemoveCategoryCommand as RelayCommand)?.RaiseCanExecuteChanged();
-            (EditCategoryCommand as RelayCommand)?.RaiseCanExecuteChanged();
-        }
-    }
-
+    private readonly MainWindowViewModel _mainWindowViewModel;
+    private readonly TaskCategoriesViewModel _taskCategoriesViewModel;
     private string _name = string.Empty;
     private string _description = string.Empty;
     private string _color = string.Empty;
@@ -132,45 +74,79 @@ public class TaskCategoriesWindowViewModel : BaseViewModel
                    ColorGenerator.IsValidHexColor(_color);
         }
     }
+    
+    private TaskCategory? _editableCategory;
 
-    public TaskCategoriesWindowViewModel()
+    public TaskCategory? EditableCategory
+    {
+        get => _editableCategory;
+        set
+        {
+            if (SetProperty(ref _editableCategory, value))
+            {
+                OnPropertyChanged(nameof(CanSaveCategory));
+            }
+        }
+    }
+    
+    private TaskCategory? _selectedСategory;
+
+    public TaskCategory? SelectedCategory
+    {
+        get => _selectedСategory;
+        set
+        {
+            _selectedСategory = value;
+            OnPropertyChanged(nameof(SelectedCategory));
+        }
+    }
+    
+    public ICommand SaveEditedCategoryCommand { get; }
+    public ICommand CancelEditCommand { get; }
+    public ICommand GenerateRandomColorCommand { get; }
+    public ICommand OpenColorPickerCommand { get; }
+    
+    public EditTaskCategoriesViewModel(TaskCategory selectedCategory, MainWindowViewModel mainWindowViewModel, 
+        TaskCategoriesViewModel taskCategoriesViewModel)
     {
         ColorGenerator = new ColorGenerator();
-        LoadCategories();
-
-        AddCategoryCommand = new RelayCommand(AddCategory);
-        EditCategoryCommand = new RelayCommand(EditCategory, CanEditCategory);
-        RemoveCategoryCommand = new RelayCommand(RemoveCategory, CanEditCategory);
-        CloseWindowCommand = new RelayCommand(CloseWindow);
+        SelectedCategory = selectedCategory;
+        EditCategory();
+        _mainWindowViewModel = mainWindowViewModel;
+        _taskCategoriesViewModel = taskCategoriesViewModel;
         SaveEditedCategoryCommand = new RelayCommand(SaveEditedCategory);
-        OpenAnalyticsCommand = new RelayCommand(OpenAnalytics);
         CancelEditCommand = new RelayCommand(CancelEdit);
         GenerateRandomColorCommand = new RelayCommand(GenerateRandomColor);
         OpenColorPickerCommand = new RelayCommand(OpenColorPicker);
     }
-
-    private void LoadCategories()
+    
+    public EditTaskCategoriesViewModel(MainWindowViewModel mainWindowViewModel,
+        TaskCategoriesViewModel taskCategoriesViewModel)
     {
-        using var context = new AppDbContext();
-        var categories = context.TaskCategories.ToList();
-        TaskCategories = new ObservableCollection<TaskCategory>(categories);
+        ColorGenerator = new ColorGenerator();
+        _mainWindowViewModel = mainWindowViewModel;
+        _taskCategoriesViewModel = taskCategoriesViewModel;
+        ColorGenerator = new ColorGenerator();
+        AddCategory();
+        SaveEditedCategoryCommand = new RelayCommand(SaveEditedCategory);
+        CancelEditCommand = new RelayCommand(CancelEdit);
+        GenerateRandomColorCommand = new RelayCommand(GenerateRandomColor);
+        OpenColorPickerCommand = new RelayCommand(OpenColorPicker);
     }
-
-    private void AddCategory(object? parameter)
+    
+    private void AddCategory()
     {
         SelectedCategory = null;
         EditableCategory = new TaskCategory();
 
         Name = string.Empty;
         Description = string.Empty;
-        var existingColors = TaskCategories.Select(c => c.Color).ToHashSet();
+        var existingColors = _taskCategoriesViewModel.TaskCategories.Select(c => c.Color).ToHashSet();
         Color = ColorGenerator.GenerateUniquePastelColor(existingColors);
         DefaultTask = string.Empty;
-
-        IsEditOverlayVisible = true;
     }
 
-    private void EditCategory(object? parameter)
+    private void EditCategory()
     {
         if (SelectedCategory != null)
         {
@@ -180,11 +156,9 @@ public class TaskCategoriesWindowViewModel : BaseViewModel
             Description = SelectedCategory.Description ?? string.Empty;
             Color = SelectedCategory.Color;
             DefaultTask = SelectedCategory.DefaultTask ?? string.Empty;
-
-            IsEditOverlayVisible = true;
         }
     }
-
+    
     private void SaveEditedCategory(object? parameter)
     {
         using var context = new AppDbContext();
@@ -208,8 +182,8 @@ public class TaskCategoriesWindowViewModel : BaseViewModel
             }
 
             context.SaveChanges();
-            IsEditOverlayVisible = false;
-            LoadCategories();
+            _taskCategoriesViewModel.LoadCategories();
+            _mainWindowViewModel.CloseTabRequest(this);
         }
     }
     
@@ -240,57 +214,15 @@ public class TaskCategoriesWindowViewModel : BaseViewModel
             Color = $"#{colorDialog.Color.R:X2}{colorDialog.Color.G:X2}{colorDialog.Color.B:X2}";
         }
     }
+    
+    private void GenerateRandomColor(object? parameter)
+    {
+        var existingColors = _taskCategoriesViewModel.TaskCategories.Select(c => c.Color).ToHashSet();
+        Color = ColorGenerator.GenerateUniquePastelColor(existingColors);
+    }
 
     private void CancelEdit(object? parameter)
     {
-        IsEditOverlayVisible = false;
-    }
-
-    private void RemoveCategory(object? parameter)
-    {
-        using var context = new AppDbContext();
-        if (SelectedCategory != null)
-        {
-            var category = context.TaskCategories.Find(SelectedCategory.TaskCategoryID);
-            if (category != null)
-            {
-                context.TaskCategories.Remove(category);
-                context.SaveChanges();
-                TaskCategories.Remove(SelectedCategory);
-            }
-        }
-    }
-
-    private bool CanEditCategory(object? parameter)
-    {
-        return SelectedCategory != null;
-    }
-
-    private void GenerateRandomColor(object? parameter)
-    {
-        var existingColors = TaskCategories.Select(c => c.Color).ToHashSet();
-        Color = ColorGenerator.GenerateUniquePastelColor(existingColors);
-    }
-    
-    private void OpenAnalytics(object? parameter)
-    {
-        var analyticsWindow = new TaskAnalyticsWindow
-        {
-            Owner = Application.Current.MainWindow
-        };
-        analyticsWindow.Show();
-    }
-
-    private void CloseWindow(object? parameter)
-    {
-        var window = Application.Current.Windows
-            .OfType<Window>()
-            .FirstOrDefault(w => w.GetType().Name == "TaskCategoriesWindow");
-
-        if (window != null)
-        {
-            OpenWindowsController.Unregister(window);
-            window.Close();
-        }
+        _mainWindowViewModel.CloseTabRequest(this);
     }
 }
