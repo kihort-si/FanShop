@@ -162,6 +162,30 @@
             <Setter Property="Foreground" Value="White" />
         </Style>
 
+        <!-- Calendar day cell button (no hover frame) -->
+        <Style Selector="Button.cell">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        </Style>
+        <Style Selector="Button.cell /template/ ContentPresenter">
+            <Setter Property="CornerRadius" Value="10" />
+        </Style>
+        <Style Selector="Button.cell:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+        </Style>
+        <Style Selector="Button.cell:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+        </Style>
+        <Style Selector="Button.cell:pointerover Border.day-frame">
+            <Setter Property="BorderBrush" Value="{StaticResource BrandPrimary}" />
+        </Style>
+
         <!-- Side menu list buttons -->
         <Style Selector="Button.menu-item">
             <Setter Property="Background" Value="Transparent" />
