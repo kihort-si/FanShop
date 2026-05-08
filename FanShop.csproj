@@ -12,33 +12,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Remove="MainWindow.xaml.cs" />
-        <Compile Remove="Windows\DayDetailsWindow.xaml.cs" />
-        <Compile Remove="Windows\DayTasksWindow.xaml.cs" />
-        <Compile Remove="Windows\SelectEmployeeWindow.xaml.cs" />
-        <Compile Remove="Windows\SplashScreenWindow.xaml.cs" />
-        <Compile Remove="Windows\TimeInputWindow.xaml.cs" />
-        <Compile Remove="Controls\AutoCompleteTextBox.cs" />
-        <Compile Remove="Utils\KeyboardNavigation.cs" />
-        <Compile Remove="Utils\OpenWindowsController.cs" />
-        <AvaloniaXaml Remove="App.xaml" />
-        <AvaloniaXaml Remove="MainWindow.xaml" />
-        <AvaloniaXaml Remove="View\*.xaml" />
-        <AvaloniaXaml Remove="Windows\*.xaml" />
-        <AvaloniaXaml Remove="Styles\*.xaml" />
-        <EmbeddedResource Remove="App.xaml" />
-        <EmbeddedResource Remove="MainWindow.xaml" />
-        <EmbeddedResource Remove="View\*.xaml" />
-        <EmbeddedResource Remove="Windows\*.xaml" />
-        <EmbeddedResource Remove="Styles\*.xaml" />
-        <None Include="App.xaml" />
-        <None Include="MainWindow.xaml" />
-        <None Include="View\*.xaml" />
-        <None Include="Windows\*.xaml" />
-        <None Include="Styles\*.xaml" />
-    </ItemGroup>
-
-    <ItemGroup>
         <!-- Avalonia -->
         <PackageReference Include="Avalonia" Version="11.0.10" />
         <PackageReference Include="Avalonia.Desktop" Version="11.0.10" />
@@ -66,11 +39,7 @@
 
     <ItemGroup>
         <AvaloniaResource Include="icon.ico" />
-        <AvaloniaResource Include="Resources\**\*" />
-        <Content Include="Resources\**\*" CopyToOutputDirectory="Always" />
-        <Content Include="icon.ico">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
+        <AvaloniaResource Include="Resources/**/*" />
     </ItemGroup>
 
 </Project>
