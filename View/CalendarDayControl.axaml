@@ -1,13 +1,12 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="FanShop.View.CalendarDayControl">
-    <Button Command="{Binding ShowDayDetailsCommand}"
-            Background="Transparent"
-            BorderThickness="0"
-            Padding="0"
+    <Button Classes="cell"
+            Command="{Binding ShowDayDetailsCommand}"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch">
-        <Border BorderBrush="#E2ECF5"
+        <Border Classes="day-frame"
+                BorderBrush="#E2ECF5"
                 BorderThickness="1"
                 CornerRadius="10"
                 Padding="8"
@@ -63,8 +62,8 @@
 
                 <StackPanel Grid.Row="2" Spacing="2" HorizontalAlignment="Center" IsVisible="{Binding HasMatch}">
                     <Image Source="{Binding Match.Logo}" Height="40" Stretch="Uniform" />
-                    <TextBlock Text="{Binding Match.TeamName}" HorizontalAlignment="Center" FontWeight="SemiBold" FontSize="11" />
-                    <TextBlock Text="{Binding Match.SartTime}" HorizontalAlignment="Center" FontSize="11" />
+                    <TextBlock Text="{Binding Match.TeamName}" HorizontalAlignment="Center" FontWeight="SemiBold" FontSize="11" Foreground="MidnightBlue" />
+                    <TextBlock Text="{Binding Match.SartTime}" HorizontalAlignment="Center" FontSize="11" Foreground="MidnightBlue" />
                 </StackPanel>
             </Grid>
         </Border>
