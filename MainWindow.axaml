@@ -82,7 +82,8 @@
                     </TabControl.ItemTemplate>
                     <TabControl.ContentTemplate>
                         <DataTemplate>
-                            <ContentControl Content="{Binding Content}" />
+                            <ContentControl Content="{Binding Content}"
+                                            DataContext="{Binding Content.DataContext}" />
                         </DataTemplate>
                     </TabControl.ContentTemplate>
                 </TabControl>
