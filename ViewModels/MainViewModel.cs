@@ -71,13 +71,9 @@ public partial class MainViewModel : BaseViewModel
             new FirebaseService("https://fanshop-11123-default-rtdb.europe-west1.firebasedatabase.app/");
         _statisticsService = new StatisticsService();
         _logoHttpClient = new HttpClient();
-        _logoHttpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 FanShop/1.0");
-        _logoHttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("image/png"));
-        _logoHttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("image/jpeg"));
-        _logoHttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("image/apng"));
-        _logoHttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("image/*", 0.8));
-        _logoHttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*", 0.5));
-        _logoHttpClient.DefaultRequestHeaders.AcceptLanguage.ParseAdd("ru-RU,ru;q=0.9,en;q=0.8");
+        _logoHttpClient.DefaultRequestHeaders.UserAgent.ParseAdd(
+            "FanShop/1.0 (https://github.com/zenit-arena/fanshop; contact@fanshop.local)");
+        _logoHttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("image/*"));
 
         _currentYear = DateTime.Now.Year;
         _currentMonth = DateTime.Now.Month;
@@ -179,40 +175,73 @@ public partial class MainViewModel : BaseViewModel
         }
     }
 
+    private static readonly string LogoCacheDir = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        "FanShop",
+        "logos");
+
+    private DateTime _lastLogoFetchUtc = DateTime.MinValue;
+    private static readonly TimeSpan LogoMinInterval = TimeSpan.FromMilliseconds(400);
+
     private async Task<Bitmap?> LoadLogoBitmapAsync(string teamName, string url)
     {
-        try
-        {
-            return await LoadBitmapWithHeadersAsync(url, null);
-        }
-        catch (Exception firstEx)
+        var cachePath = GetLogoCachePath(url);
+        if (File.Exists(cachePath))
         {
             try
             {
-                var referer = new Uri(url).GetLeftPart(UriPartial.Authority) + "/";
-                return await LoadBitmapWithHeadersAsync(url, referer);
+                return new Bitmap(cachePath);
             }
-            catch (Exception secondEx)
+            catch
             {
-                Console.WriteLine($"Logo load failed for {teamName}: {url}. First: {firstEx.Message}. Second: {secondEx.Message}");
+                File.Delete(cachePath);
+            }
+        }
+
+        for (int attempt = 0; attempt < 3; attempt++)
+        {
+            var sinceLast = DateTime.UtcNow - _lastLogoFetchUtc;
+            if (sinceLast < LogoMinInterval)
+                await Task.Delay(LogoMinInterval - sinceLast);
+
+            try
+            {
+                _lastLogoFetchUtc = DateTime.UtcNow;
+                using var response = await _logoHttpClient.GetAsync(url);
+
+                if ((int)response.StatusCode == 429 && attempt < 2)
+                {
+                    var retryAfter = response.Headers.RetryAfter?.Delta ?? TimeSpan.FromSeconds(2 * (attempt + 1));
+                    await Task.Delay(retryAfter);
+                    continue;
+                }
+
+                response.EnsureSuccessStatusCode();
+                var bytes = await response.Content.ReadAsByteArrayAsync();
+                Directory.CreateDirectory(LogoCacheDir);
+                await File.WriteAllBytesAsync(cachePath, bytes);
+                using var stream = new MemoryStream(bytes);
+                return new Bitmap(stream);
+            }
+            catch (Exception ex) when (attempt == 2)
+            {
+                Console.WriteLine($"Logo load failed for {teamName}: {url}. {ex.Message}");
                 return null;
             }
+            catch
+            {
+                await Task.Delay(TimeSpan.FromSeconds(1 + attempt));
+            }
         }
+
+        return null;
     }
 
-    private async Task<Bitmap> LoadBitmapWithHeadersAsync(string url, string? referer)
+    private static string GetLogoCachePath(string url)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Get, url);
-        if (!string.IsNullOrWhiteSpace(referer))
-        {
-            request.Headers.Referrer = new Uri(referer);
-        }
-
-        using var response = await _logoHttpClient.SendAsync(request);
-        response.EnsureSuccessStatusCode();
-        var imageBytes = await response.Content.ReadAsByteArrayAsync();
-        using var stream = new MemoryStream(imageBytes);
-        return new Bitmap(stream);
+        var hash = System.Security.Cryptography.SHA1.HashData(System.Text.Encoding.UTF8.GetBytes(url));
+        var name = Convert.ToHexString(hash).ToLowerInvariant();
+        return Path.Combine(LogoCacheDir, name);
     }
 
     public async Task GenerateCalendar(int year, int month)

@@ -13,10 +13,10 @@
                 <TextBlock Text="Информация о дне" FontSize="24" FontWeight="Bold" />
                 <TextBlock Text="{Binding Date, Converter={StaticResource RussianDateConverter}}" Foreground="#6E7E8F" />
             </StackPanel>
-            <Button Grid.Column="1" Content="Закрыть" Click="CloseButton_Click" />
+            <Button Grid.Column="1" Classes="ghost" Content="Закрыть" Click="CloseButton_Click" />
         </Grid>
 
-        <Border Grid.Row="1" Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="12" Padding="12">
+        <Border Grid.Row="1" Background="#F9FBFD" BorderBrush="{StaticResource BrandBorder}" BorderThickness="1" CornerRadius="12" Padding="12">
             <DataGrid ItemsSource="{Binding Employees}"
                       SelectedItem="{Binding SelectedEmployee}"
                       AutoGenerateColumns="False"
@@ -32,10 +32,10 @@
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" Margin="0,12,0,0">
             <Button Content="Добавить" Command="{Binding AddEmployeesCommand}" />
-            <Button Content="Удалить" Command="{Binding RemoveEmployeesCommand}" />
+            <Button Classes="danger" Content="Удалить" Command="{Binding RemoveEmployeesCommand}" />
             <Button Content="Пропуск" Command="{Binding PrintPassCommand}" />
             <Button Content="Тайминг" Command="{Binding DailyScheduleCommand}" />
-            <Button Content="Закрыть" Click="CloseButton_Click" />
+            <Button Classes="ghost" Content="Закрыть" Click="CloseButton_Click" />
         </StackPanel>
     </Grid>
 </Window>

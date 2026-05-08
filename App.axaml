@@ -4,11 +4,22 @@
              x:Class="FanShop.App"
              RequestedThemeVariant="Light">
 
-    <Application.Styles>
-        <FluentTheme />
-    </Application.Styles>
-
     <Application.Resources>
+        <FontFamily x:Key="AppFont">fonts:Inter#Inter, $Default</FontFamily>
+
+        <SolidColorBrush x:Key="BrandPrimary" Color="#0A6DAE" />
+        <SolidColorBrush x:Key="BrandPrimaryHover" Color="#0E7FC8" />
+        <SolidColorBrush x:Key="BrandPrimaryPressed" Color="#085A91" />
+        <SolidColorBrush x:Key="BrandAccent" Color="#009EE1" />
+        <SolidColorBrush x:Key="BrandSurface" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="BrandSurfaceAlt" Color="#F4F8FB" />
+        <SolidColorBrush x:Key="BrandBorder" Color="#E2ECF5" />
+        <SolidColorBrush x:Key="BrandText" Color="#16324F" />
+        <SolidColorBrush x:Key="BrandTextSubtle" Color="#6E7E8F" />
+        <SolidColorBrush x:Key="BrandDanger" Color="#D64545" />
+        <SolidColorBrush x:Key="BrandDangerHover" Color="#E25C5C" />
+        <SolidColorBrush x:Key="BrandDangerPressed" Color="#B23838" />
+
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <converters:ZeroToVisibilityConverter x:Key="ZeroToVisibilityConverter" />
         <converters:BoolToBackgroundConverter x:Key="BoolToBackgroundConverter" />
@@ -18,4 +29,156 @@
         <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
         <converters:RussianDateConverter x:Key="RussianDateConverter" />
     </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+
+        <Style Selector="Window">
+            <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
+        </Style>
+        <Style Selector="UserControl">
+            <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
+        </Style>
+
+        <!-- Default brand button -->
+        <Style Selector="Button">
+            <Setter Property="Background" Value="{StaticResource BrandPrimary}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="14,8" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style Selector="Button:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource BrandPrimaryHover}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="Button:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource BrandPrimaryPressed}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="Button:disabled /template/ ContentPresenter">
+            <Setter Property="Background" Value="#B7C7D6" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+
+        <!-- Danger button (destructive actions) -->
+        <Style Selector="Button.danger">
+            <Setter Property="Background" Value="{StaticResource BrandDanger}" />
+        </Style>
+        <Style Selector="Button.danger:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource BrandDangerHover}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="Button.danger:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource BrandDangerPressed}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+
+        <!-- Ghost button (transparent background, brand text) -->
+        <Style Selector="Button.ghost">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource BrandText}" />
+            <Setter Property="FontWeight" Value="Normal" />
+        </Style>
+        <Style Selector="Button.ghost:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#EAF4FB" />
+            <Setter Property="Foreground" Value="{StaticResource BrandText}" />
+        </Style>
+        <Style Selector="Button.ghost:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#D7E9F6" />
+            <Setter Property="Foreground" Value="{StaticResource BrandText}" />
+        </Style>
+
+        <!-- Chrome buttons in custom title bar -->
+        <Style Selector="Button.chrome">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="CornerRadius" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Width" Value="46" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="Normal" />
+        </Style>
+        <Style Selector="Button.chrome:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1F86C2" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="Button.chrome:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#0A6DAE" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="Button.chrome.close:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource BrandDanger}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="Button.chrome.close:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource BrandDangerPressed}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+
+        <!-- Tab bar styling -->
+        <Style Selector="TabControl">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="TabItem">
+            <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Foreground" Value="{StaticResource BrandTextSubtle}" />
+            <Setter Property="Padding" Value="14,6" />
+            <Setter Property="MinHeight" Value="36" />
+        </Style>
+        <Style Selector="TabItem:selected">
+            <Setter Property="Foreground" Value="{StaticResource BrandPrimary}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <!-- Tab close button -->
+        <Style Selector="Button.tab-close">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource BrandTextSubtle}" />
+            <Setter Property="Width" Value="20" />
+            <Setter Property="Height" Value="20" />
+            <Setter Property="MinWidth" Value="20" />
+            <Setter Property="MinHeight" Value="20" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Button.tab-close:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource BrandDanger}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="Button.tab-close:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource BrandDangerPressed}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+
+        <!-- Side menu list buttons -->
+        <Style Selector="Button.menu-item">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource BrandText}" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Padding" Value="14,12" />
+            <Setter Property="FontWeight" Value="Normal" />
+            <Setter Property="CornerRadius" Value="10" />
+        </Style>
+        <Style Selector="Button.menu-item:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#EAF4FB" />
+            <Setter Property="Foreground" Value="{StaticResource BrandText}" />
+        </Style>
+        <Style Selector="Button.menu-item:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#D7E9F6" />
+            <Setter Property="Foreground" Value="{StaticResource BrandText}" />
+        </Style>
+    </Application.Styles>
 </Application>
