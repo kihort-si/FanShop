@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FanShop.View.EditTaskCategoriesControl">
+    <ScrollViewer>
+        <StackPanel Margin="24" Spacing="12" MaxWidth="720">
+            <TextBlock Text="Категория задач" FontSize="24" FontWeight="Bold" />
+            <TextBox Watermark="Название" Text="{Binding Name}" />
+            <TextBox Watermark="Описание" Text="{Binding Description}" AcceptsReturn="True" Height="120" />
+            <Grid ColumnDefinitions="*,Auto,Auto">
+                <TextBox Grid.Column="0" Watermark="#RRGGBB" Text="{Binding Color}" />
+                <Button Grid.Column="1" Margin="8,0,0,0" Content="Случайный цвет" Command="{Binding GenerateRandomColorCommand}" />
+                <Button Grid.Column="2" Margin="8,0,0,0" Content="Исправить цвет" Command="{Binding OpenColorPickerCommand}" />
+            </Grid>
+            <TextBox Watermark="Задача по умолчанию" Text="{Binding DefaultTask}" />
+            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+                <Button Content="Сохранить" Command="{Binding SaveEditedCategoryCommand}" />
+                <Button Content="Отмена" Command="{Binding CancelEditCommand}" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

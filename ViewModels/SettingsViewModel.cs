@@ -1,98 +1,63 @@
-﻿using System.ComponentModel;
-using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using FanShop.Models;
 
-namespace FanShop.ViewModels
+namespace FanShop.ViewModels;
+
+public partial class SettingsViewModel : BaseViewModel
 {
-    public class SettingsViewModel : BaseViewModel
+    private readonly MainWindowViewModel _mainWindowViewModel;
+    private readonly Settings _settings;
+
+    [ObservableProperty]
+    private string _head = string.Empty;
+
+    [ObservableProperty]
+    private string _responsiblePerson = string.Empty;
+
+    [ObservableProperty]
+    private string _responsiblePhoneNumber = string.Empty;
+
+    [ObservableProperty]
+    private string _responsiblePosition = string.Empty;
+
+    [ObservableProperty]
+    private string _visitGoal = string.Empty;
+
+    [ObservableProperty]
+    private decimal _dailySalary;
+
+    public SettingsViewModel(MainWindowViewModel mainWindowViewModel)
     {
-        private readonly MainWindowViewModel _mainWindowViewModel;
-        private Settings _settings;
+        _mainWindowViewModel = mainWindowViewModel;
+        _settings = Settings.Load();
 
-        public string Head
-        {
-            get => _settings.Head;
-            set
-            {
-                _settings.Head = value;
-                OnPropertyChanged(nameof(Head));
-            }
-        }
+        Head = _settings.Head;
+        ResponsiblePerson = _settings.ResponsiblePerson;
+        ResponsiblePhoneNumber = _settings.ResponsiblePhoneNumber;
+        ResponsiblePosition = _settings.ResponsiblePosition;
+        VisitGoal = _settings.VisitGoal;
+        DailySalary = _settings.DailySalary;
+    }
 
-        public string ResponsiblePerson
-        {
-            get => _settings.ResponsiblePerson;
-            set
-            {
-                _settings.ResponsiblePerson = value;
-                OnPropertyChanged(nameof(ResponsiblePerson));
-            }
-        }
+    [RelayCommand]
+    private void Save()
+    {
+        _settings.Head = Head;
+        _settings.ResponsiblePerson = ResponsiblePerson;
+        _settings.ResponsiblePhoneNumber = ResponsiblePhoneNumber;
+        _settings.ResponsiblePosition = ResponsiblePosition;
+        _settings.VisitGoal = VisitGoal;
+        _settings.DailySalary = DailySalary;
+        _settings.Save();
 
-        public string ResponsiblePhoneNumber 
-        {
-            get => _settings.ResponsiblePhoneNumber;
-            set
-            {
-                _settings.ResponsiblePhoneNumber = value;
-                OnPropertyChanged(nameof(ResponsiblePhoneNumber));
-            }
-        }
-        
-        public string ResponsiblePosition
-        {
-            get => _settings.ResponsiblePosition;
-            set
-            {
-                _settings.ResponsiblePosition = value;
-                OnPropertyChanged(nameof(ResponsiblePosition));
-            }
-        }
+        _mainWindowViewModel.RefreshStatistics();
+        _mainWindowViewModel.CloseTabRequest(this);
+    }
 
-        public string VisitGoal
-        {
-            get => _settings.VisitGoal;
-            set
-            {
-                _settings.VisitGoal = value;
-                OnPropertyChanged(nameof(VisitGoal));
-            }
-        }
-
-        public decimal DailySalary
-        {
-            get => _settings.DailySalary;
-            set
-            {
-                _settings.DailySalary = value;
-                OnPropertyChanged(nameof(DailySalary));
-            }
-        }
-
-        public ICommand SaveCommand { get; }
-        public ICommand CancelCommand { get; }
-
-        public event Action? CloseRequested;
-
-        public SettingsViewModel(MainWindowViewModel mainWindowViewModel)
-        {
-            _mainWindowViewModel = mainWindowViewModel;
-            _settings = Settings.Load();
-            SaveCommand = new RelayCommand(Save);
-            CancelCommand = new RelayCommand(Cancel);
-        }
-
-        private void Save(object? parameter)
-        {
-            _settings.Save();
-            _mainWindowViewModel.RefreshStatistics();
-            _mainWindowViewModel.CloseTabRequest(this);
-            CloseRequested?.Invoke();
-        }
-
-        private void Cancel(object? parameter)
-        {
-            _mainWindowViewModel.CloseTabRequest(this);
-        }
+    [RelayCommand]
+    private void Cancel()
+    {
+        _mainWindowViewModel.CloseTabRequest(this);
     }
 }

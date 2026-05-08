@@ -1,85 +1,76 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net8.0-windows</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <UseWPF>true</UseWPF>
-		<UseWindowsForms>true</UseWindowsForms>
         <ApplicationIcon>icon.ico</ApplicationIcon>
         <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
         <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
-      <PackageReference Include="EPPlus" Version="8.1.0" />
-      <PackageReference Include="Firebase.Database" Version="1.0.0" />
-      <PackageReference Include="HtmlAgilityPack" Version="1.12.2" />
-      <PackageReference Include="iExt.Microsoft.Xaml.Behaviors.Wpf" Version="2023.1228.1812-preview" />
-      <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-rc5.4" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.10" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.10">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.10" />
-      <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
-      <PackageReference Include="SQLite" Version="3.13.0" />
+        <Compile Remove="MainWindow.xaml.cs" />
+        <Compile Remove="Windows\DayDetailsWindow.xaml.cs" />
+        <Compile Remove="Windows\DayTasksWindow.xaml.cs" />
+        <Compile Remove="Windows\SelectEmployeeWindow.xaml.cs" />
+        <Compile Remove="Windows\SplashScreenWindow.xaml.cs" />
+        <Compile Remove="Windows\TimeInputWindow.xaml.cs" />
+        <Compile Remove="Controls\AutoCompleteTextBox.cs" />
+        <Compile Remove="Utils\KeyboardNavigation.cs" />
+        <Compile Remove="Utils\OpenWindowsController.cs" />
+        <AvaloniaXaml Remove="App.xaml" />
+        <AvaloniaXaml Remove="MainWindow.xaml" />
+        <AvaloniaXaml Remove="View\*.xaml" />
+        <AvaloniaXaml Remove="Windows\*.xaml" />
+        <AvaloniaXaml Remove="Styles\*.xaml" />
+        <EmbeddedResource Remove="App.xaml" />
+        <EmbeddedResource Remove="MainWindow.xaml" />
+        <EmbeddedResource Remove="View\*.xaml" />
+        <EmbeddedResource Remove="Windows\*.xaml" />
+        <EmbeddedResource Remove="Styles\*.xaml" />
+        <None Include="App.xaml" />
+        <None Include="MainWindow.xaml" />
+        <None Include="View\*.xaml" />
+        <None Include="Windows\*.xaml" />
+        <None Include="Styles\*.xaml" />
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="Resources\fanshop_logo.png" />
-      <Content Include="Resources\fanshop_logo.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <None Remove="Resources\CSKA.png" />
-      <Content Include="Resources\menu_icon.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Resources\close_icon.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="icon.ico">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <None Remove="Resources\fullsize_icon.png" />
-      <None Remove="Resources\collapse_icon.png" />
-      <None Remove="Resources\fanshop_logo_blue_and_light_blue.png" />
-      <Content Include="Resources\fanshop_logo_blue_and_light_blue.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <None Remove="Resources\zenit_arena.png" />
-      <Content Include="Resources\zenit_arena.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Update="icon.ico" CopyToOutputDirectory="PreserveNewest" />
-      <Content Include="Resources\close-window.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <None Remove="Resources\close-window.png" />
-      <Content Include="Resources\close-window.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Resources\expand-window.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Resources\minimize.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Resources\minimize.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Resources\expand-window.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
+        <!-- Avalonia -->
+        <PackageReference Include="Avalonia" Version="11.0.10" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.0.10" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.10" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.10" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.10" />
+
+        <!-- EF Core -->
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.2" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.2">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.2" />
+
+        <!-- Other dependencies -->
+        <PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
+        <PackageReference Include="EPPlus" Version="8.1.0" />
+        <PackageReference Include="Firebase.Database" Version="1.0.0" />
+        <PackageReference Include="HtmlAgilityPack" Version="1.12.2" />
+        <PackageReference Include="SkiaSharp" Version="2.88.9" />
+        <PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-rc5.4" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include=".github\images\" />
+        <AvaloniaResource Include="icon.ico" />
+        <AvaloniaResource Include="Resources\**\*" />
+        <Content Include="Resources\**\*" CopyToOutputDirectory="Always" />
+        <Content Include="icon.ico">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
 </Project>

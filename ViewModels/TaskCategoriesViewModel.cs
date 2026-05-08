@@ -1,58 +1,33 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Input;
+using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using FanShop.Models;
 using FanShop.Services;
-using FanShop.Utils;
 using FanShop.View;
 using FanShop.Windows;
-using Application = System.Windows.Application;
 
 namespace FanShop.ViewModels;
 
-public class TaskCategoriesViewModel : BaseViewModel
+public partial class TaskCategoriesViewModel : BaseViewModel
 {
     private readonly MainWindowViewModel _mainWindowViewModel;
-    
+
+    [ObservableProperty]
     private ObservableCollection<TaskCategory> _taskCategories = new();
 
-    public ObservableCollection<TaskCategory> TaskCategories
-    {
-        get => _taskCategories;
-        set => SetProperty(ref _taskCategories, value);
-    }
-
-    public ICommand AddCategoryCommand { get; }
-    public ICommand EditCategoryCommand { get; }
-    public ICommand RemoveCategoryCommand { get; }
-    public ICommand OpenAnalyticsCommand { get; }
-    public ICommand CloseWindowCommand { get; }
-
+    [ObservableProperty]
     private TaskCategory? _selectedCategory;
-
-    public TaskCategory? SelectedCategory
-    {
-        get => _selectedCategory;
-        set
-        {
-            _selectedCategory = value;
-            OnPropertyChanged(nameof(SelectedCategory));
-            (RemoveCategoryCommand as RelayCommand)?.RaiseCanExecuteChanged();
-            (EditCategoryCommand as RelayCommand)?.RaiseCanExecuteChanged();
-        }
-    }
 
     public TaskCategoriesViewModel(MainWindowViewModel mainWindowViewModel)
     {
         _mainWindowViewModel = mainWindowViewModel;
-        
         LoadCategories();
+    }
 
-        AddCategoryCommand = new RelayCommand(AddCategory);
-        EditCategoryCommand = new RelayCommand(EditCategory, CanEditCategory);
-        RemoveCategoryCommand = new RelayCommand(RemoveCategory, CanEditCategory);
-        CloseWindowCommand = new RelayCommand(CloseWindow);
-        OpenAnalyticsCommand = new RelayCommand(OpenAnalytics);
+    partial void OnSelectedCategoryChanged(TaskCategory? value)
+    {
+        RemoveCategoryCommand.NotifyCanExecuteChanged();
+        EditCategoryCommand.NotifyCanExecuteChanged();
     }
 
     public void LoadCategories()
@@ -61,15 +36,17 @@ public class TaskCategoriesViewModel : BaseViewModel
         var categories = context.TaskCategories.ToList();
         TaskCategories = new ObservableCollection<TaskCategory>(categories);
     }
-    
-    private void AddCategory(object? parameter)
+
+    [RelayCommand]
+    private void AddCategory()
     {
         var editTaskCategoriesViewModel = new EditTaskCategoriesViewModel(_mainWindowViewModel, this);
         var editTaskCategoriesControl = new EditTaskCategoriesControl();
         _mainWindowViewModel.OpenTabRequest(editTaskCategoriesViewModel, editTaskCategoriesControl, "Новая категория");
     }
 
-    private void EditCategory(object? parameter)
+    [RelayCommand(CanExecute = nameof(CanEditCategory))]
+    private void EditCategory()
     {
         if (SelectedCategory != null)
         {
@@ -80,7 +57,10 @@ public class TaskCategoriesViewModel : BaseViewModel
         }
     }
 
-    private void RemoveCategory(object? parameter)
+    private bool CanEditCategory => SelectedCategory != null;
+
+    [RelayCommand(CanExecute = nameof(CanRemoveCategory))]
+    private void RemoveCategory()
     {
         using var context = new AppDbContext();
         if (SelectedCategory != null)
@@ -95,19 +75,18 @@ public class TaskCategoriesViewModel : BaseViewModel
         }
     }
 
-    private bool CanEditCategory(object? parameter)
-    {
-        return SelectedCategory != null;
-    }
-    
-    private void OpenAnalytics(object? parameter)
+    private bool CanRemoveCategory => SelectedCategory != null;
+
+    [RelayCommand]
+    private void OpenAnalytics()
     {
         var taskAnalyticsViewModel = new TaskAnalyticsViewModel(_mainWindowViewModel);
         var taskAnalyticsControl = new TaskAnalyticsControl();
         _mainWindowViewModel.OpenTabRequest(taskAnalyticsViewModel, taskAnalyticsControl, "Аналитика задач");
     }
 
-    private void CloseWindow(object? parameter)
+    [RelayCommand]
+    private void CloseWindow()
     {
         _mainWindowViewModel.CloseTabRequest(this);
     }

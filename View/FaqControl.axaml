@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FanShop.View.FaqControl">
+    <ScrollViewer>
+        <StackPanel Margin="24" Spacing="16" MaxWidth="860">
+            <TextBlock Text="FAQ" FontSize="24" FontWeight="Bold" />
+            <Border Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="12" Padding="16">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Как добавить сотрудника?" FontWeight="Bold" />
+                    <TextBlock Text="Откройте вкладку сотрудников и нажмите «Добавить»." TextWrapping="Wrap" />
+                    <TextBlock Text="Как назначить людей на день?" FontWeight="Bold" Margin="0,8,0,0" />
+                    <TextBlock Text="На главном календаре нажмите на нужный день без матча, затем используйте кнопку «Добавить»." TextWrapping="Wrap" />
+                    <TextBlock Text="Где смотреть тайминг?" FontWeight="Bold" Margin="0,8,0,0" />
+                    <TextBlock Text="В деталях дня нажмите «Тайминг» или откройте раздел категорий и аналитики." TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
