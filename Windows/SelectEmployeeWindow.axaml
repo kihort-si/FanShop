@@ -14,7 +14,7 @@
         </StackPanel>
 
         <Grid Grid.Row="1" ColumnDefinitions="*,220">
-            <Border Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="12" Padding="12">
+            <Border Background="#F9FBFD" BorderBrush="{StaticResource BrandBorder}" BorderThickness="1" CornerRadius="12" Padding="12">
                 <DataGrid x:Name="EmployeesGrid"
                           ItemsSource="{Binding Employees}"
                           SelectedItem="{Binding SelectedEmployee}"
@@ -30,7 +30,7 @@
                 </DataGrid>
             </Border>
 
-            <Border Grid.Column="1" Margin="12,0,0,0" Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="12" Padding="12">
+            <Border Grid.Column="1" Margin="12,0,0,0" Background="#F9FBFD" BorderBrush="{StaticResource BrandBorder}" BorderThickness="1" CornerRadius="12" Padding="12">
                 <StackPanel Spacing="10">
                     <TextBlock Text="Занятость" FontWeight="Bold" />
                     <ComboBox x:Name="WorkDurationComboBox" SelectedIndex="0">
@@ -43,7 +43,7 @@
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" Margin="0,12,0,0">
             <Button Content="Выбрать" Click="SelectButton_Click" />
-            <Button Content="Отмена" Click="CancelButton_Click" />
+            <Button Classes="ghost" Content="Отмена" Click="CancelButton_Click" />
         </StackPanel>
     </Grid>
 </Window>

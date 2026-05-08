@@ -14,7 +14,7 @@
             <TextBox Watermark="Задача по умолчанию" Text="{Binding DefaultTask}" />
             <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
                 <Button Content="Сохранить" Command="{Binding SaveEditedCategoryCommand}" />
-                <Button Content="Отмена" Command="{Binding CancelEditCommand}" />
+                <Button Classes="ghost" Content="Отмена" Command="{Binding CancelEditCommand}" />
             </StackPanel>
         </StackPanel>
     </ScrollViewer>

@@ -43,13 +43,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border MinHeight="125"
-                                    Margin="3"
-                                    BorderBrush="#D7E4EF"
-                                    BorderThickness="1"
-                                    Background="White">
-                                <view:CalendarDayControl />
-                            </Border>
+                            <view:CalendarDayControl Margin="3" MinHeight="125" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
