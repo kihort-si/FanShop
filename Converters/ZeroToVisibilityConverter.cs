@@ -1,25 +1,24 @@
-﻿using System;
+using Avalonia.Data.Converters;
+using System;
 using System.Globalization;
-using System.Windows;
-using System.Windows.Data;
 
-namespace FanShop.Converters
+namespace FanShop.Converters;
 
+public class ZeroToVisibilityConverter : IValueConverter
 {
-    public class ZeroToVisibilityConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is int intValue)
-            {
-                return intValue == 0 ? Visibility.Visible : Visibility.Collapsed;
-            }
-            return Visibility.Collapsed;
-        }
+    public static readonly ZeroToVisibilityConverter Instance = new();
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is int intValue)
         {
-            throw new NotImplementedException();
+            return intValue == 0;
         }
+        return false;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
     }
 }

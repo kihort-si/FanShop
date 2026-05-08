@@ -1,0 +1,116 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:view="using:FanShop.View"
+             x:Class="FanShop.View.MainControl">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="20" RowDefinitions="Auto,Auto,Auto,Auto">
+            <Grid Grid.Row="0" Width="770" HorizontalAlignment="Center" ColumnDefinitions="*,Auto,*" Margin="0,10,0,12">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Button Width="36" Height="36" Margin="5,0" Command="{Binding GoToTodayCommand}">
+                        <TextBlock Text="⌂" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Button>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="{Binding PreviousMonthName}" Command="{Binding GoToPreviousMonthCommand}" Background="Transparent" BorderThickness="0" Foreground="Gray" />
+                    <TextBlock Text="{Binding CurrentMonthName}" FontSize="20" FontWeight="Bold" Margin="20,0" VerticalAlignment="Center" />
+                    <Button Content="{Binding NextMonthName}" Command="{Binding GoToNextMonthCommand}" Background="Transparent" BorderThickness="0" Foreground="Gray" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Width="36" Height="36" Margin="5,0" Command="{Binding ToggleCalendarViewModeCommand}">
+                        <TextBlock Text="⇄" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <StackPanel Grid.Row="1" HorizontalAlignment="Center" Spacing="6">
+                <Grid Width="812" Height="30" ColumnDefinitions="*,*,*,*,*,*,*">
+                    <TextBlock Grid.Column="0" Text="ПН" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="14" Foreground="#656565" />
+                    <TextBlock Grid.Column="1" Text="ВТ" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="14" Foreground="#656565" />
+                    <TextBlock Grid.Column="2" Text="СР" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="14" Foreground="#656565" />
+                    <TextBlock Grid.Column="3" Text="ЧТ" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="14" Foreground="#656565" />
+                    <TextBlock Grid.Column="4" Text="ПТ" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="14" Foreground="#656565" />
+                    <TextBlock Grid.Column="5" Text="СБ" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="14" Foreground="#995B5B" />
+                    <TextBlock Grid.Column="6" Text="ВС" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="14" Foreground="#995B5B" />
+                </Grid>
+
+                <ItemsControl ItemsSource="{Binding CalendarDays}" Width="812">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="7" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border MinHeight="125"
+                                    Margin="3"
+                                    BorderBrush="#D7E4EF"
+                                    BorderThickness="1"
+                                    Background="White">
+                                <view:CalendarDayControl />
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
+            <Border Grid.Row="2" Background="White" Margin="20,20,20,0" CornerRadius="15" BorderBrush="#D7E4EF" BorderThickness="1">
+                <Grid RowDefinitions="Auto,*">
+                    <Border Grid.Row="0" CornerRadius="15,15,0,0" Padding="20,15" Background="#EAF4FB">
+                        <TextBlock Text="{Binding FormattedMonthTitle}" FontSize="20" FontWeight="Bold" Foreground="#0077B5" />
+                    </Border>
+
+                    <Grid Grid.Row="1" Margin="20" ColumnDefinitions="*,*">
+                        <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                            <TextBlock Text="Общая статистика" FontWeight="SemiBold" FontSize="16" Foreground="#333333" Margin="0,0,0,15" />
+                            <WrapPanel>
+                                <Border Width="180" Height="90" Margin="0,0,15,15" CornerRadius="10" Background="White" BorderThickness="1" BorderBrush="#E0E0E0">
+                                    <StackPanel Margin="15,10">
+                                        <TextBlock Text="Матчи" Foreground="#666666" />
+                                        <TextBlock Text="{Binding MonthMatchesCount}" FontSize="24" FontWeight="Bold" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Width="180" Height="90" Margin="0,0,15,15" CornerRadius="10" Background="White" BorderThickness="1" BorderBrush="#E0E0E0">
+                                    <StackPanel Margin="15,10">
+                                        <TextBlock Text="Сотрудники" Foreground="#666666" />
+                                        <TextBlock Text="{Binding TotalEmployeesCount}" FontSize="24" FontWeight="Bold" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Width="180" Height="90" Margin="0,0,15,15" CornerRadius="10" Background="White" BorderThickness="1" BorderBrush="#E0E0E0">
+                                    <StackPanel Margin="15,10">
+                                        <TextBlock Text="Смены" Foreground="#666666" />
+                                        <TextBlock Text="{Binding TotalShiftCount}" FontSize="24" FontWeight="Bold" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Width="180" Height="90" Margin="0,0,15,15" CornerRadius="10" Background="White" BorderThickness="1" BorderBrush="#E0E0E0">
+                                    <StackPanel Margin="15,10">
+                                        <TextBlock Text="ФОТ" Foreground="#666666" />
+                                        <TextBlock Text="{Binding TotalSalary}" FontSize="24" FontWeight="Bold" />
+                                    </StackPanel>
+                                </Border>
+                            </WrapPanel>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Margin="15,0,0,0">
+                            <TextBlock Text="Сотрудники за месяц" FontWeight="SemiBold" FontSize="16" Foreground="#333333" Margin="0,0,0,15" />
+                            <ItemsControl ItemsSource="{Binding EmployeeStatistics}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="White" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="8" Padding="10" Margin="0,0,0,8">
+                                            <Grid ColumnDefinitions="*,Auto,Auto">
+                                                <TextBlock Text="{Binding EmployeeName}" FontWeight="SemiBold" />
+                                                <TextBlock Grid.Column="1" Margin="8,0,0,0" Text="{Binding WorkDaysCount, Converter={StaticResource ShiftToRussian}}" FontSize="12" Foreground="#6E7E8F" VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="2" Margin="8,0,0,0" Text="{Binding TotalSalary}" FontSize="12" Foreground="#0A6DAE" VerticalAlignment="Center" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

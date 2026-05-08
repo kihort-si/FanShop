@@ -1,0 +1,54 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FanShop.ViewModels"
+        x:Class="FanShop.Windows.SplashScreenWindow"
+        Title="Загрузка приложения"
+        Height="300"
+        Width="600"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False"
+        SystemDecorations="None"
+        TransparencyLevelHint="Transparent"
+        Background="White">
+
+    <Design.DataContext>
+        <vm:SplashScreenViewModel/>
+    </Design.DataContext>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0" Margin="30, 40, 0, 60">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" HorizontalAlignment="Left">
+                <Image Source="/Resources/fanshop_logo_blue_and_light_blue.png" Margin="0, 0, 0, 12" Width="260"/>
+                <TextBlock Text="Версия 2.0.0"
+                           FontSize="12"
+                           FontWeight="Bold"
+                           Foreground="#666666"/>
+            </StackPanel>
+            <StackPanel Grid.Row="2">
+                <TextBlock Text="{Binding LoadingText}"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           Foreground="#666666"
+                           Margin="0, 0, 0, 8"/>
+                <Border Background="#D9D9D9" Height="5" MaxWidth="360">
+                    <Rectangle Fill="#003D75"
+                               Width="{Binding ProgressWidth}"
+                               HorizontalAlignment="Left"
+                               Height="5"/>
+                </Border>
+            </StackPanel>
+        </Grid>
+        <Image Grid.Column="1" Source="/Resources/zenit_arena.png" Stretch="UniformToFill" Height="248" Margin="0, 14, 0, 0"/>
+    </Grid>
+</Window>
