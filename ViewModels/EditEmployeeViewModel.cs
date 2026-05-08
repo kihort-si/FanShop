@@ -154,18 +154,15 @@ public partial class EditEmployeeViewModel : BaseViewModel
                     }
                 }
 
-                var rows = context.SaveChanges();
-                Console.WriteLine($"[SaveEditedEmployee] saved {rows} row(s); Surname='{Surname}' FirstName='{FirstName}'");
+                context.SaveChanges();
 
                 _employeeViewModel.RefreshEmployees();
-                Console.WriteLine($"[SaveEditedEmployee] Employees count after refresh: {_employeeViewModel.Employees.Count}");
                 _mainWindowViewModel.CloseTabRequest(this);
             }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"[SaveEditedEmployee] FAILED: {ex.GetType().Name}: {ex.Message}");
-            Console.Error.WriteLine(ex.ToString());
+            Console.Error.WriteLine($"[SaveEditedEmployee] FAILED: {ex}");
         }
     }
 
