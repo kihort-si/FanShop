@@ -11,24 +11,30 @@ public partial class EditEmployeeViewModel : BaseViewModel
     private readonly EmployeeViewModel _employeeViewModel;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(SaveEditedEmployeeCommand))]
     private string _surname = string.Empty;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(SaveEditedEmployeeCommand))]
     private string _firstName = string.Empty;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(SaveEditedEmployeeCommand))]
     private string _lastName = string.Empty;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(SaveEditedEmployeeCommand))]
     private string _dateOfBirth = string.Empty;
 
     [ObservableProperty]
     private DateTime? _dateOfBirthPicker;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(SaveEditedEmployeeCommand))]
     private string _placeOfBirth = string.Empty;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(SaveEditedEmployeeCommand))]
     private string _passport = string.Empty;
 
     [ObservableProperty]
@@ -114,42 +120,52 @@ public partial class EditEmployeeViewModel : BaseViewModel
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanSaveEmployee))]
     private void SaveEditedEmployee()
     {
-        using var context = new AppDbContext();
-        if (EditableEmployee != null)
+        try
         {
-            if (SelectedEmployee == null)
+            using var context = new AppDbContext();
+            if (EditableEmployee != null)
             {
-                EditableEmployee.Surname = Surname;
-                EditableEmployee.FirstName = FirstName;
-                EditableEmployee.LastName = LastName;
-                EditableEmployee.DateOfBirth = DateOfBirth;
-                EditableEmployee.PlaceOfBirth = PlaceOfBirth;
-                EditableEmployee.Passport = Passport;
-
-                context.Employees.Add(EditableEmployee);
-            }
-            else
-            {
-                var employee = context.Employees.Find(SelectedEmployee.EmployeeID);
-                if (employee != null)
+                if (SelectedEmployee == null)
                 {
-                    employee.FirstName = FirstName;
-                    employee.LastName = LastName;
-                    employee.Surname = Surname;
-                    employee.DateOfBirth = DateOfBirth;
-                    employee.PlaceOfBirth = PlaceOfBirth;
-                    employee.Passport = Passport;
-                    context.Employees.Update(employee);
+                    EditableEmployee.Surname = Surname;
+                    EditableEmployee.FirstName = FirstName;
+                    EditableEmployee.LastName = LastName;
+                    EditableEmployee.DateOfBirth = DateOfBirth;
+                    EditableEmployee.PlaceOfBirth = PlaceOfBirth;
+                    EditableEmployee.Passport = Passport;
+
+                    context.Employees.Add(EditableEmployee);
                 }
+                else
+                {
+                    var employee = context.Employees.Find(SelectedEmployee.EmployeeID);
+                    if (employee != null)
+                    {
+                        employee.FirstName = FirstName;
+                        employee.LastName = LastName;
+                        employee.Surname = Surname;
+                        employee.DateOfBirth = DateOfBirth;
+                        employee.PlaceOfBirth = PlaceOfBirth;
+                        employee.Passport = Passport;
+                        context.Employees.Update(employee);
+                    }
+                }
+
+                var rows = context.SaveChanges();
+                Console.WriteLine($"[SaveEditedEmployee] saved {rows} row(s); Surname='{Surname}' FirstName='{FirstName}'");
+
+                _employeeViewModel.RefreshEmployees();
+                Console.WriteLine($"[SaveEditedEmployee] Employees count after refresh: {_employeeViewModel.Employees.Count}");
+                _mainWindowViewModel.CloseTabRequest(this);
             }
-
-            context.SaveChanges();
-
-            _employeeViewModel.RefreshEmployees();
-            _mainWindowViewModel.CloseTabRequest(this);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"[SaveEditedEmployee] FAILED: {ex.GetType().Name}: {ex.Message}");
+            Console.Error.WriteLine(ex.ToString());
         }
     }
 
