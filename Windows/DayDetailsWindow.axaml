@@ -1,0 +1,41 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="FanShop.Windows.DayDetailsWindow"
+        Width="900"
+        Height="620"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Title="Детали дня">
+    <Grid RowDefinitions="Auto,*,Auto" Margin="18">
+        <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+            <StackPanel>
+                <TextBlock Text="Информация о дне" FontSize="24" FontWeight="Bold" />
+                <TextBlock Text="{Binding Date, Converter={StaticResource RussianDateConverter}}" Foreground="#6E7E8F" />
+            </StackPanel>
+            <Button Grid.Column="1" Content="Закрыть" Click="CloseButton_Click" />
+        </Grid>
+
+        <Border Grid.Row="1" Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="12" Padding="12">
+            <DataGrid ItemsSource="{Binding Employees}"
+                      SelectedItem="{Binding SelectedEmployee}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Фамилия" Binding="{Binding Surname}" Width="*" />
+                    <DataGridTextColumn Header="Имя" Binding="{Binding FirstName}" Width="*" />
+                    <DataGridTextColumn Header="Дата рождения" Binding="{Binding DateOfBirth}" Width="*" />
+                    <DataGridTextColumn Header="Занятость" Binding="{Binding WorkDuration}" Width="*" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" Margin="0,12,0,0">
+            <Button Content="Добавить" Command="{Binding AddEmployeesCommand}" />
+            <Button Content="Удалить" Command="{Binding RemoveEmployeesCommand}" />
+            <Button Content="Пропуск" Command="{Binding PrintPassCommand}" />
+            <Button Content="Тайминг" Command="{Binding DailyScheduleCommand}" />
+            <Button Content="Закрыть" Click="CloseButton_Click" />
+        </StackPanel>
+    </Grid>
+</Window>

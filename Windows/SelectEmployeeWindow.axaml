@@ -1,0 +1,49 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="FanShop.Windows.SelectEmployeeWindow"
+        Width="860"
+        Height="560"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Title="Выбор сотрудника">
+    <Grid RowDefinitions="Auto,*,Auto" Margin="18">
+        <StackPanel Margin="0,0,0,12">
+            <TextBlock Text="Добавление сотрудника" FontSize="24" FontWeight="Bold" />
+            <TextBlock Text="Выберите сотрудника и тип занятости" Foreground="#6E7E8F" />
+        </StackPanel>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,220">
+            <Border Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="12" Padding="12">
+                <DataGrid x:Name="EmployeesGrid"
+                          ItemsSource="{Binding Employees}"
+                          SelectedItem="{Binding SelectedEmployee}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          DoubleTapped="EmployeesGrid_DoubleTapped">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Фамилия" Binding="{Binding Surname}" Width="*" />
+                        <DataGridTextColumn Header="Имя" Binding="{Binding FirstName}" Width="*" />
+                        <DataGridTextColumn Header="Отчество" Binding="{Binding LastName}" Width="*" />
+                        <DataGridTextColumn Header="Дата рождения" Binding="{Binding DateOfBirth}" Width="*" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+
+            <Border Grid.Column="1" Margin="12,0,0,0" Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="12" Padding="12">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Занятость" FontWeight="Bold" />
+                    <ComboBox x:Name="WorkDurationComboBox" SelectedIndex="0">
+                        <ComboBoxItem Content="Целый день" />
+                        <ComboBoxItem Content="Полдня" />
+                    </ComboBox>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button Content="Выбрать" Click="SelectButton_Click" />
+            <Button Content="Отмена" Click="CancelButton_Click" />
+        </StackPanel>
+    </Grid>
+</Window>

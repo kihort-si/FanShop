@@ -1,26 +1,29 @@
-﻿using System.Globalization;
-using System.Windows.Data;
+using Avalonia.Data.Converters;
+using System;
+using System.Globalization;
 
 namespace FanShop.Converters;
 
 public class TimeSpanFormatConverter : IValueConverter
 {
-    public static TimeSpanFormatConverter Instance { get; } = new TimeSpanFormatConverter();
+    public static readonly TimeSpanFormatConverter Instance = new();
 
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is TimeSpan timeSpan)
         {
-            return timeSpan.Hours == 0 ? $"{timeSpan.Minutes} {FormatedMinutes(timeSpan.Minutes)}" : $"{timeSpan.Hours} {FormatedHours(timeSpan.Hours)} {timeSpan.Minutes} {FormatedMinutes(timeSpan.Minutes)}";
+            return timeSpan.Hours == 0
+                ? $"{timeSpan.Minutes} {FormatedMinutes(timeSpan.Minutes)}"
+                : $"{timeSpan.Hours} {FormatedHours(timeSpan.Hours)} {timeSpan.Minutes} {FormatedMinutes(timeSpan.Minutes)}";
         }
         return value;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new NotImplementedException();
     }
-    
+
     private string FormatedHours(int hours)
     {
         return hours switch
@@ -30,7 +33,7 @@ public class TimeSpanFormatConverter : IValueConverter
             _ => "часов"
         };
     }
-    
+
     private string FormatedMinutes(int minutes)
     {
         return minutes switch
@@ -39,6 +42,5 @@ public class TimeSpanFormatConverter : IValueConverter
             int n when (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) => "минуты",
             _ => "минут"
         };
-
     }
 }

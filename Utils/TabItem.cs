@@ -1,28 +1,16 @@
-﻿using UserControl = System.Windows.Controls.UserControl;
+using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace FanShop.ViewModels;
+namespace FanShop.Utils;
 
-public class TabItem : BaseViewModel
+public partial class TabItem : ObservableObject
 {
-    private string _title;
-    private UserControl _content;
+    [ObservableProperty]
+    private string _title = string.Empty;
+
+    [ObservableProperty]
+    private UserControl _content = new();
+
+    [ObservableProperty]
     private bool _isClosable = true;
-    
-    public string Title
-    {
-        get => _title;
-        set => SetProperty(ref _title, value);
-    }
-    
-    public UserControl Content
-    {
-        get => _content;
-        set => SetProperty(ref _content, value);
-    }
-    
-    public bool IsClosable
-    {
-        get => _isClosable;
-        set => SetProperty(ref _isClosable, value);
-    }
 }

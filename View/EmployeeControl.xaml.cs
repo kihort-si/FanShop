@@ -1,30 +1,11 @@
-﻿using System.Globalization;
-using System.Windows;
-using System.Windows.Data;
-using UserControl = System.Windows.Controls.UserControl;
+﻿using Avalonia.Controls;
 
-namespace FanShop.View
+namespace FanShop.View;
+
+public partial class EmployeeControl : UserControl
 {
-    public partial class EmployeeControl : UserControl
+    public EmployeeControl()
     {
-        public EmployeeControl()
-        {
-            InitializeComponent();
-        }
-    }
-    
-    public class StringToVisibilityConverter : IValueConverter
-    {
-        public static readonly StringToVisibilityConverter Instance = new();
-        
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return string.IsNullOrWhiteSpace(value as string) ? Visibility.Collapsed : Visibility.Visible;
-        }
-        
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+        InitializeComponent();
     }
 }

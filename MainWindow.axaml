@@ -1,0 +1,181 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FanShop.ViewModels"
+        x:Class="FanShop.MainWindow"
+        Title="FANSHOP"
+        Width="1280"
+        Height="820"
+        MinWidth="960"
+        MinHeight="640"
+        WindowStartupLocation="CenterScreen"
+        Background="#F4F8FB"
+        Icon="/icon.ico"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="40">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+    <Grid RowDefinitions="40,*">
+        <Border Grid.Row="0" Background="#0A6DAE">
+            <Grid ColumnDefinitions="80,*,140">
+                <Button Grid.Column="0"
+                        Command="{Binding ToggleMenuCommand}"
+                        Background="Transparent"
+                        BorderThickness="0">
+                    <Image Source="/Resources/menu_icon.png" Width="20" Height="20" />
+                </Button>
+
+                <Image Grid.Column="1"
+                       Source="/Resources/fanshop_logo.png"
+                       Height="26"
+                       Margin="0,7"
+                       HorizontalAlignment="Center" />
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Width="46"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Click="MinimizeButton_Click"
+                            Content="_"
+                            FontSize="18"
+                            FontWeight="Bold"
+                            Foreground="White">
+                    </Button>
+                    <Button Width="46"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Click="MaximizeButton_Click"
+                            Content="□"
+                            FontSize="16"
+                            Foreground="White">
+                    </Button>
+                    <Button Width="46"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Click="CloseButton_Click"
+                            Content="×"
+                            FontSize="20"
+                            Foreground="White">
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Border Margin="16" Background="White" CornerRadius="14" BorderBrush="#D7E4EF" BorderThickness="1">
+                <TabControl ItemsSource="{Binding OpenWindows}" SelectedItem="{Binding SelectedWindow}">
+                    <TabControl.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel LastChildFill="True">
+                                <Button DockPanel.Dock="Right"
+                                        Width="22"
+                                        Height="22"
+                                        Margin="8,0,0,0"
+                                        Padding="0"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Command="{Binding DataContext.CloseTabCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        IsVisible="{Binding IsClosable}">
+                                    <TextBlock Text="x" />
+                                </Button>
+                                <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                            </DockPanel>
+                        </DataTemplate>
+                    </TabControl.ItemTemplate>
+                    <TabControl.ContentTemplate>
+                        <DataTemplate>
+                            <ContentControl Content="{Binding Content}" />
+                        </DataTemplate>
+                    </TabControl.ContentTemplate>
+                </TabControl>
+            </Border>
+
+            <Button
+                    Background="#66000000"
+                    BorderThickness="0"
+                    IsVisible="{Binding IsBlackoutMode}"
+                    ZIndex="5"
+                    Command="{Binding CloseMenuCommand}" />
+
+            <Border Width="300"
+                    HorizontalAlignment="Left"
+                    IsVisible="{Binding IsMenuOpen}"
+                    ZIndex="10"
+                    CornerRadius="8,0,0,8"
+                    BorderThickness="3,0,0,3">
+                <Border.BorderBrush>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#009EE1" Offset="0.0" />
+                        <GradientStop Color="#0096D8" Offset="1.0" />
+                    </LinearGradientBrush>
+                </Border.BorderBrush>
+                <Grid RowDefinitions="40,*,Auto">
+                    <Border Grid.Row="0" Background="#0A6DAE" CornerRadius="8,0,0,0">
+                        <Grid ColumnDefinitions="60,*,40">
+                            <Button Grid.Column="0"
+                                    Command="{Binding ToggleMenuCommand}"
+                                    Background="Transparent"
+                                    BorderThickness="0">
+                                <Image Source="/Resources/close_icon.png" Width="18" Height="18" />
+                            </Button>
+                            <TextBlock Grid.Column="1"
+                                       Text="МЕНЮ"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       Foreground="White"
+                                       FontWeight="Bold"
+                                       FontSize="16" />
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Row="1" Background="White">
+                        <ScrollViewer>
+                            <StackPanel Margin="10" Spacing="6">
+                                <Button Command="{Binding OpenEmployeeTabCommand}" Background="#FFFFFF" BorderBrush="#D7E4EF" BorderThickness="1" Padding="14,12" HorizontalContentAlignment="Stretch">
+                                    <StackPanel HorizontalAlignment="Left">
+                                        <TextBlock Text="Сотрудники" FontWeight="SemiBold" Foreground="#16324F" />
+                                        <TextBlock Text="База и рабочие смены" FontSize="12" Foreground="#6E7E8F" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Command="{Binding LoadMatchesCommand}" Background="#FFFFFF" BorderBrush="#D7E4EF" BorderThickness="1" Padding="14,12" HorizontalContentAlignment="Stretch">
+                                    <StackPanel HorizontalAlignment="Left">
+                                        <TextBlock Text="Обновить расписание" FontWeight="SemiBold" Foreground="#16324F" />
+                                        <TextBlock Text="Загрузить матчи и обновить календарь" FontSize="12" Foreground="#6E7E8F" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Command="{Binding OpenTaskCategoriesTabCommand}" Background="#FFFFFF" BorderBrush="#D7E4EF" BorderThickness="1" Padding="14,12" HorizontalContentAlignment="Stretch">
+                                    <StackPanel HorizontalAlignment="Left">
+                                        <TextBlock Text="Тайминг" FontWeight="SemiBold" Foreground="#16324F" />
+                                        <TextBlock Text="Категории задач и аналитика" FontSize="12" Foreground="#6E7E8F" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Command="{Binding OpenSettingsTabCommand}" Background="#FFFFFF" BorderBrush="#D7E4EF" BorderThickness="1" Padding="14,12" HorizontalContentAlignment="Stretch">
+                                    <StackPanel HorizontalAlignment="Left">
+                                        <TextBlock Text="Настройки" FontWeight="SemiBold" Foreground="#16324F" />
+                                        <TextBlock Text="Параметры документов и оплаты" FontSize="12" Foreground="#6E7E8F" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Command="{Binding OpenFaqTabCommand}" Background="#FFFFFF" BorderBrush="#D7E4EF" BorderThickness="1" Padding="14,12" HorizontalContentAlignment="Stretch">
+                                    <StackPanel HorizontalAlignment="Left">
+                                        <TextBlock Text="FAQ" FontWeight="SemiBold" Foreground="#16324F" />
+                                        <TextBlock Text="Подсказки по работе с приложением" FontSize="12" Foreground="#6E7E8F" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+
+                    <Border Grid.Row="2" Background="#F5F8FB" Padding="16" CornerRadius="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock Text="FANSHOP" FontWeight="Bold" Foreground="#0A6DAE" HorizontalAlignment="Center" />
+                            <TextBlock Text="Кроссплатформенная версия" FontSize="12" Foreground="#6E7E8F" HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
