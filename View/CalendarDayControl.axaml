@@ -7,9 +7,9 @@
             Padding="0"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch">
-        <Border BorderBrush="#D7E4EF"
+        <Border BorderBrush="#E2ECF5"
                 BorderThickness="1"
-                CornerRadius="8"
+                CornerRadius="10"
                 Padding="8"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"

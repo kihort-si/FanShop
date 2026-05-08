@@ -5,7 +5,7 @@
         <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,16">
             <Button Content="Добавить" Command="{Binding AddCategoryCommand}" />
             <Button Content="Изменить" Command="{Binding EditCategoryCommand}" />
-            <Button Content="Удалить" Command="{Binding RemoveCategoryCommand}" />
+            <Button Classes="danger" Content="Удалить" Command="{Binding RemoveCategoryCommand}" />
             <Button Content="Аналитика" Command="{Binding OpenAnalyticsCommand}" />
         </StackPanel>
 

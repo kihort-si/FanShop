@@ -104,13 +104,22 @@ public partial class App : Application
             _splashScreen?.ViewModel.UpdateProgress(10);
             await Task.Delay(100);
 
-            _mainWindowViewModel = new MainWindowViewModel();
-            _mainWindowViewModel.OpenMainTab();
-
             await using (var db = new AppDbContext())
             {
-                await db.Database.MigrateAsync();
+                await db.Database.EnsureCreatedAsync();
+                try
+                {
+                    await db.Employees.AnyAsync();
+                }
+                catch (Microsoft.Data.Sqlite.SqliteException)
+                {
+                    await db.Database.EnsureDeletedAsync();
+                    await db.Database.EnsureCreatedAsync();
+                }
             }
+
+            _mainWindowViewModel = new MainWindowViewModel();
+            _mainWindowViewModel.OpenMainTab();
 
             _splashScreen?.ViewModel.UpdateProgress(30);
             await Task.Delay(100);
@@ -131,7 +140,6 @@ public partial class App : Application
                 await Task.Delay(100);
             }
 
-            DbInitializer.Initialize();
             _mainWindowViewModel.RefreshStatistics();
 
             _splashScreen?.ViewModel.UpdateProgress(100);

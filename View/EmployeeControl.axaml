@@ -5,7 +5,7 @@
         <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,16">
             <Button Content="Добавить" Command="{Binding AddEmployeeCommand}" />
             <Button Content="Изменить" Command="{Binding EditEmployeeCommand}" />
-            <Button Content="Удалить" Command="{Binding RemoveEmployeeCommand}" />
+            <Button Classes="danger" Content="Удалить" Command="{Binding RemoveEmployeeCommand}" />
         </StackPanel>
 
         <Grid Grid.Row="1" ColumnDefinitions="*,*">
