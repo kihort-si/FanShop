@@ -14,5 +14,8 @@ public class WorkDayEmployee
     public Employee Employee { get; set; }
     
     [Required]
-    public string WorkDuration { get; set; } 
+    public string WorkDuration { get; set; }
+
+    public bool IncludeInPass { get; set; } = true;
+    public bool IncludeInSalary { get; set; } = true;
 }

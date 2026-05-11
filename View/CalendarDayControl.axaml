@@ -33,7 +33,7 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border Background="#D9F1FB" CornerRadius="4" Padding="4,2">
-                                    <TextBlock Text="{Binding}" FontSize="11" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding}" FontSize="11" TextTrimming="CharacterEllipsis" Foreground="MidnightBlue" />
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

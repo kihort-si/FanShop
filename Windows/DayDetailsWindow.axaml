@@ -19,13 +19,14 @@
         <Border Grid.Row="1" Background="#F9FBFD" BorderBrush="{StaticResource BrandBorder}" BorderThickness="1" CornerRadius="12" Padding="12">
             <DataGrid ItemsSource="{Binding Employees}"
                       SelectedItem="{Binding SelectedEmployee}"
-                      AutoGenerateColumns="False"
-                      IsReadOnly="True">
+                      AutoGenerateColumns="False">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Фамилия" Binding="{Binding Surname}" Width="*" />
-                    <DataGridTextColumn Header="Имя" Binding="{Binding FirstName}" Width="*" />
-                    <DataGridTextColumn Header="Дата рождения" Binding="{Binding DateOfBirth}" Width="*" />
-                    <DataGridTextColumn Header="Занятость" Binding="{Binding WorkDuration}" Width="*" />
+                    <DataGridTextColumn Header="Фамилия" Binding="{Binding Surname}" Width="*" IsReadOnly="True" />
+                    <DataGridTextColumn Header="Имя" Binding="{Binding FirstName}" Width="*" IsReadOnly="True" />
+                    <DataGridTextColumn Header="Дата рождения" Binding="{Binding DateOfBirth}" Width="*" IsReadOnly="True" />
+                    <DataGridTextColumn Header="Занятость" Binding="{Binding WorkDuration}" Width="*" IsReadOnly="True" />
+                    <DataGridCheckBoxColumn Header="В пропуск" Binding="{Binding IncludeInPass}" Width="100" />
+                    <DataGridCheckBoxColumn Header="В зарплату" Binding="{Binding IncludeInSalary}" Width="110" />
                 </DataGrid.Columns>
             </DataGrid>
         </Border>
