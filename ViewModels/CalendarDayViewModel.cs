@@ -34,7 +34,11 @@ public partial class CalendarDayViewModel : BaseViewModel
                         workDay.WorkDayEmployees.Select(wde => new EmployeeWorkInfo
                         {
                             Employee = wde.Employee,
-                            WorkDuration = wde.WorkDuration
+                            WorkDuration = wde.WorkDuration,
+                            WorkDayEmployeeID = wde.WorkDayEmployeeID,
+                            IncludeInPass = wde.IncludeInPass,
+                            IncludeInSalary = wde.IncludeInSalary,
+                            StatisticsChangedCallback = NotifyMainControlOfChanges
                         }))
                     : new ObservableCollection<EmployeeWorkInfo>();
             }
@@ -331,7 +335,7 @@ public partial class CalendarDayViewModel : BaseViewModel
         MainViewModel?.RefreshStatistics();
     }
 
-    public void AddEmployeeToDay(Employee employee, string workDuration)
+    public void AddEmployeeToDay(Employee employee, string workDuration, int workDayEmployeeId)
     {
         if (Employees.Any(x => x.Employee.EmployeeID == employee.EmployeeID))
             return;
@@ -339,7 +343,9 @@ public partial class CalendarDayViewModel : BaseViewModel
         Employees.Add(new EmployeeWorkInfo
         {
             Employee = employee,
-            WorkDuration = workDuration
+            WorkDuration = workDuration,
+            WorkDayEmployeeID = workDayEmployeeId,
+            StatisticsChangedCallback = NotifyMainControlOfChanges
         });
 
         OnPropertyChanged(nameof(Employees));
@@ -349,12 +355,39 @@ public partial class CalendarDayViewModel : BaseViewModel
     }
 }
 
-public class EmployeeWorkInfo
+public partial class EmployeeWorkInfo : ObservableObject
 {
     public required Employee Employee { get; set; }
     public required string WorkDuration { get; set; }
 
+    public int WorkDayEmployeeID { get; set; }
+
+    [ObservableProperty]
+    private bool _includeInPass = true;
+
+    [ObservableProperty]
+    private bool _includeInSalary = true;
+
+    public Action? StatisticsChangedCallback { get; set; }
+
     public string FirstName => Employee.FirstName;
     public string Surname => Employee.Surname;
     public string DateOfBirth => Employee.DateOfBirth;
+
+    partial void OnIncludeInPassChanged(bool value) => PersistFlag(wde => wde.IncludeInPass = value);
+    partial void OnIncludeInSalaryChanged(bool value)
+    {
+        PersistFlag(wde => wde.IncludeInSalary = value);
+        StatisticsChangedCallback?.Invoke();
+    }
+
+    private void PersistFlag(Action<WorkDayEmployee> mutate)
+    {
+        if (WorkDayEmployeeID == 0) return;
+        using var context = new AppDbContext();
+        var wde = context.WorkDayEmployees.Find(WorkDayEmployeeID);
+        if (wde == null) return;
+        mutate(wde);
+        context.SaveChanges();
+    }
 }

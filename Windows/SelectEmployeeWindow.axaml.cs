@@ -59,18 +59,19 @@ public partial class SelectEmployeeWindow : Window
         var existingAssignment = workDay.WorkDayEmployees.FirstOrDefault(x => x.EmployeeID == employee.EmployeeID);
         if (existingAssignment == null)
         {
-            context.WorkDayEmployees.Add(new WorkDayEmployee
+            existingAssignment = new WorkDayEmployee
             {
                 WorkDayID = workDay.WorkDayID,
                 EmployeeID = employee.EmployeeID,
                 WorkDuration = workDuration
-            });
+            };
+            context.WorkDayEmployees.Add(existingAssignment);
             context.SaveChanges();
         }
 
         if (!ParentViewModel.Employees.Any(x => x.Employee.EmployeeID == employee.EmployeeID))
         {
-            ParentViewModel.AddEmployeeToDay(employee, workDuration);
+            ParentViewModel.AddEmployeeToDay(employee, workDuration, existingAssignment.WorkDayEmployeeID);
         }
 
         Close();
