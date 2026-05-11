@@ -30,11 +30,9 @@ public partial class App : Application
         {
             desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
 
-            // Show splash screen first
             _splashScreen = new SplashScreenWindow();
             _splashScreen.Show();
 
-            // Run initialization in background
             _ = InitializeAppAsync();
         }
 
@@ -116,6 +114,9 @@ public partial class App : Application
                     await db.Database.EnsureDeletedAsync();
                     await db.Database.EnsureCreatedAsync();
                 }
+
+                await EnsureColumnAsync(db, "WorkDayEmployees", "IncludeInPass", "INTEGER NOT NULL DEFAULT 1");
+                await EnsureColumnAsync(db, "WorkDayEmployees", "IncludeInSalary", "INTEGER NOT NULL DEFAULT 1");
             }
 
             _mainWindowViewModel = new MainWindowViewModel();
@@ -147,7 +148,6 @@ public partial class App : Application
 
             _splashScreen?.ViewModel.Stop();
 
-            // Create and show main window on UI thread
             await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
             {
                 _mainWindow = new MainWindow { DataContext = _mainWindowViewModel };
@@ -212,5 +212,26 @@ public partial class App : Application
         {
             _splashScreen?.Close();
         }
+    }
+
+    private static async Task EnsureColumnAsync(AppDbContext db, string table, string column, string columnDef)
+    {
+        var connection = db.Database.GetDbConnection();
+        if (connection.State != System.Data.ConnectionState.Open)
+            await connection.OpenAsync();
+
+        await using var probe = connection.CreateCommand();
+        probe.CommandText = $"PRAGMA table_info(\"{table}\");";
+        await using var reader = await probe.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            if (string.Equals(reader.GetString(1), column, StringComparison.OrdinalIgnoreCase))
+                return;
+        }
+        await reader.CloseAsync();
+
+        await using var alter = connection.CreateCommand();
+        alter.CommandText = $"ALTER TABLE \"{table}\" ADD COLUMN \"{column}\" {columnDef};";
+        await alter.ExecuteNonQueryAsync();
     }
 }

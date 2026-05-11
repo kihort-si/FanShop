@@ -46,6 +46,7 @@ namespace FanShop.Services
                         }
 
                         var sorted = employees
+                            .Where(e => e.IncludeInPass)
                             .OrderBy(e => e.Employee.Surname)
                             .ThenBy(e => e.Employee.FirstName)
                             .ThenBy(e => e.Employee.LastName)
