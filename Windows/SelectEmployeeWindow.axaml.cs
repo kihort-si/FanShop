@@ -30,7 +30,7 @@ public partial class SelectEmployeeWindow : Window
 
     private void CancelButton_Click(object? sender, RoutedEventArgs e)
     {
-        Close();
+        Close(false);
     }
 
     private void SelectEmployee()
@@ -74,6 +74,6 @@ public partial class SelectEmployeeWindow : Window
             ParentViewModel.AddEmployeeToDay(employee, workDuration, existingAssignment.WorkDayEmployeeID);
         }
 
-        Close();
+        Close(true);
     }
 }

@@ -3,10 +3,19 @@
         x:Class="FanShop.Windows.DayTasksWindow"
         Width="1100"
         Height="680"
+        CanResize="False"
+        SystemDecorations="None"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent"
         Title="Тайминг дня">
-    <Grid RowDefinitions="Auto,*,Auto" Margin="18">
+    <Border Margin="18"
+            Padding="18"
+            Background="White"
+            CornerRadius="16"
+            BoxShadow="0 0 34 0 #40000000">
+    <Grid RowDefinitions="Auto,*,Auto">
         <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,12">
             <StackPanel>
                 <TextBlock Text="График задач" FontSize="24" FontWeight="Bold" />
@@ -60,4 +69,5 @@
             <Button Classes="ghost" Content="Закрыть" Click="CloseButton_Click" />
         </StackPanel>
     </Grid>
+    </Border>
 </Window>

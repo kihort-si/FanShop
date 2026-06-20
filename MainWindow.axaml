@@ -19,7 +19,6 @@
     </Design.DataContext>
 
     <Grid RowDefinitions="40,*">
-        <!-- Custom title bar -->
         <Border Grid.Row="0" Background="{StaticResource BrandPrimary}">
             <Grid ColumnDefinitions="46,*,138">
                 <Button Grid.Column="0"
@@ -55,7 +54,6 @@
             </Grid>
         </Border>
 
-        <!-- Main content area with tabs -->
         <Grid Grid.Row="1">
             <Border Margin="16"
                     Background="{StaticResource BrandSurface}"
@@ -87,8 +85,7 @@
                     </TabControl.ContentTemplate>
                 </TabControl>
             </Border>
-
-            <!-- Blackout overlay -->
+            
             <Button Background="#66000000"
                     BorderThickness="0"
                     CornerRadius="0"
@@ -97,7 +94,6 @@
                     ZIndex="5"
                     Command="{Binding CloseMenuCommand}" />
 
-            <!-- Side drawer -->
             <Border Width="300"
                     HorizontalAlignment="Left"
                     IsVisible="{Binding IsMenuOpen}"
@@ -146,10 +142,22 @@
                                     <TextBlock Text="Категории задач и аналитика" FontSize="12" Foreground="{StaticResource BrandTextSubtle}" />
                                 </StackPanel>
                             </Button>
+                            <Button Classes="menu-item" Command="{Binding OpenEmployeeCostAnalyticsTabCommand}">
+                                <StackPanel>
+                                    <TextBlock Text="Аналитика затрат" FontWeight="SemiBold" />
+                                    <TextBlock Text="ЗП, матчи и объяснение нагрузки" FontSize="12" Foreground="{StaticResource BrandTextSubtle}" />
+                                </StackPanel>
+                            </Button>
                             <Button Classes="menu-item" Command="{Binding OpenSettingsTabCommand}">
                                 <StackPanel>
                                     <TextBlock Text="Настройки" FontWeight="SemiBold" />
                                     <TextBlock Text="Параметры документов и оплаты" FontSize="12" Foreground="{StaticResource BrandTextSubtle}" />
+                                </StackPanel>
+                            </Button>
+                            <Button Classes="menu-item" Command="{Binding OpenPassTemplateCommand}">
+                                <StackPanel>
+                                    <TextBlock Text="Шаблон пропуска" FontWeight="SemiBold" />
+                                    <TextBlock Text="Открыть или добавить болванку .docx" FontSize="12" Foreground="{StaticResource BrandTextSubtle}" />
                                 </StackPanel>
                             </Button>
                             <Button Classes="menu-item" Command="{Binding OpenFaqTabCommand}">
@@ -164,7 +172,8 @@
                     <Border Grid.Row="2" Background="{StaticResource BrandSurfaceAlt}" Padding="20,14">
                         <StackPanel HorizontalAlignment="Center">
                             <TextBlock Text="FANSHOP" FontWeight="Bold" Foreground="{StaticResource BrandPrimary}" HorizontalAlignment="Center" />
-                            <TextBlock Text="Кроссплатформенная версия" FontSize="11" Foreground="{StaticResource BrandTextSubtle}" HorizontalAlignment="Center" />
+                            <TextBlock Name="VersionTextBlock" FontSize="11" Foreground="{StaticResource BrandTextSubtle}" HorizontalAlignment="Center" />
+                            <TextBlock Text="Разработка: Васильев Никита" FontSize="10" Foreground="{StaticResource BrandTextSubtle}" HorizontalAlignment="Center" />
                         </StackPanel>
                     </Border>
                 </Grid>
