@@ -10,12 +10,11 @@ namespace FanShop.ViewModels;
 public partial class EmployeeViewModel : BaseViewModel
 {
     private readonly MainWindowViewModel? _mainWindowViewModel;
+    private static readonly EmployeeNameComparer NameComparer = new();
 
     public EmployeeViewModel()
     {
-        var (employeesSorted, employeesWithStats) = RefreshEmployees();
-        Employees = new ObservableCollection<Employee>(employeesSorted);
-        EmployeesWithStats = new ObservableCollection<Employee>(employeesWithStats);
+        RefreshEmployees();
     }
 
     [ObservableProperty]
@@ -31,10 +30,7 @@ public partial class EmployeeViewModel : BaseViewModel
     {
         _mainWindowViewModel = mainWindowViewModel;
 
-        var (employeesSorted, employeesWithStats) = RefreshEmployees();
-
-        Employees = new ObservableCollection<Employee>(employeesSorted);
-        EmployeesWithStats = new ObservableCollection<Employee>(employeesWithStats);
+        RefreshEmployees();
     }
 
     partial void OnSelectedEmployeeChanged(Employee? value)
@@ -114,14 +110,8 @@ public partial class EmployeeViewModel : BaseViewModel
         using var context = new AppDbContext();
         List<Employee> allEmployees = context.Employees.ToList();
 
-        List<Employee> employeesSorted = allEmployees.Select(emp => new
-            {
-                Employee = emp
-            })
-            .OrderBy(x => x.Employee.Surname)
-            .ThenBy(x => x.Employee.FirstName)
-            .ThenBy(x => x.Employee.LastName)
-            .Select(x => x.Employee)
+        List<Employee> employeesSorted = allEmployees
+            .OrderBy(employee => employee, NameComparer)
             .ToList();
 
         List<Employee> employeesWithStats = allEmployees.Select(emp => new
@@ -130,18 +120,43 @@ public partial class EmployeeViewModel : BaseViewModel
                 WorkDaysCount = GetWorkDaysCount(emp.EmployeeID, context)
             })
             .OrderByDescending(x => x.WorkDaysCount)
-            .ThenBy(x => x.Employee.Surname)
+            .ThenBy(x => x.Employee, NameComparer)
             .Select(x => x.Employee)
             .ToList();
 
-        Employees.Clear();
-        foreach (var employee in employeesSorted)
-            Employees.Add(employee);
-
-        EmployeesWithStats.Clear();
-        foreach (var employee in employeesWithStats)
-            EmployeesWithStats.Add(employee);
+        Employees = new ObservableCollection<Employee>(employeesSorted);
+        EmployeesWithStats = new ObservableCollection<Employee>(employeesWithStats);
 
         return (employeesSorted, employeesWithStats);
+    }
+
+    public void SelectEmployeeById(int employeeId)
+    {
+        if (employeeId == 0)
+        {
+            return;
+        }
+
+        SelectedEmployee = Employees.FirstOrDefault(employee => employee.EmployeeID == employeeId);
+    }
+
+    private sealed class EmployeeNameComparer : IComparer<Employee>
+    {
+        public int Compare(Employee? x, Employee? y)
+        {
+            if (ReferenceEquals(x, y)) return 0;
+            if (x is null) return -1;
+            if (y is null) return 1;
+
+            return StringComparer.Ordinal.Compare(GetSortKey(x), GetSortKey(y));
+        }
+
+        private static string GetSortKey(Employee employee)
+        {
+            return $"{Normalize(employee.Surname)}\u0000{Normalize(employee.FirstName)}\u0000{Normalize(employee.LastName)}";
+        }
+
+        private static string Normalize(string? value) =>
+            (value ?? string.Empty).Trim().ToUpperInvariant().Replace('Ё', 'Е');
     }
 }

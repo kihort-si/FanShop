@@ -40,8 +40,7 @@
         <Style Selector="UserControl">
             <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
         </Style>
-
-        <!-- Default brand button -->
+        
         <Style Selector="Button">
             <Setter Property="Background" Value="{StaticResource BrandPrimary}" />
             <Setter Property="Foreground" Value="White" />
@@ -65,7 +64,6 @@
             <Setter Property="Foreground" Value="White" />
         </Style>
 
-        <!-- Danger button (destructive actions) -->
         <Style Selector="Button.danger">
             <Setter Property="Background" Value="{StaticResource BrandDanger}" />
         </Style>
@@ -78,7 +76,6 @@
             <Setter Property="Foreground" Value="White" />
         </Style>
 
-        <!-- Ghost button (transparent background, brand text) -->
         <Style Selector="Button.ghost">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Foreground" Value="{StaticResource BrandText}" />
@@ -93,7 +90,6 @@
             <Setter Property="Foreground" Value="{StaticResource BrandText}" />
         </Style>
 
-        <!-- Chrome buttons in custom title bar -->
         <Style Selector="Button.chrome">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Foreground" Value="White" />
@@ -121,7 +117,6 @@
             <Setter Property="Foreground" Value="White" />
         </Style>
 
-        <!-- Tab bar styling -->
         <Style Selector="TabControl">
             <Setter Property="Padding" Value="0" />
             <Setter Property="Background" Value="Transparent" />
@@ -139,17 +134,16 @@
             <Setter Property="FontWeight" Value="SemiBold" />
         </Style>
 
-        <!-- Tab close button -->
         <Style Selector="Button.tab-close">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Foreground" Value="{StaticResource BrandTextSubtle}" />
-            <Setter Property="Width" Value="20" />
-            <Setter Property="Height" Value="20" />
-            <Setter Property="MinWidth" Value="20" />
-            <Setter Property="MinHeight" Value="20" />
-            <Setter Property="Padding" Value="0" />
+            <Setter Property="Width" Value="12" />
+            <Setter Property="Height" Value="12" />
+            <Setter Property="MinWidth" Value="12" />
+            <Setter Property="MinHeight" Value="12" />
+            <Setter Property="Padding" Value="1, 0, 0, 0" />
             <Setter Property="CornerRadius" Value="10" />
-            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontSize" Value="8" />
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="HorizontalContentAlignment" Value="Center" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -163,7 +157,6 @@
             <Setter Property="Foreground" Value="White" />
         </Style>
 
-        <!-- Calendar day cell button (no hover frame) -->
         <Style Selector="Button.cell">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
@@ -187,7 +180,6 @@
             <Setter Property="BorderBrush" Value="{StaticResource BrandPrimary}" />
         </Style>
 
-        <!-- Side menu list buttons -->
         <Style Selector="Button.menu-item">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Foreground" Value="{StaticResource BrandText}" />

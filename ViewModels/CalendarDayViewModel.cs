@@ -1,11 +1,10 @@
 using System.Collections.ObjectModel;
-using System.Text.Json.Serialization;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FanShop.Models;
 using FanShop.Services;
-using FanShop.View;
 using FanShop.Windows;
 using Microsoft.EntityFrameworkCore;
 
@@ -134,12 +133,12 @@ public partial class CalendarDayViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private void AddEmployees()
+    private async Task AddEmployees()
     {
         using var context = new AppDbContext();
         var employeeWindowViewModel = new EmployeeViewModel();
 
-        var availableEmployees = employeeWindowViewModel.Employees
+        var availableEmployees = employeeWindowViewModel.EmployeesWithStats
             .Where(e => !Employees.Any(existing => existing.Employee.EmployeeID == e.EmployeeID))
             .ToList();
 
@@ -151,17 +150,10 @@ public partial class CalendarDayViewModel : BaseViewModel
             ParentViewModel = this
         };
 
-        SetBlackoutMode(true);
-
-        selectEmployeeWindow.Closed += (s, e) =>
+        var owner = GetCurrentDayDetailsOwner();
+        if (owner != null)
         {
-            SetBlackoutMode(false);
-        };
-
-        if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop &&
-            desktop.MainWindow != null)
-        {
-            selectEmployeeWindow.ShowDialog(desktop.MainWindow);
+            await selectEmployeeWindow.ShowDialog(owner);
         }
         else
         {
@@ -206,11 +198,16 @@ public partial class CalendarDayViewModel : BaseViewModel
     private bool CanRemoveEmployees => SelectedEmployee != null;
 
     [RelayCommand(CanExecute = nameof(CanPrintPass))]
-    private void PrintPass()
+    private async Task PrintPass()
     {
         if (Employees.Count == 0)
         {
-            // Show notification - will be handled by view
+            return;
+        }
+
+        var owner = GetCurrentDayDetailsOwner();
+        if (!await PassTemplateService.EnsureTemplateAsync(owner))
+        {
             return;
         }
 
@@ -254,6 +251,19 @@ public partial class CalendarDayViewModel : BaseViewModel
     public void SetBlackoutMode(bool isBlackout)
     {
         IsBlackoutMode = isBlackout;
+    }
+
+    private Window? GetCurrentDayDetailsOwner()
+    {
+        if (Avalonia.Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            return null;
+        }
+
+        return desktop.Windows
+            .OfType<DayDetailsWindow>()
+            .LastOrDefault(window => ReferenceEquals(window.DataContext, this))
+            ?? desktop.MainWindow;
     }
 
     [ObservableProperty]

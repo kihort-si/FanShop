@@ -1,7 +1,9 @@
 using System.Collections.ObjectModel;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FanShop.Services;
 using FanTabItem = FanShop.Utils.TabItem;
 using FanShop.View;
 
@@ -49,11 +51,27 @@ public partial class MainWindowViewModel : BaseViewModel
         await LoadMatchesFromFirebase();
     }
 
+    [RelayCommand]
+    private async Task OpenPassTemplate()
+    {
+        await PassTemplateService.OpenTemplateAsync(GetMainWindow());
+
+        IsMenuOpen = false;
+        IsBlackoutMode = false;
+    }
+
     public IRelayCommand<object?> CloseTabCommand { get; }
 
     public void SetBlackoutMode(bool isBlackout)
     {
         IsBlackoutMode = isBlackout;
+    }
+
+    private static Window? GetMainWindow()
+    {
+        return Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
+            ? desktop.MainWindow
+            : null;
     }
 
     public void OpenMainTab()
@@ -128,6 +146,24 @@ public partial class MainWindowViewModel : BaseViewModel
     }
 
     [RelayCommand]
+    private void OpenEmployeeCostAnalyticsTab()
+    {
+        var analyticsTab = new EmployeeCostAnalyticsControl
+        {
+            DataContext = new EmployeeCostAnalyticsViewModel(this)
+        };
+
+        var tabItem = new FanTabItem
+        {
+            Title = "Аналитика затрат",
+            Content = analyticsTab,
+            IsClosable = true
+        };
+
+        OpenTab(tabItem);
+    }
+
+    [RelayCommand]
     private void OpenFaqTab()
     {
         var faqWindowTab = new FaqControl();
@@ -159,7 +195,18 @@ public partial class MainWindowViewModel : BaseViewModel
     {
         if (parameter is FanTabItem tab)
         {
+            var closedTabIndex = OpenWindows.IndexOf(tab);
+            var wasSelected = ReferenceEquals(SelectedWindow, tab);
+
             OpenWindows.Remove(tab);
+
+            if (wasSelected)
+            {
+                SelectedWindow = OpenWindows.Count == 0
+                    ? null
+                    : OpenWindows[Math.Min(closedTabIndex, OpenWindows.Count - 1)];
+            }
+
             OnPropertyChanged(nameof(HasOpenWindows));
         }
     }
@@ -193,7 +240,7 @@ public partial class MainWindowViewModel : BaseViewModel
         }
     }
 
-    public void CloseTabRequest(object? viewModel)
+    public void CloseTabRequest(object? viewModel, object? fallbackViewModel = null)
     {
         var tabToClose = OpenWindows.FirstOrDefault(tab =>
             tab.Content is Control element && element.DataContext == viewModel);
@@ -201,6 +248,22 @@ public partial class MainWindowViewModel : BaseViewModel
         if (tabToClose != null)
         {
             CloseTab(tabToClose);
+        }
+
+        if (fallbackViewModel != null)
+        {
+            SelectTabByViewModel(fallbackViewModel);
+        }
+    }
+
+    private void SelectTabByViewModel(object viewModel)
+    {
+        var fallbackTab = OpenWindows.FirstOrDefault(tab =>
+            tab.Content is Control element && ReferenceEquals(element.DataContext, viewModel));
+
+        if (fallbackTab != null)
+        {
+            SelectedWindow = fallbackTab;
         }
     }
 

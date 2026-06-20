@@ -141,7 +141,6 @@ public partial class DayTasksWindowViewModel : BaseViewModel
     [RelayCommand]
     private void CloseWindow()
     {
-        // Window will be closed by the view
     }
 
     [RelayCommand(CanExecute = nameof(CanSaveSelectedTask))]
