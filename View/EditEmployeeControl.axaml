@@ -4,12 +4,37 @@
     <ScrollViewer>
         <StackPanel Margin="24" Spacing="12" MaxWidth="720">
             <TextBlock Text="Карточка сотрудника" FontSize="24" FontWeight="Bold" />
-            <TextBox Watermark="Фамилия" Text="{Binding Surname}" />
-            <TextBox Watermark="Имя" Text="{Binding FirstName}" />
-            <TextBox Watermark="Отчество" Text="{Binding LastName}" />
-            <TextBox Watermark="Дата рождения" Text="{Binding DateOfBirth}" />
-            <TextBox Watermark="Место рождения" Text="{Binding PlaceOfBirth}" />
-            <TextBox Watermark="Паспорт" Text="{Binding Passport}" />
+            <TextBox x:Name="SurnameTextBox"
+                     Watermark="Фамилия"
+                     Text="{Binding Surname}"
+                     KeyDown="InputTextBox_KeyDown" />
+            <TextBox x:Name="FirstNameTextBox"
+                     Watermark="Имя"
+                     Text="{Binding FirstName}"
+                     KeyDown="InputTextBox_KeyDown" />
+            <TextBox x:Name="LastNameTextBox"
+                     Watermark="Отчество"
+                     Text="{Binding LastName}"
+                     KeyDown="InputTextBox_KeyDown" />
+            <TextBox x:Name="DateOfBirthTextBox"
+                     Watermark="Дата рождения"
+                     MaxLength="10"
+                     Text="{Binding DateOfBirth}"
+                     KeyDown="InputTextBox_KeyDown"
+                     TextChanged="DateOfBirthTextBox_TextChanged" />
+            <TextBlock Text="{Binding DateOfBirthError}"
+                       Foreground="#D64545"
+                       FontSize="12"
+                       Margin="2,-8,0,0"
+                       IsVisible="{Binding IsDateOfBirthErrorVisible}" />
+            <TextBox x:Name="PlaceOfBirthTextBox"
+                     Watermark="Место рождения"
+                     Text="{Binding PlaceOfBirth}"
+                     KeyDown="InputTextBox_KeyDown" />
+            <TextBox x:Name="PassportTextBox"
+                     Watermark="Паспорт"
+                     Text="{Binding Passport}"
+                     KeyDown="InputTextBox_KeyDown" />
             <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
                 <Button Content="Сохранить" Command="{Binding SaveEditedEmployeeCommand}" />
                 <Button Classes="ghost" Content="Отмена" Command="{Binding CancelCommand}" />

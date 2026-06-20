@@ -15,6 +15,7 @@
                     <DataGrid ItemsSource="{Binding Employees}"
                               SelectedItem="{Binding SelectedEmployee}"
                               AutoGenerateColumns="False"
+                              CanUserSortColumns="False"
                               IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Фамилия" Binding="{Binding Surname}" Width="*" />
@@ -31,6 +32,7 @@
                     <TextBlock Text="По активности за 30 дней" FontSize="18" FontWeight="Bold" />
                     <DataGrid ItemsSource="{Binding EmployeesWithStats}"
                               AutoGenerateColumns="False"
+                              CanUserSortColumns="False"
                               IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Фамилия" Binding="{Binding Surname}" Width="*" />

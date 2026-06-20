@@ -4,10 +4,18 @@
         Width="860"
         Height="560"
         CanResize="False"
+        SystemDecorations="None"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent"
         Title="Выбор сотрудника">
-    <Grid RowDefinitions="Auto,*,Auto" Margin="18">
+    <Border Margin="18"
+            Padding="18"
+            Background="White"
+            CornerRadius="16"
+            BoxShadow="0 0 34 0 #40000000">
+    <Grid RowDefinitions="Auto,*,Auto">
         <StackPanel Margin="0,0,0,12">
             <TextBlock Text="Добавление сотрудника" FontSize="24" FontWeight="Bold" />
             <TextBlock Text="Выберите сотрудника и тип занятости" Foreground="#6E7E8F" />
@@ -19,6 +27,7 @@
                           ItemsSource="{Binding Employees}"
                           SelectedItem="{Binding SelectedEmployee}"
                           AutoGenerateColumns="False"
+                          CanUserSortColumns="False"
                           IsReadOnly="True"
                           DoubleTapped="EmployeesGrid_DoubleTapped">
                     <DataGrid.Columns>
@@ -46,4 +55,5 @@
             <Button Classes="ghost" Content="Отмена" Click="CancelButton_Click" />
         </StackPanel>
     </Grid>
+    </Border>
 </Window>

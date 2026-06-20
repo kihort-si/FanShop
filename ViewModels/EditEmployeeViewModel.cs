@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FanShop.Models;
 using FanShop.Services;
+using System.Globalization;
 
 namespace FanShop.ViewModels;
 
@@ -24,6 +25,8 @@ public partial class EditEmployeeViewModel : BaseViewModel
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SaveEditedEmployeeCommand))]
+    [NotifyPropertyChangedFor(nameof(DateOfBirthError))]
+    [NotifyPropertyChangedFor(nameof(IsDateOfBirthErrorVisible))]
     private string _dateOfBirth = string.Empty;
 
     [ObservableProperty]
@@ -47,9 +50,13 @@ public partial class EditEmployeeViewModel : BaseViewModel
         !string.IsNullOrWhiteSpace(Surname) &&
         !string.IsNullOrWhiteSpace(FirstName) &&
         !string.IsNullOrWhiteSpace(LastName) &&
-        !string.IsNullOrWhiteSpace(DateOfBirth) &&
+        IsValidDateOfBirth(DateOfBirth) &&
         !string.IsNullOrWhiteSpace(PlaceOfBirth) &&
         !string.IsNullOrWhiteSpace(Passport);
+
+    public string DateOfBirthError => GetDateOfBirthError(DateOfBirth);
+
+    public bool IsDateOfBirthErrorVisible => !string.IsNullOrEmpty(DateOfBirthError);
 
     public EditEmployeeViewModel(Employee selectedEmployee, MainWindowViewModel mainWindowViewModel,
         EmployeeViewModel employeeViewModel)
@@ -126,6 +133,8 @@ public partial class EditEmployeeViewModel : BaseViewModel
         try
         {
             using var context = new AppDbContext();
+            var savedEmployeeId = SelectedEmployee?.EmployeeID ?? 0;
+
             if (EditableEmployee != null)
             {
                 if (SelectedEmployee == null)
@@ -155,9 +164,11 @@ public partial class EditEmployeeViewModel : BaseViewModel
                 }
 
                 context.SaveChanges();
+                savedEmployeeId = SelectedEmployee?.EmployeeID ?? EditableEmployee.EmployeeID;
 
                 _employeeViewModel.RefreshEmployees();
-                _mainWindowViewModel.CloseTabRequest(this);
+                _employeeViewModel.SelectEmployeeById(savedEmployeeId);
+                _mainWindowViewModel.CloseTabRequest(this, _employeeViewModel);
             }
         }
         catch (Exception ex)
@@ -166,9 +177,35 @@ public partial class EditEmployeeViewModel : BaseViewModel
         }
     }
 
+    private static bool IsValidDateOfBirth(string value)
+    {
+        return string.IsNullOrEmpty(GetDateOfBirthError(value));
+    }
+
+    private static string GetDateOfBirthError(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return string.Empty;
+        }
+
+        if (!DateTime.TryParseExact(value, "dd.MM.yyyy", CultureInfo.InvariantCulture,
+                DateTimeStyles.None, out var dateOfBirth))
+        {
+            return "Введите реальную дату в формате ДД.ММ.ГГГГ";
+        }
+
+        if (dateOfBirth.Date >= DateTime.Today)
+        {
+            return "Дата рождения должна быть меньше сегодняшней даты";
+        }
+
+        return string.Empty;
+    }
+
     [RelayCommand]
     private void Cancel()
     {
-        _mainWindowViewModel.CloseTabRequest(this);
+        _mainWindowViewModel.CloseTabRequest(this, _employeeViewModel);
     }
 }

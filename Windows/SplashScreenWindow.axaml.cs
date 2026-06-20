@@ -12,6 +12,8 @@ public partial class SplashScreenWindow : Window
     {
         InitializeComponent();
         DataContext = ViewModel;
+        var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+        VersionTextBlock.Text = $"Версия {version?.Major}.{version?.Minor}.{version?.Build}";
     }
 
     protected override void OnClosed(EventArgs e)

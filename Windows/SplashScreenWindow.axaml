@@ -30,7 +30,7 @@
 
             <StackPanel Grid.Row="0" HorizontalAlignment="Left">
                 <Image Source="/Resources/fanshop_logo_blue_and_light_blue.png" Margin="0, 0, 0, 12" Width="260"/>
-                <TextBlock Text="Версия 2.0.0"
+                <TextBlock Name="VersionTextBlock"
                            FontSize="12"
                            FontWeight="Bold"
                            Foreground="#666666"/>
