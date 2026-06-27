@@ -19,6 +19,9 @@
         <SolidColorBrush x:Key="BrandDanger" Color="#D64545" />
         <SolidColorBrush x:Key="BrandDangerHover" Color="#E25C5C" />
         <SolidColorBrush x:Key="BrandDangerPressed" Color="#B23838" />
+        <SolidColorBrush x:Key="BrandExcel" Color="#00972D" />
+        <SolidColorBrush x:Key="BrandExcelHover" Color="#00C73C" />
+        <SolidColorBrush x:Key="BrandExcelPressed" Color="#005F1C" />
 
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <converters:ZeroToVisibilityConverter x:Key="ZeroToVisibilityConverter" />
@@ -88,6 +91,18 @@
         <Style Selector="Button.ghost:pressed /template/ ContentPresenter">
             <Setter Property="Background" Value="#D7E9F6" />
             <Setter Property="Foreground" Value="{StaticResource BrandText}" />
+        </Style>
+        
+        <Style Selector="Button.excel">
+            <Setter Property="Background" Value="{StaticResource BrandExcel}" />
+        </Style>
+        <Style Selector="Button.excel:pointerover /template/ ContentPresenter">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="{StaticResource BrandExcelHover}" />
+        </Style>
+        <Style Selector="Button.excel:pressed /template/ ContentPresenter">
+            <Setter Property="Foreground" Value="#D7E9F6" />
+            <Setter Property="Background" Value="{StaticResource BrandExcelPressed}" />
         </Style>
 
         <Style Selector="Button.chrome">

@@ -145,7 +145,7 @@
                             <Button Classes="menu-item" Command="{Binding OpenEmployeeCostAnalyticsTabCommand}">
                                 <StackPanel>
                                     <TextBlock Text="Аналитика затрат" FontWeight="SemiBold" />
-                                    <TextBlock Text="ЗП, матчи и объяснение нагрузки" FontSize="12" Foreground="{StaticResource BrandTextSubtle}" />
+                                    <TextBlock Text="Заработная плата и матчи" FontSize="12" Foreground="{StaticResource BrandTextSubtle}" />
                                 </StackPanel>
                             </Button>
                             <Button Classes="menu-item" Command="{Binding OpenSettingsTabCommand}">

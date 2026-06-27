@@ -11,10 +11,24 @@
                 </StackPanel>
             </Grid>
             
-            <Grid ColumnDefinitions="Auto,Auto,Auto" Margin="0,8,0,16">
-                <DatePicker Grid.Column="0" SelectedDate="{Binding StartDateSelection}" />
-                <DatePicker Grid.Column="1" Margin="8,0,0,0" SelectedDate="{Binding EndDateSelection}" />
-                <Button Grid.Column="2" Margin="8,0,0,0" Content="Обновить" Command="{Binding UpdateAnalyticsCommand}" />
+            <Grid ColumnDefinitions="Auto,Auto,Auto,Auto" Margin="0,8,0,16">
+                <DatePicker Grid.Column="0"
+                            SelectedDate="{Binding StartDateSelection}" />
+
+                <DatePicker Grid.Column="1"
+                            Margin="8,0,0,0"
+                            SelectedDate="{Binding EndDateSelection}" />
+
+                <Button Grid.Column="2"
+                        Margin="8,0,0,0"
+                        Content="Обновить"
+                        Command="{Binding UpdateAnalyticsCommand}" />
+
+                <Button Grid.Column="3"
+                        Classes="excel"
+                        Margin="8,0,0,0"
+                        Content="Экспорт Excel"
+                        Click="ExportButton_Click" />
             </Grid>
 
             <ItemsControl ItemsSource="{Binding KpiItems}">
@@ -40,7 +54,10 @@
                 <Border Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="14" Padding="14" Margin="0,0,8,8">
                     <Grid RowDefinitions="Auto,*">
                         <TextBlock Text="Динамика затрат по месяцам" FontSize="18" FontWeight="Bold" />
-                        <lvc:CartesianChart Grid.Row="1" Series="{Binding SalaryByMonthSeries}" XAxes="{Binding SalaryByMonthXAxes}" />
+                        <lvc:CartesianChart Grid.Row="1"
+                                            Series="{Binding SalaryByMonthSeries}"
+                                            XAxes="{Binding SalaryByMonthXAxes}"
+                                            YAxes="{Binding SalaryByMonthYAxes}" />
                     </Grid>
                 </Border>
 
@@ -54,6 +71,26 @@
                 <Border Grid.Row="1" Grid.ColumnSpan="2" Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="14" Padding="14" Margin="0,8,0,0">
                     <Grid RowDefinitions="Auto,*">
                         <TextBlock Text="Нагрузка по матчам" FontSize="18" FontWeight="Bold" />
+                        <ItemsControl ItemsSource="{Binding MatchLegend}" Margin="0, 25">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,12,4">
+                                        <Border Width="16"
+                                                Height="16"
+                                                Background="{Binding Color}" />
+
+                                        <TextBlock Margin="6,0,0,0"
+                                                   Text="{Binding Text}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                         <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
                             <lvc:CartesianChart MinWidth="{Binding MatchLoadChartWidth}"
                                                 Series="{Binding MatchLoadSeries}"
@@ -90,7 +127,23 @@
                     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
                         <DataGrid ItemsSource="{Binding MatchAnalyses}" AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="True" MinHeight="220">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Матч" Binding="{Binding MatchTitle}" Width="200" />
+                                <DataGridTemplateColumn Header="Матч" Width="220" SortMemberPath="MatchDate">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{Binding HighlightBackground}"
+                                                    BorderBrush="{Binding HighlightBorder}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="8"
+                                                    Padding="8,6"
+                                                    Margin="0,2">
+                                                <StackPanel Spacing="2">
+                                                    <TextBlock Text="{Binding MatchTitle}" FontWeight="SemiBold" />
+                                                    <TextBlock Text="{Binding Situation}" FontSize="11" Foreground="#5F6C78" TextWrapping="Wrap" />
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                                 <DataGridTextColumn Header="Окно" Binding="{Binding PreparationWindow}" Width="120" />
                                 <DataGridTextColumn Header="Дней" Binding="{Binding WindowDays}" Width="90" />
                                 <DataGridTextColumn Header="Раб. дней" Binding="{Binding WorkDays}" Width="110" />
@@ -108,7 +161,7 @@
                 <StackPanel Spacing="10">
                     <TextBlock Text="Сотрудники: оплачиваемые, вне матчей и вне ЗП" FontSize="18" FontWeight="Bold" />
                     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                        <DataGrid MinWidth="1280" ItemsSource="{Binding EmployeeSummaries}" AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="False" MinHeight="220">
+                        <DataGrid MinWidth="1280" ItemsSource="{Binding EmployeeSummaries}" AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="True" MinHeight="220">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Сотрудник" Binding="{Binding EmployeeName}" Width="300" />
                                 <DataGridTextColumn Header="В ЗП" Binding="{Binding PaidShifts}" Width="80" />
@@ -127,7 +180,7 @@
                 <StackPanel Spacing="10">
                     <TextBlock Text="Расшифровка каждого рабочего дня" FontSize="18" FontWeight="Bold" />
                     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                        <DataGrid MinWidth="1500" ItemsSource="{Binding WorkDayExplanations}" AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="False" MinHeight="360">
+                        <DataGrid MinWidth="1500" ItemsSource="{Binding WorkDayExplanations}" AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="True" MinHeight="360">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Дата" Binding="{Binding DateText}" Width="110" />
                                 <DataGridTextColumn Header="Сотрудник" Binding="{Binding EmployeeName}" Width="300" />
