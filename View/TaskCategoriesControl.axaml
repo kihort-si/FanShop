@@ -17,7 +17,13 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="2*" />
                     <DataGridTextColumn Header="Описание" Binding="{Binding Description}" Width="3*" />
-                    <DataGridTextColumn Header="Цвет" Binding="{Binding Color}" Width="*" />
+                    <DataGridTemplateColumn Header="Цвет" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Background="{Binding Color}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn Header="Задача по умолчанию" Binding="{Binding DefaultTask}" Width="2*" />
                 </DataGrid.Columns>
             </DataGrid>

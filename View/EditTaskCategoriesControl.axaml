@@ -6,11 +6,66 @@
             <TextBlock Text="Категория задач" FontSize="24" FontWeight="Bold" />
             <TextBox Watermark="Название" Text="{Binding Name}" />
             <TextBox Watermark="Описание" Text="{Binding Description}" AcceptsReturn="True" Height="120" />
-            <Grid ColumnDefinitions="*,Auto,Auto">
-                <TextBox Grid.Column="0" Watermark="#RRGGBB" Text="{Binding Color}" />
-                <Button Grid.Column="1" Margin="8,0,0,0" Content="Случайный цвет" Command="{Binding GenerateRandomColorCommand}" />
-                <Button Grid.Column="2" Margin="8,0,0,0" Content="Исправить цвет" Command="{Binding OpenColorPickerCommand}" />
-            </Grid>
+            <StackPanel Spacing="8">
+
+                <Grid ColumnDefinitions="*,28,Auto,Auto">
+
+                    <TextBox Grid.Column="0"
+                             Watermark="#RRGGBB"
+                             Text="{Binding Color}" />
+
+                    <Border Grid.Column="1"
+                            Margin="8,2"
+                            Width="20"
+                            Height="20"
+                            CornerRadius="4"
+                            BorderBrush="Gray"
+                            BorderThickness="1"
+                            Background="{Binding Color}" />
+
+                    <Button Grid.Column="2"
+                            Margin="8,0,0,0"
+                            Content="Случайный цвет"
+                            Command="{Binding GenerateRandomColorCommand}" />
+
+                    <Button Grid.Column="3"
+                            Margin="8,0,0,0"
+                            Content="Выбрать цвет"
+                            Command="{Binding OpenColorPickerCommand}" />
+
+                </Grid>
+
+                <ItemsControl IsVisible="{Binding IsPaletteOpen}"
+                              ItemsSource="{Binding PaletteColors}">
+
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="5"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+
+                            <Button Width="40"
+                                    Height="40"
+                                    Margin="4"
+                                    Padding="0"
+                                    Background="{Binding}"
+                                    BorderBrush="Gray"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Command="{Binding DataContext.SelectColorCommand,
+                                          RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding}" />
+
+                        </DataTemplate>
+
+                    </ItemsControl.ItemTemplate>
+
+                </ItemsControl>
+
+            </StackPanel>
             <TextBox Watermark="Задача по умолчанию" Text="{Binding DefaultTask}" />
             <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
                 <Button Content="Сохранить" Command="{Binding SaveEditedCategoryCommand}" />

@@ -1,0 +1,33 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="FanShop.Windows.ColorPaletteWindow"
+        Width="340"
+        Height="250"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Title="Выбор цвета">
+
+    <UniformGrid Columns="5" Rows="4" Margin="16">
+        <ItemsControl ItemsSource="{Binding Colors}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="5"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Button
+                        Width="48"
+                        Height="48"
+                        Margin="4"
+                        Background="{Binding}"
+                        Command="{Binding $parent[Window].DataContext.SelectColorCommand}"
+                        CommandParameter="{Binding}">
+                    </Button>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </UniformGrid>
+
+</Window>
