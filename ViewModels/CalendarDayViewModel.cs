@@ -217,11 +217,12 @@ public partial class CalendarDayViewModel : BaseViewModel
     private bool CanPrintPass => Employees.Count > 0;
 
     [RelayCommand]
-    private void DailySchedule()
+    private async void DailySchedule()
     {
         var dayTasksWindow = new DayTasksWindow
         {
-            DataContext = new DayTasksWindowViewModel(Date)
+            DataContext = new DayTasksWindowViewModel(Date),
+            ParentViewModel = this
         };
 
         dayTasksWindow.Closed += (s, e) =>
@@ -231,17 +232,17 @@ public partial class CalendarDayViewModel : BaseViewModel
             OnPropertyChanged(nameof(IsAdditionalTasksTextVisible));
         };
 
-        if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop &&
-            desktop.MainWindow != null)
+        var owner = GetCurrentDayDetailsOwner();
+        if (owner != null)
         {
-            dayTasksWindow.ShowDialog(desktop.MainWindow);
+            await dayTasksWindow.ShowDialog(owner);
         }
         else
         {
             dayTasksWindow.Show();
         }
     }
-
+    
     [RelayCommand]
     private void CloseWindow()
     {

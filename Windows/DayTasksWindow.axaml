@@ -30,35 +30,96 @@
                           SelectedItem="{Binding SelectedTask}"
                           AutoGenerateColumns="False">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Начало" Binding="{Binding StartTimeText}" Width="90" />
-                        <DataGridTextColumn Header="Конец" Binding="{Binding EndTimeText}" Width="90" />
-                        <DataGridTextColumn Header="Название" Binding="{Binding Title}" Width="2*" />
-                        <DataGridTextColumn Header="Описание" Binding="{Binding Comment}" Width="2*" />
-                        <DataGridTextColumn Header="Категория" Binding="{Binding Category.Name}" Width="*" />
+                        <DataGridTextColumn Header="Начало" Binding="{Binding StartTimeText}" Width="50" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Конец" Binding="{Binding EndTimeText}" Width="50" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Название" Binding="{Binding Title}" Width="90" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Описание" Binding="{Binding Comment}" Width="90" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Категория" Binding="{Binding Category.Name}" Width="*" IsReadOnly="True" />
                         <DataGridTextColumn Header="Длительность" Binding="{Binding Duration, Converter={StaticResource TimeSpanFormatConverter}}" Width="*" IsReadOnly="True" />
                     </DataGrid.Columns>
                 </DataGrid>
             </Border>
 
-            <Border Grid.Column="1" Margin="12,0,0,0" Background="#F9FBFD" BorderBrush="{StaticResource BrandBorder}" BorderThickness="1" CornerRadius="12" Padding="12">
-                <StackPanel Spacing="10">
-                    <TextBlock Text="Редактор задачи" FontSize="18" FontWeight="Bold" />
-                    <TextBox Watermark="Название" Text="{Binding SelectedTask.Title}" />
-                    <TextBox Watermark="Описание" Text="{Binding SelectedTask.Comment}" AcceptsReturn="True" Height="100" />
-                    <Grid ColumnDefinitions="*,*">
-                        <TextBox Grid.Column="0" Watermark="Начало" Text="{Binding SelectedTask.StartTimeText}" />
-                        <TextBox Grid.Column="1" Margin="8,0,0,0" Watermark="Конец" Text="{Binding SelectedTask.EndTimeText}" />
-                    </Grid>
-                    <ComboBox ItemsSource="{Binding TaskCategories}"
-                              SelectedItem="{Binding SelectedTask.Category}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Name}" />
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                    <Button Content="Сохранить изменения" Command="{Binding SaveSelectedTaskCommand}" />
+            <Border Grid.Column="1"
+                    Margin="12,0,0,0"
+                    Background="#F9FBFD"
+                    BorderBrush="{StaticResource BrandBorder}"
+                    BorderThickness="1"
+                    CornerRadius="12"
+                    Padding="20"
+                    IsVisible="{Binding !HasTasks}">
+                
+                <StackPanel
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Spacing="16">
+
+                    <TextBlock
+                        Text="На этот день пока нет задач"
+                        FontSize="22"
+                        FontWeight="Bold"
+                        HorizontalAlignment="Center"/>
+
+                    <TextBlock
+                        Text="Создайте первую задачу для этого дня."
+                        Foreground="Gray"
+                        HorizontalAlignment="Center"/>
+
+                    <Button
+                        Content="Добавить задачу"
+                        Command="{Binding AddTaskCommand}"
+                        HorizontalAlignment="Center"/>
                 </StackPanel>
+            </Border>
+            
+            <Border Grid.Column="1"
+                    Margin="12,0,0,0"
+                    Background="#F9FBFD"
+                    BorderBrush="{StaticResource BrandBorder}"
+                    BorderThickness="1"
+                    CornerRadius="12"
+                    Padding="20"
+                    IsVisible="{Binding HasTasks}">
+                <Grid>
+                    <StackPanel
+                        IsVisible="{Binding !HasSelectedTask}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+
+                        <TextBlock
+                            Text="Выберите задачу"
+                            FontSize="20"
+                            FontWeight="Bold"/>
+
+                        <TextBlock
+                            Text="Для просмотра и редактирования"
+                            Foreground="Gray"/>
+
+                    </StackPanel>
+
+                    <StackPanel
+                        IsVisible="{Binding HasSelectedTask}"
+                        Spacing="10">
+                        <TextBlock Text="Редактор задачи" FontSize="18" FontWeight="Bold" />
+                        <TextBox Watermark="Название" Text="{Binding SelectedTask.Title}" />
+                        <TextBox Watermark="Описание" Text="{Binding SelectedTask.Comment}" AcceptsReturn="True" Height="100" />
+                        <Grid ColumnDefinitions="*,Auto,*,Auto">
+                            <TextBox Grid.Column="0" Watermark="Начало" Text="{Binding SelectedTask.StartTimeText}" />
+                            <Button Grid.Column="1" Content="Сейчас" Command="{Binding SetStartNowCommand}" Margin="8, 0, 0, 0"/>
+                            <TextBox Grid.Column="2" Margin="8,0,0,0" Watermark="Конец" Text="{Binding SelectedTask.EndTimeText}" />
+                            <Button Grid.Column="3" Content="Сейчас" Command="{Binding SetEndNowCommand}" Margin="8, 0, 0, 0"/>
+                        </Grid>
+                        <ComboBox ItemsSource="{Binding TaskCategories}"
+                                  SelectedItem="{Binding SelectedTask.Category}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <Button Content="Сохранить изменения" Command="{Binding SaveSelectedTaskCommand}" />
+                    </StackPanel>
+                </Grid>
             </Border>
         </Grid>
 

@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FanShop.Models;
 using FanShop.Services;
+using FanShop.Windows;
 
 namespace FanShop.ViewModels;
 
@@ -28,7 +29,37 @@ public partial class EditTaskCategoriesViewModel : BaseViewModel
 
     [ObservableProperty]
     private TaskCategory? _selectedCategory;
+    
+    [ObservableProperty]
+    private bool _isPaletteOpen;
 
+    public IReadOnlyList<string> PaletteColors { get; } =
+    [
+        "#F8BBD0",
+        "#F48FB1",
+        "#CE93D8",
+        "#B39DDB",
+        "#9FA8DA",
+
+        "#90CAF9",
+        "#81D4FA",
+        "#80DEEA",
+        "#80CBC4",
+        "#A5D6A7",
+
+        "#C5E1A5",
+        "#E6EE9C",
+        "#FFF59D",
+        "#FFE082",
+        "#FFCC80",
+
+        "#FFAB91",
+        "#BCAAA4",
+        "#CFD8DC",
+        "#AED581",
+        "#4DB6AC"
+    ];
+    
     private ColorGenerator ColorGenerator { get; set; }
 
     public bool CanSaveCategory =>
@@ -125,10 +156,14 @@ public partial class EditTaskCategoriesViewModel : BaseViewModel
     [RelayCommand]
     private void OpenColorPicker()
     {
-        if (string.IsNullOrWhiteSpace(Color) || !ColorGenerator.IsValidHexColor(Color))
-        {
-            GenerateRandomColor();
-        }
+        IsPaletteOpen = !IsPaletteOpen;
+    }
+    
+    [RelayCommand]
+    private void SelectColor(string color)
+    {
+        Color = color;
+        IsPaletteOpen = false;
     }
 
     [RelayCommand]

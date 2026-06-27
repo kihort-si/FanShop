@@ -36,6 +36,10 @@ public partial class DayTasksWindowViewModel : BaseViewModel
 
     [ObservableProperty]
     private List<string> _taskSuggestions = new();
+    
+    public bool HasTasks => DayTasks.Count > 0;
+
+    public bool HasSelectedTask => SelectedTask != null;
 
     public DayTasksWindowViewModel(DateTime date)
     {
@@ -63,6 +67,8 @@ public partial class DayTasksWindowViewModel : BaseViewModel
     {
         RemoveTaskCommand.NotifyCanExecuteChanged();
         SaveSelectedTaskCommand.NotifyCanExecuteChanged();
+
+        OnPropertyChanged(nameof(HasSelectedTask));
     }
 
     private void UpdateCanSaveTask()
@@ -88,6 +94,9 @@ public partial class DayTasksWindowViewModel : BaseViewModel
 
         var categories = context.TaskCategories.ToList();
         TaskCategories = new ObservableCollection<TaskCategory>(categories);
+        
+        OnPropertyChanged(nameof(HasTasks));
+        OnPropertyChanged(nameof(HasSelectedTask));
     }
 
     [RelayCommand]
@@ -107,6 +116,9 @@ public partial class DayTasksWindowViewModel : BaseViewModel
         };
 
         DayTasks.Add(newTask);
+        SelectedTask = newTask;
+
+        OnPropertyChanged(nameof(HasTasks));
         SaveTaskChanges(newTask);
     }
 
@@ -125,6 +137,8 @@ public partial class DayTasksWindowViewModel : BaseViewModel
 
             DayTasks.Remove(SelectedTask);
             SelectedTask = null;
+
+            OnPropertyChanged(nameof(HasTasks));
         }
     }
 
@@ -151,6 +165,22 @@ public partial class DayTasksWindowViewModel : BaseViewModel
 
         SaveTaskChanges(SelectedTask);
         UpdateTaskTitleByCategory(SelectedTask);
+    }
+
+    [RelayCommand]
+    private void SetStartNow()
+    {
+        if (SelectedTask == null) return;
+
+        SelectedTask.StartTimeText = DateTime.Now.ToShortTimeString();
+    }
+
+    [RelayCommand]
+    private void SetEndNow()
+    {
+        if (SelectedTask == null) return;
+
+        SelectedTask.EndTimeText = DateTime.Now.ToShortTimeString();
     }
 
     private bool CanSaveSelectedTask => SelectedTask != null;
