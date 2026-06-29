@@ -1,59 +1,231 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
              x:Class="FanShop.View.TaskAnalyticsControl">
-    <ScrollViewer>
-        <Grid Margin="20" RowDefinitions="Auto,Auto,*" ColumnDefinitions="*,*">
-            <TextBlock Grid.ColumnSpan="2" Text="Аналитика задач" FontSize="24" FontWeight="Bold" Margin="0,0,0,16" />
 
-            <Grid Grid.Row="1" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,16">
-                <TextBlock Grid.Column="0"
-                           VerticalAlignment="Center"
-                           Text="{Binding StartDate, StringFormat='Период: {0:dd.MM.yyyy}'}" />
-                <Button Grid.Column="1" Margin="8,0,0,0" Content="Обновить" Command="{Binding UpdateAnalyticsCommand}" />
-                <Button Grid.Column="2" Margin="8,0,0,0" Content="Экспорт" Command="{Binding ExportToExcelCommand}" />
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="20" Spacing="16">
+            <Grid ColumnDefinitions="*,Auto">
+
+                <StackPanel>
+                    <TextBlock Text="Аналитика задач"
+                               FontSize="28"
+                               FontWeight="Bold"/>
+
+                    <TextBlock Text="Статистика выполнения задач, распределение времени и анализ переключений"
+                               Foreground="#6E7E8F"/>
+                </StackPanel>
+
+                <Button Grid.Column="1"
+                        Classes="ghost"
+                        Content="Закрыть"
+                        Command="{Binding CloseCommand}"/>
+
             </Grid>
 
-            <Border Grid.Row="2" Grid.Column="0" Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="12" Padding="12" Margin="0,0,8,0">
-                <StackPanel Spacing="8">
-                    <TextBlock Text="Сводка" FontSize="18" FontWeight="Bold" />
-                    <ItemsControl ItemsSource="{Binding StatisticItems}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Grid ColumnDefinitions="*,Auto">
-                                    <TextBlock Text="{Binding Label}" Foreground="#6E7E8F" />
-                                    <TextBlock Grid.Column="1" Text="{Binding Value}" FontWeight="SemiBold" />
-                                </Grid>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
-            </Border>
+            <Border Background="#F9FBFD"
+                    BorderBrush="#D7E4EF"
+                    BorderThickness="1"
+                    CornerRadius="12"
+                    Padding="12">
+                <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*">
 
-            <Border Grid.Row="2" Grid.Column="1" Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="12" Padding="12" Margin="8,0,0,0">
-                <StackPanel Spacing="8">
-                    <TextBlock Text="Прерывания по категориям" FontSize="18" FontWeight="Bold" />
-                    <ComboBox ItemsSource="{Binding AvailableCategories}" SelectedItem="{Binding SelectedCategoryForInterruptions}">
+                    <DatePicker SelectedDate="{Binding StartDateSelection}" />
+
+                    <DatePicker Grid.Column="1"
+                                Margin="8,0,0,0"
+                                SelectedDate="{Binding EndDateSelection}" />
+
+                    <Button Grid.Column="2"
+                            Margin="8,0,0,0"
+                            Content="Обновить"
+                            Command="{Binding UpdateAnalyticsCommand}"/>
+
+                    <Button Grid.Column="3"
+                            Margin="8,0,0,0"
+                            Classes="excel"
+                            Content="Экспорт Excel"
+                            Command="{Binding ExportToExcelCommand}"/>
+                </Grid>
+            </Border>
+            
+            <ItemsControl ItemsSource="{Binding StatisticItems}">
+
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+
+                    <DataTemplate>
+
+                        <Border Width="250"
+                                Margin="6"
+                                Padding="14"
+                                Background="#F9FBFD"
+                                BorderBrush="#D7E4EF"
+                                BorderThickness="1"
+                                CornerRadius="12">
+
+                            <StackPanel>
+
+                                <TextBlock Text="{Binding Value}"
+                                           FontWeight="Bold"
+                                           FontSize="22"/>
+
+                                <TextBlock Margin="0,6,0,0"
+                                           Text="{Binding Label}"
+                                           Foreground="#6E7E8F"
+                                           TextWrapping="Wrap"/>
+
+                            </StackPanel>
+
+                        </Border>
+
+                    </DataTemplate>
+
+                </ItemsControl.ItemTemplate>
+
+            </ItemsControl>
+
+            <StackPanel Spacing="16">
+
+                <Border Height="360">
+                    <StackPanel>
+                        <TextBlock Text="Распределение времени по категориям"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,12"/>
+                        <lvc:PieChart
+                            Height="300"
+                            Series="{Binding CategorySeries}"
+                            LegendPosition="Right"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Height="360">
+                    <StackPanel>
+                        <TextBlock Text="Нагрузка по дням недели"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,12"/>
+                        <lvc:CartesianChart
+                            Height="300"
+                            Series="{Binding DayOfWeekSeries}"
+                            XAxes="{Binding DayOfWeekXAxes}"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Height="360">
+                    <StackPanel>
+                        <TextBlock Text="Распределение рабочего времени по часам"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,12"/>
+                        <lvc:CartesianChart
+                            Height="300"
+                            Series="{Binding HourOfDaySeries}"
+                            XAxes="{Binding HourOfDayXAxes}"/>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+            
+            <Border Background="#F9FBFD"
+                    BorderBrush="#D7E4EF"
+                    BorderThickness="1"
+                    CornerRadius="12"
+                    Padding="12">
+
+                <StackPanel Spacing="12">
+
+                    <TextBlock Text="Анализ переключений между категориями"
+                               FontSize="18"
+                               FontWeight="Bold"/>
+
+                    <TextBlock Text="Показывает, какие категории чаще всего следуют сразу после выбранной."
+                               Foreground="#6E7E8F"/>
+
+                    <ComboBox Width="320"
+                              ItemsSource="{Binding AvailableCategories}"
+                              SelectedItem="{Binding SelectedCategoryForInterruptions}">
+
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Name}" />
+                                <StackPanel Orientation="Horizontal"
+                                            Spacing="8">
+
+                                    <Border Width="14"
+                                            Height="14"
+                                            CornerRadius="3"
+                                            Background="{Binding Color}"/>
+
+                                    <TextBlock Text="{Binding Name}"/>
+                                </StackPanel>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
+
                     <ItemsControl ItemsSource="{Binding Interruptions}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="White" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="8" Padding="10" Margin="0,0,0,8">
-                                    <Grid ColumnDefinitions="*,Auto,Auto">
-                                        <TextBlock Text="{Binding CategoryName}" FontWeight="SemiBold" />
-                                        <TextBlock Grid.Column="1" Margin="8,0,0,0" Text="{Binding Count}" />
-                                        <TextBlock Grid.Column="2" Margin="8,0,0,0" Text="{Binding FormattedAverage}" Foreground="#0A6DAE" />
-                                    </Grid>
+                                <Border Width="260"
+                                        Margin="6"
+                                        Padding="12"
+                                        Background="White"
+                                        BorderBrush="#D7E4EF"
+                                        BorderThickness="1"
+                                        CornerRadius="10">
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal"
+                                                    Spacing="8">
+                                            <Border Width="16"
+                                                    Height="16"
+                                                    CornerRadius="3"
+                                                    Background="{Binding CategoryColor}"/>
+
+                                            <TextBlock Text="{Binding CategoryName}"
+                                                       FontWeight="Bold"/>
+                                        </StackPanel>
+
+                                        <Separator Margin="0,8"/>
+
+                                        <Grid ColumnDefinitions="*,Auto">
+
+                                            <TextBlock Text="Количество переключений"/>
+
+                                            <TextBlock Grid.Column="1"
+                                                       FontWeight="Bold"
+                                                       FontSize="20"
+                                                       Text="{Binding Count}"/>
+                                        </Grid>
+
+                                        <Grid Margin="0,8,0,0"
+                                              ColumnDefinitions="*,Auto">
+
+                                            <TextBlock Text="Среднее время"/>
+
+                                            <TextBlock Grid.Column="1"
+                                                       Foreground="#0A6DAE"
+                                                       FontWeight="Bold"
+                                                       Text="{Binding FormattedAverage}"/>
+
+                                        </Grid>
+                                    </StackPanel>
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </StackPanel>
             </Border>
-        </Grid>
+        </StackPanel>
     </ScrollViewer>
 </UserControl>
