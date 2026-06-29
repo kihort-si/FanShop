@@ -8,6 +8,7 @@ public class AppDbContext : DbContext
 {
     public DbSet<Employee> Employees { get; set; }
     public DbSet<WorkDay> WorkDays { get; set; }
+    public DbSet<WorkDayEmployee> WorkDayEmployees { get; set; }
     public DbSet<DayTask> DayTasks { get; set; }
     public DbSet<TaskCategory> TaskCategories { get; set; }
     

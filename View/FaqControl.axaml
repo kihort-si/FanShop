@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FanShop.View.FaqControl">
+    <ScrollViewer>
+        <StackPanel Margin="24" Spacing="16" MaxWidth="860">
+            <TextBlock Text="FAQ" FontSize="24" FontWeight="Bold" />
+            <Border Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="12" Padding="16">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Как добавить нового сотрудника?" FontWeight="Bold"/>
+                    <TextBlock Text="Откройте меню «Сотрудники», нажмите кнопку «Добавить», заполните данные и сохраните изменения."
+                               TextWrapping="Wrap"/>
+
+                    <TextBlock Text="Как изменить данные существующего сотрудника?" FontWeight="Bold" Margin="0,8,0,0"/>
+                    <TextBlock Text="Откройте меню «Сотрудники», выберите сотрудника, нажмите «Изменить», внесите изменения и сохраните их."
+                               TextWrapping="Wrap"/>
+
+                    <TextBlock Text="Что делать, если отображается некорректное расписание матчей?" FontWeight="Bold" Margin="0,8,0,0"/>
+                    <TextBlock Text="Нажмите кнопку «Обновить расписание», проверьте подключение к интернету. Если проблема сохраняется, обратитесь в техническую поддержку."
+                               TextWrapping="Wrap"/>
+
+                    <TextBlock Text="Как добавить сотруднику смену в конкретный день?" FontWeight="Bold" Margin="0,8,0,0"/>
+                    <TextBlock Text="Дважды кликните по нужному дню в календаре, нажмите «Добавить», выберите сотрудника и укажите время работы."
+                               TextWrapping="Wrap"/>
+
+                    <TextBlock Text="Как удалить сотруднику смену в конкретный день?" FontWeight="Bold" Margin="0,8,0,0"/>
+                    <TextBlock Text="Откройте нужный день, выберите сотрудника в списке назначенных и нажмите «Удалить»."
+                               TextWrapping="Wrap"/>
+
+                    <TextBlock Text="Как распечатать пропуск?" FontWeight="Bold" Margin="0,8,0,0"/>
+                    <TextBlock Text="Откройте нужный день, убедитесь, что сотрудники добавлены, затем нажмите кнопку «Пропуск». Будет создан Word-документ для печати."
+                               TextWrapping="Wrap"/>
+
+                    <TextBlock Text="Как изменить шаблон пропуска?" FontWeight="Bold" Margin="0,8,0,0"/>
+                    <TextBlock Text="Откройте папку с шаблонами пропусков и измените используемый шаблон документа."
+                               TextWrapping="Wrap"/>
+
+                    <TextBlock Text="Как вести тайминг?" FontWeight="Bold" Margin="0,8,0,0"/>
+                    <TextBlock Text="Создайте категории в разделе «Тайминг», затем откройте нужный день, нажмите «Тайминг» и добавьте задачи с указанием времени выполнения."
+                               TextWrapping="Wrap"/>
+
+                    <TextBlock Text="Как изменить категорию задач?" FontWeight="Bold" Margin="0,8,0,0"/>
+                    <TextBlock Text="Откройте раздел «Тайминг», выберите категорию, нажмите «Изменить», внесите изменения и сохраните их."
+                               TextWrapping="Wrap"/>
+
+                    <TextBlock Text="Как посмотреть аналитику задач?" FontWeight="Bold" Margin="0,8,0,0"/>
+                    <TextBlock Text="Откройте раздел «Тайминг», нажмите «Аналитика» и выберите период для анализа."
+                               TextWrapping="Wrap"/>
+
+                    <TextBlock Text="Как экспортировать тайминг в Excel?" FontWeight="Bold" Margin="0,8,0,0"/>
+                    <TextBlock Text="Экспорт доступен как из окна тайминга конкретного дня, так и из раздела аналитики по выбранному периоду."
+                               TextWrapping="Wrap"/>
+
+                    <TextBlock Text="Как изменить режим отображения календаря?" FontWeight="Bold" Margin="0,8,0,0"/>
+                    <TextBlock Text="Нажмите кнопку в правом верхнем углу календаря для переключения между отображением сотрудников и задач."
+                               TextWrapping="Wrap"/>
+
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

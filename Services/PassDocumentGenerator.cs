@@ -10,13 +10,17 @@ namespace FanShop.Services
 {
     public static class PassDocumentGenerator
     {
-        public static void CreateWordPass(DateTime date, ObservableCollection<EmployeeWorkInfo> employees)
+        public static bool CreateWordPass(DateTime date, ObservableCollection<EmployeeWorkInfo> employees)
         {
-            string templatePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FanShop", "болванка.docx");
+            string templatePath = PassTemplateService.TemplatePath;
+            if (!File.Exists(templatePath))
+            {
+                return false;
+            }
 
             string tempPath = Path.GetTempFileName();
             string outputPath = Path.ChangeExtension(tempPath, ".docx");
-            
+
             try
             {
                 File.Copy(templatePath, outputPath, true);
@@ -46,9 +50,8 @@ namespace FanShop.Services
                         }
 
                         var sorted = employees
-                            .OrderBy(e => e.Employee.Surname)
-                            .ThenBy(e => e.Employee.FirstName)
-                            .ThenBy(e => e.Employee.LastName)
+                            .Where(e => e.IncludeInPass)
+                            .OrderBy(GetEmployeeSortKey, StringComparer.Ordinal)
                             .ToList();
 
                         for (int i = 0; i < sorted.Count; i++)
@@ -71,12 +74,12 @@ namespace FanShop.Services
 
                     wordDoc.MainDocumentPart.Document.Save();
                 }
-                
-                var processInfo = new System.Diagnostics.ProcessStartInfo(outputPath) 
-                { 
-                    UseShellExecute = true 
+
+                var processInfo = new System.Diagnostics.ProcessStartInfo(outputPath)
+                {
+                    UseShellExecute = true
                 };
-        
+
                 var process = System.Diagnostics.Process.Start(processInfo);
 
                 if (process != null)
@@ -87,28 +90,31 @@ namespace FanShop.Services
                         {
                             await process.WaitForExitAsync();
                             await Task.Delay(1000);
-                    
+
                             if (File.Exists(outputPath))
                             {
                                 File.Delete(outputPath);
                             }
+
                             if (File.Exists(tempPath))
                             {
                                 File.Delete(tempPath);
                             }
                         }
                         catch
-                        { }
+                        {
+                        }
                     });
                 }
+
+                return true;
             }
             catch (IOException ex) when (ex.Message.Contains("being used"))
             {
-                outputPath = Path.Combine(Path.GetTempPath(), $"пропуск_{date:yyyyMMdd}_{Guid.NewGuid():N[..8]}.docx");
+                outputPath = Path.Combine(Path.GetTempPath(), $"пропуск_{date:yyyyMMdd}_{Guid.NewGuid():N}.docx");
                 File.Copy(templatePath, outputPath, true);
-        
-                CreateWordPass(date, employees);
-                return;
+
+                return CreateWordPass(date, employees);
             }
             catch (Exception)
             {
@@ -118,7 +124,7 @@ namespace FanShop.Services
                     if (File.Exists(tempPath)) File.Delete(tempPath);
                 }
                 catch { }
-                throw;
+                return false;
             }
         }
         
@@ -140,6 +146,14 @@ namespace FanShop.Services
         
             return row;
         }
+
+        private static string GetEmployeeSortKey(EmployeeWorkInfo employee)
+        {
+            return $"{Normalize(employee.Surname)}\u0000{Normalize(employee.FirstName)}\u0000{Normalize(employee.Employee.LastName)}";
+        }
+
+        private static string Normalize(string? value) =>
+            (value ?? string.Empty).Trim().ToUpperInvariant().Replace('Ё', 'Е');
 
         private static void ReplaceText(WordprocessingDocument wordDoc, string searchText, string replaceText)
         {

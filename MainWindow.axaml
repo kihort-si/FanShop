@@ -1,0 +1,183 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FanShop.ViewModels"
+        x:Class="FanShop.MainWindow"
+        Title="FANSHOP"
+        Width="1280"
+        Height="820"
+        MinWidth="960"
+        MinHeight="640"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BrandSurfaceAlt}"
+        Icon="/icon.ico"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="40">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <Grid RowDefinitions="40,*">
+        <Border Grid.Row="0" Background="{StaticResource BrandPrimary}">
+            <Grid ColumnDefinitions="46,*,138">
+                <Button Grid.Column="0"
+                        Classes="chrome"
+                        Command="{Binding ToggleMenuCommand}"
+                        ToolTip.Tip="Меню">
+                    <Image Source="/Resources/menu_icon.png" Width="18" Height="18" />
+                </Button>
+
+                <Image Grid.Column="1"
+                       Source="/Resources/fanshop_logo.png"
+                       Height="22"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center" />
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Classes="chrome"
+                            Click="MinimizeButton_Click"
+                            ToolTip.Tip="Свернуть">
+                        <TextBlock Text="—" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Button>
+                    <Button Classes="chrome"
+                            Click="MaximizeButton_Click"
+                            ToolTip.Tip="Развернуть">
+                        <TextBlock Text="☐" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Button>
+                    <Button Classes="chrome close"
+                            Click="CloseButton_Click"
+                            ToolTip.Tip="Закрыть">
+                        <TextBlock Text="✕" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Border Margin="16"
+                    Background="{StaticResource BrandSurface}"
+                    CornerRadius="14"
+                    BorderBrush="{StaticResource BrandBorder}"
+                    BorderThickness="1">
+                <TabControl ItemsSource="{Binding OpenWindows}"
+                            SelectedItem="{Binding SelectedWindow}"
+                            Padding="0">
+                    <TabControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Title}"
+                                           TextTrimming="CharacterEllipsis"
+                                           VerticalAlignment="Center" />
+                                <Button Classes="tab-close"
+                                        Command="{Binding DataContext.CloseTabCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        IsVisible="{Binding IsClosable}"
+                                        ToolTip.Tip="Закрыть вкладку"
+                                        Content="✕" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </TabControl.ItemTemplate>
+                    <TabControl.ContentTemplate>
+                        <DataTemplate>
+                            <ContentControl Content="{Binding Content}" />
+                        </DataTemplate>
+                    </TabControl.ContentTemplate>
+                </TabControl>
+            </Border>
+            
+            <Button Background="#66000000"
+                    BorderThickness="0"
+                    CornerRadius="0"
+                    Padding="0"
+                    IsVisible="{Binding IsBlackoutMode}"
+                    ZIndex="5"
+                    Command="{Binding CloseMenuCommand}" />
+
+            <Border Width="300"
+                    HorizontalAlignment="Left"
+                    IsVisible="{Binding IsMenuOpen}"
+                    ZIndex="10"
+                    Background="{StaticResource BrandSurface}"
+                    BorderBrush="{StaticResource BrandBorder}"
+                    BorderThickness="0,0,1,0"
+                    BoxShadow="2 0 16 0 #1F000000">
+                <Grid RowDefinitions="56,*,Auto">
+                    <Border Grid.Row="0" Background="{StaticResource BrandPrimary}">
+                        <Grid ColumnDefinitions="*,46">
+                            <TextBlock Grid.Column="0"
+                                       Text="МЕНЮ"
+                                       VerticalAlignment="Center"
+                                       Margin="20,0,0,0"
+                                       Foreground="White"
+                                       FontWeight="SemiBold"
+                                       FontSize="14" />
+                            <Button Grid.Column="1"
+                                    Classes="chrome close"
+                                    Command="{Binding ToggleMenuCommand}"
+                                    Height="56"
+                                    ToolTip.Tip="Закрыть меню">
+                                <TextBlock Text="✕" FontSize="14" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <ScrollViewer Grid.Row="1">
+                        <StackPanel Margin="10" Spacing="4">
+                            <Button Classes="menu-item" Command="{Binding OpenEmployeeTabCommand}">
+                                <StackPanel>
+                                    <TextBlock Text="Сотрудники" FontWeight="SemiBold" />
+                                    <TextBlock Text="База и рабочие смены" FontSize="12" Foreground="{StaticResource BrandTextSubtle}" />
+                                </StackPanel>
+                            </Button>
+                            <Button Classes="menu-item" Command="{Binding LoadMatchesCommand}">
+                                <StackPanel>
+                                    <TextBlock Text="Обновить расписание" FontWeight="SemiBold" />
+                                    <TextBlock Text="Загрузить матчи и обновить календарь" FontSize="12" Foreground="{StaticResource BrandTextSubtle}" />
+                                </StackPanel>
+                            </Button>
+                            <Button Classes="menu-item" Command="{Binding OpenTaskCategoriesTabCommand}">
+                                <StackPanel>
+                                    <TextBlock Text="Тайминг" FontWeight="SemiBold" />
+                                    <TextBlock Text="Категории задач и аналитика" FontSize="12" Foreground="{StaticResource BrandTextSubtle}" />
+                                </StackPanel>
+                            </Button>
+                            <Button Classes="menu-item" Command="{Binding OpenEmployeeCostAnalyticsTabCommand}">
+                                <StackPanel>
+                                    <TextBlock Text="Аналитика затрат" FontWeight="SemiBold" />
+                                    <TextBlock Text="Заработная плата и матчи" FontSize="12" Foreground="{StaticResource BrandTextSubtle}" />
+                                </StackPanel>
+                            </Button>
+                            <Button Classes="menu-item" Command="{Binding OpenSettingsTabCommand}">
+                                <StackPanel>
+                                    <TextBlock Text="Настройки" FontWeight="SemiBold" />
+                                    <TextBlock Text="Параметры документов и оплаты" FontSize="12" Foreground="{StaticResource BrandTextSubtle}" />
+                                </StackPanel>
+                            </Button>
+                            <Button Classes="menu-item" Command="{Binding OpenPassTemplateCommand}">
+                                <StackPanel>
+                                    <TextBlock Text="Шаблон пропуска" FontWeight="SemiBold" />
+                                    <TextBlock Text="Открыть или добавить болванку .docx" FontSize="12" Foreground="{StaticResource BrandTextSubtle}" />
+                                </StackPanel>
+                            </Button>
+                            <Button Classes="menu-item" Command="{Binding OpenFaqTabCommand}">
+                                <StackPanel>
+                                    <TextBlock Text="FAQ" FontWeight="SemiBold" />
+                                    <TextBlock Text="Подсказки по работе с приложением" FontSize="12" Foreground="{StaticResource BrandTextSubtle}" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <Border Grid.Row="2" Background="{StaticResource BrandSurfaceAlt}" Padding="20,14">
+                        <StackPanel HorizontalAlignment="Center">
+                            <TextBlock Text="FANSHOP" FontWeight="Bold" Foreground="{StaticResource BrandPrimary}" HorizontalAlignment="Center" />
+                            <TextBlock Name="VersionTextBlock" FontSize="11" Foreground="{StaticResource BrandTextSubtle}" HorizontalAlignment="Center" />
+                            <TextBlock Text="Разработка: Васильев Никита" FontSize="10" Foreground="{StaticResource BrandTextSubtle}" HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
