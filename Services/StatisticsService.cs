@@ -50,11 +50,12 @@ namespace FanShop.Services
             var workDayEmployees = context.WorkDays
                 .Where(wd => wd.Date >= firstDay && wd.Date <= lastDay)
                 .SelectMany(wd => wd.WorkDayEmployees)
+                .Where(wde => wde.IncludeInSalary)
                 .ToList();
-            
+
             var total = workDayEmployees
                 .Sum(wde => wde.WorkDuration == "Целый день" ? (double)settings.DailySalary : (double)settings.DailySalary / 2);
-        
+
             return $"{total:N0}₽";
         }
 
@@ -63,10 +64,11 @@ namespace FanShop.Services
             using var context = new AppDbContext();
             var (firstDay, lastDay) = GetMonthBounds(year, month);
             var settings = Settings.Load();
-        
+
             var workDayEmployees = context.WorkDays
                 .Where(wd => wd.Date >= firstDay && wd.Date <= lastDay)
                 .SelectMany(wd => wd.WorkDayEmployees)
+                .Where(wde => wde.IncludeInSalary)
                 .Include(wde => wde.Employee)
                 .ToList();
         
