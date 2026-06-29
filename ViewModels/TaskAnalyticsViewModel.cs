@@ -23,6 +23,12 @@ public partial class TaskAnalyticsViewModel : BaseViewModel
     private DateTime _endDate;
 
     [ObservableProperty]
+    private DateTimeOffset? _startDateSelection;
+
+    [ObservableProperty]
+    private DateTimeOffset? _endDateSelection;
+
+    [ObservableProperty]
     private ObservableCollection<StatisticItem> _statisticItems = new();
 
     [ObservableProperty]
@@ -66,14 +72,28 @@ public partial class TaskAnalyticsViewModel : BaseViewModel
 
     partial void OnStartDateChanged(DateTime value)
     {
+        StartDateSelection = new DateTimeOffset(value);
         UpdateAnalytics();
     }
 
     partial void OnEndDateChanged(DateTime value)
     {
+        EndDateSelection = new DateTimeOffset(value);
         UpdateAnalytics();
     }
+    
+    partial void OnStartDateSelectionChanged(DateTimeOffset? value)
+    {
+        if (value.HasValue)
+            StartDate = value.Value.Date;
+    }
 
+    partial void OnEndDateSelectionChanged(DateTimeOffset? value)
+    {
+        if (value.HasValue)
+            EndDate = value.Value.Date;
+    }
+    
     [RelayCommand]
     private void Close()
     {
