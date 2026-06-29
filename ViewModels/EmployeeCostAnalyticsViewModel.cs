@@ -78,7 +78,7 @@ public partial class EmployeeCostAnalyticsViewModel : BaseViewModel
 
         _isInitializing = true;
         EndDate = DateTime.Today;
-        StartDate = new DateTime(DateTime.Today.Year, 1, 1);
+        StartDate = new DateTime(DateTime.Today.Year - 1, DateTime.Today.Month, DateTime.Today.Day);
         StartDateSelection = new DateTimeOffset(StartDate);
         EndDateSelection = new DateTimeOffset(EndDate);
         _isInitializing = false;

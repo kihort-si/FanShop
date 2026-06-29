@@ -30,9 +30,9 @@
                           SelectedItem="{Binding SelectedTask}"
                           AutoGenerateColumns="False">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Начало" Binding="{Binding StartTimeText}" Width="50" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Конец" Binding="{Binding EndTimeText}" Width="50" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Название" Binding="{Binding Title}" Width="90" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Начало" Binding="{Binding StartTimeText}" Width="90" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Конец" Binding="{Binding EndTimeText}" Width="90" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Название" Binding="{Binding Title}" Width="120" IsReadOnly="True" />
                         <DataGridTextColumn Header="Описание" Binding="{Binding Comment}" Width="90" IsReadOnly="True" />
                         <DataGridTextColumn Header="Категория" Binding="{Binding Category.Name}" Width="*" IsReadOnly="True" />
                         <DataGridTextColumn Header="Длительность" Binding="{Binding Duration, Converter={StaticResource TimeSpanFormatConverter}}" Width="*" IsReadOnly="True" />
