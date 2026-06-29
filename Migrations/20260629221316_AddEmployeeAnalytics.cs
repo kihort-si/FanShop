@@ -41,14 +41,14 @@ namespace FanShop.Migrations
                 table: "WorkDayEmployees",
                 type: "INTEGER",
                 nullable: false,
-                defaultValue: false);
+                defaultValue: true);
 
             migrationBuilder.AddColumn<bool>(
                 name: "IncludeInSalary",
                 table: "WorkDayEmployees",
                 type: "INTEGER",
                 nullable: false,
-                defaultValue: false);
+                defaultValue: true);
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_WorkDayEmployees",
