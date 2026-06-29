@@ -5,7 +5,7 @@
              RequestedThemeVariant="Light">
 
     <Application.Resources>
-        <FontFamily x:Key="AppFont">fonts:Inter#Inter, $Default</FontFamily>
+        <FontFamily x:Key="AppFont">Segoe UI</FontFamily>
 
         <SolidColorBrush x:Key="BrandPrimary" Color="#0A6DAE" />
         <SolidColorBrush x:Key="BrandPrimaryHover" Color="#0E7FC8" />
