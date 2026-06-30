@@ -5,7 +5,8 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text.Json;
-using Application = System.Windows.Application;
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
 
 namespace FanShop.Services
 {
@@ -49,6 +50,9 @@ namespace FanShop.Services
 
         public async Task<bool> UpdateAsync()
         {
+            if (!OperatingSystem.IsWindows())
+                return false;
+
             try
             {
                 var latestRelease = await GetLatestReleaseInfoAsync();
@@ -82,12 +86,6 @@ namespace FanShop.Services
 
                 CreateUpdateScript(tempExtractPath, appPath);
 
-                System.Windows.MessageBox.Show(
-                    "Приложение будет закрыто для обновления и автоматически запущено после завершения.",
-                    "Обновление FanShop",
-                    System.Windows.MessageBoxButton.OK,
-                    System.Windows.MessageBoxImage.Information);
-
                 string batPath = Path.Combine(Path.GetTempPath(), "update_fanshop.bat");
 
                 Process.Start(new ProcessStartInfo
@@ -110,6 +108,9 @@ namespace FanShop.Services
 
         public void ExecuteUpdate()
         {
+            if (!OperatingSystem.IsWindows())
+                return;
+
             string updaterPath = Path.Combine(
                 Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName),
                 "updater.bat");
@@ -124,13 +125,16 @@ namespace FanShop.Services
                     WindowStyle = ProcessWindowStyle.Hidden
                 });
 
-                Application.Current.Shutdown();
+                if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+                {
+                    desktop.Shutdown();
+                }
             }
         }
 
         private Version GetCurrentVersion()
         {
-            return Assembly.GetExecutingAssembly().GetName().Version;
+            return Assembly.GetExecutingAssembly().GetName().Version ?? new Version(1, 0, 0);
         }
 
         private async Task<ReleaseInfo> GetLatestReleaseInfoAsync()
@@ -197,13 +201,13 @@ namespace FanShop.Services
 
     public class ReleaseInfo
     {
-        public string Tag_Name { get; set; }
-        public ReleaseAsset[] Assets { get; set; }
+        public string Tag_Name { get; set; } = string.Empty;
+        public ReleaseAsset[] Assets { get; set; } = [];
     }
 
     public class ReleaseAsset
     {
-        public string Name { get; set; }
-        public string Browser_Download_Url { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Browser_Download_Url { get; set; } = string.Empty;
     }
 }

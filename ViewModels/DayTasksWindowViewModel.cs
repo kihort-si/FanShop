@@ -1,273 +1,244 @@
-﻿using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Linq;
-using System.Windows;
-using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using FanShop.Models;
 using FanShop.Services;
 using Microsoft.EntityFrameworkCore;
-using Application = System.Windows.Application;
-using MessageBox = System.Windows.MessageBox;
 
-namespace FanShop.ViewModels
+namespace FanShop.ViewModels;
+
+public partial class DayTasksWindowViewModel : BaseViewModel
 {
-    public class DayTasksWindowViewModel : BaseViewModel
+    [ObservableProperty]
+    private DateTime _date;
+
+    [ObservableProperty]
+    private ObservableCollection<DayTask> _dayTasks = new();
+
+    [ObservableProperty]
+    private ObservableCollection<TaskCategory> _taskCategories = new();
+
+    [ObservableProperty]
+    private DayTask? _selectedTask;
+
+    [ObservableProperty]
+    private string _taskTitle = string.Empty;
+
+    [ObservableProperty]
+    private string _startTimeText = string.Empty;
+
+    [ObservableProperty]
+    private string _endTimeText = string.Empty;
+
+    [ObservableProperty]
+    private bool _canSaveTask;
+
+    [ObservableProperty]
+    private List<string> _taskSuggestions = new();
+    
+    public bool HasTasks => DayTasks.Count > 0;
+
+    public bool HasSelectedTask => SelectedTask != null;
+
+    public DayTasksWindowViewModel(DateTime date)
     {
-        private DateTime _date;
-        public DateTime Date
-        {
-            get => _date;
-            set => SetProperty(ref _date, value);
-        }
+        Date = date;
+        LoadData();
+        LoadTaskSuggestions();
+    }
 
-        private ObservableCollection<DayTask> _dayTasks;
-        public ObservableCollection<DayTask> DayTasks
-        {
-            get => _dayTasks;
-            set => SetProperty(ref _dayTasks, value);
-        }
+    partial void OnTaskTitleChanged(string value)
+    {
+        UpdateCanSaveTask();
+    }
 
-        private ObservableCollection<TaskCategory> _taskCategories;
-        public ObservableCollection<TaskCategory> TaskCategories
-        {
-            get => _taskCategories;
-            set => SetProperty(ref _taskCategories, value);
-        }
+    partial void OnStartTimeTextChanged(string value)
+    {
+        UpdateCanSaveTask();
+    }
 
-        private DayTask _selectedTask;
-        public DayTask SelectedTask
-        {
-            get => _selectedTask;
-            set
-            {
-                if (SetProperty(ref _selectedTask, value))
-                {
-                    (RemoveTaskCommand as RelayCommand)?.RaiseCanExecuteChanged();
-                }
-            }
-        }
+    partial void OnEndTimeTextChanged(string value)
+    {
+        UpdateCanSaveTask();
+    }
 
-        private string _taskTitle;
-        public string TaskTitle
-        {
-            get => _taskTitle;
-            set
-            {
-                if (SetProperty(ref _taskTitle, value))
-                {
-                    UpdateCanSaveTask();
-                }
-            }
-        }
+    partial void OnSelectedTaskChanged(DayTask? value)
+    {
+        RemoveTaskCommand.NotifyCanExecuteChanged();
+        SaveSelectedTaskCommand.NotifyCanExecuteChanged();
 
-        private string _startTimeText;
-        public string StartTimeText
-        {
-            get => _startTimeText;
-            set
-            {
-                if (SetProperty(ref _startTimeText, value))
-                {
-                    UpdateCanSaveTask();
-                }
-            }
-        }
+        OnPropertyChanged(nameof(HasSelectedTask));
+    }
 
-        private string _endTimeText;
-        public string EndTimeText
-        {
-            get => _endTimeText;
-            set
-            {
-                if (SetProperty(ref _endTimeText, value))
-                {
-                    UpdateCanSaveTask();
-                }
-            }
-        }
+    private void UpdateCanSaveTask()
+    {
+        CanSaveTask = !string.IsNullOrWhiteSpace(TaskTitle) &&
+                     !string.IsNullOrWhiteSpace(StartTimeText) &&
+                     !string.IsNullOrWhiteSpace(EndTimeText);
+    }
 
-        private bool _canSaveTask;
-        public bool CanSaveTask
-        {
-            get => _canSaveTask;
-            set => SetProperty(ref _canSaveTask, value);
-        }
+    [RelayCommand]
+    private void LoadData()
+    {
+        using var context = new AppDbContext();
+
+        var tasks = context.DayTasks
+            .Include(t => t.Category)
+            .Where(t => t.Date.Date == Date.Date)
+            .ToList()
+            .OrderBy(t => t.StartTime)
+            .ToList();
+
+        DayTasks = new ObservableCollection<DayTask>(tasks);
+
+        var categories = context.TaskCategories.ToList();
+        TaskCategories = new ObservableCollection<TaskCategory>(categories);
         
-        private List<string> _taskSuggestions;
-        public List<string> TaskSuggestions
+        OnPropertyChanged(nameof(HasTasks));
+        OnPropertyChanged(nameof(HasSelectedTask));
+    }
+
+    [RelayCommand]
+    private void AddTask()
+    {
+        var newTask = new DayTask
         {
-            get => _taskSuggestions;
-            set => SetProperty(ref _taskSuggestions, value);
-        }
+            Date = Date,
+            Title = "Новая задача",
+            Comment = string.Empty,
+            StartTimeText = DateTime.Now.ToShortTimeString(),
+            EndTimeText = DateTime.Now.AddMinutes(15).ToShortTimeString(),
+            StartHour = DateTime.Now.Hour,
+            StartMinute = DateTime.Now.Minute,
+            EndHour = DateTime.Now.AddMinutes(15).Hour,
+            EndMinute = DateTime.Now.AddMinutes(15).Minute
+        };
 
-        public ICommand AddTaskCommand { get; }
-        public ICommand ExportToExcelCommand { get; }
-        public ICommand RemoveTaskCommand { get; } 
-        public ICommand CloseWindowCommand { get; }
+        DayTasks.Add(newTask);
+        SelectedTask = newTask;
 
-        public DayTasksWindowViewModel(DateTime date)
-        {
-            Date = date;
-            
-            AddTaskCommand = new RelayCommand(AddTask);
-            ExportToExcelCommand = new RelayCommand(ExportToExcel);
-            RemoveTaskCommand = new RelayCommand(RemoveTask, CanEditTask);
-            CloseWindowCommand = new RelayCommand(CloseWindow);
+        OnPropertyChanged(nameof(HasTasks));
+        SaveTaskChanges(newTask);
+    }
 
-            LoadData();
-            LoadTaskSuggestions();
-        }
-
-        private void LoadData()
+    [RelayCommand(CanExecute = nameof(CanRemoveTask))]
+    private void RemoveTask()
+    {
+        if (SelectedTask != null)
         {
             using var context = new AppDbContext();
-        
-            var tasks = context.DayTasks
-                .Include(t => t.Category)
-                .Where(t => t.Date.Date == Date.Date)
-                .ToList() 
-                .OrderBy(t => t.StartTime) 
-                .ToList();
-        
-            DayTasks = new ObservableCollection<DayTask>(tasks);
-        
-            var categories = context.TaskCategories.ToList();
-            TaskCategories = new ObservableCollection<TaskCategory>(categories);
-        }
-
-        private void AddTask(object parameter)
-        {
-            var newTask = new DayTask
+            var taskToRemove = context.DayTasks.Find(SelectedTask.DayTaskID);
+            if (taskToRemove != null)
             {
-                Date = Date,
-                Title = "Новая задача",
-                Comment = string.Empty,
-                StartTimeText = DateTime.Now.ToShortTimeString(),
-                EndTimeText = DateTime.Now.AddMinutes(15).ToShortTimeString(),
-                StartHour = DateTime.Now.Hour,
-                StartMinute = DateTime.Now.Minute,
-                EndHour = DateTime.Now.AddMinutes(15).Hour,
-                EndMinute = DateTime.Now.AddMinutes(15).Minute
-            };
-
-            DayTasks.Add(newTask);
-            SaveTaskChanges(newTask);
-        }
-        
-        private bool CanEditTask(object parameter)
-        {
-            return SelectedTask != null;
-        }
-        
-        private void ExportToExcel(object parameter)
-        {
-            DateTime startDate = Date.Date;
-            DateTime endDate = Date.Date;
-            TaskExportToExcel.ExportToExcel(startDate, endDate);
-        }
-
-        private void RemoveTask(object parameter)
-        {
-            if (SelectedTask != null)
-            {
-                var result = MessageBox.Show(
-                    $"Удалить задачу \"{SelectedTask.Title}\"?",
-                    "Подтверждение удаления",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
-
-                if (result == MessageBoxResult.Yes)
-                {
-                    using var context = new AppDbContext();
-                    var taskToRemove = context.DayTasks.Find(SelectedTask.DayTaskID);
-                    if (taskToRemove != null)
-                    {
-                        context.DayTasks.Remove(taskToRemove);
-                        context.SaveChanges();
-                    }
-
-                    DayTasks.Remove(SelectedTask);
-                    SelectedTask = null;
-                }
-            }
-        }
-        
-        public void SaveTaskChanges(object taskItem)
-        {
-            if (taskItem is DayTask task)
-            {
-                using var context = new AppDbContext();
-                var existingTask = context.DayTasks.Find(task.DayTaskID);
-        
-                if (existingTask == null)
-                {
-                    if (task.Category != null)
-                    {
-                        task.TaskCategoryID = task.Category.TaskCategoryID;
-                        task.Category = null;
-                    }
-                    
-                    context.DayTasks.Add(task);
-                }
-                else
-                {
-                    existingTask.StartHour = task.StartHour;
-                    existingTask.StartMinute = task.StartMinute;
-                    existingTask.EndHour = task.EndHour;
-                    existingTask.EndMinute = task.EndMinute;
-                    existingTask.Title = task.Title;
-                    existingTask.Comment = task.Comment;
-                    existingTask.TaskCategoryID = task.Category?.TaskCategoryID;
-                    
-                    context.DayTasks.Update(existingTask);
-                }
-        
+                context.DayTasks.Remove(taskToRemove);
                 context.SaveChanges();
             }
+
+            DayTasks.Remove(SelectedTask);
+            SelectedTask = null;
+
+            OnPropertyChanged(nameof(HasTasks));
         }
-        
-        public void UpdateTaskTitleByCategory(DayTask task)
-        {
-            if (task?.Category != null && !string.IsNullOrEmpty(task.Category.DefaultTask))
-            {
-                string oldTitle = task.Title;
-                task.Title = task.Category.DefaultTask;
-                task.OnPropertyChanged(nameof(task.Title));
-                
-                SaveTaskChanges(task);
-            }
-        }
-        
-        private void LoadTaskSuggestions()
+    }
+
+    private bool CanRemoveTask => SelectedTask != null;
+
+    [RelayCommand]
+    private void ExportToExcel()
+    {
+        DateTime startDate = Date.Date;
+        DateTime endDate = Date.Date;
+        TaskExportToExcel.ExportToExcel(startDate, endDate);
+    }
+
+    [RelayCommand]
+    private void CloseWindow()
+    {
+    }
+
+    [RelayCommand(CanExecute = nameof(CanSaveSelectedTask))]
+    private void SaveSelectedTask()
+    {
+        if (SelectedTask == null)
+            return;
+
+        SaveTaskChanges(SelectedTask);
+        UpdateTaskTitleByCategory(SelectedTask);
+    }
+
+    [RelayCommand]
+    private void SetStartNow()
+    {
+        if (SelectedTask == null) return;
+
+        SelectedTask.StartTimeText = DateTime.Now.ToShortTimeString();
+    }
+
+    [RelayCommand]
+    private void SetEndNow()
+    {
+        if (SelectedTask == null) return;
+
+        SelectedTask.EndTimeText = DateTime.Now.ToShortTimeString();
+    }
+
+    private bool CanSaveSelectedTask => SelectedTask != null;
+
+    public void SaveTaskChanges(object taskItem)
+    {
+        if (taskItem is DayTask task)
         {
             using var context = new AppDbContext();
-        
-            TaskSuggestions = context.DayTasks
-                .Select(t => t.Title)
-                .Where(t => !string.IsNullOrEmpty(t))
-                .Distinct()
-                .OrderBy(t => t)
-                .ToList();
-        }
-        
-        private void CloseWindow(object parameter)
-        {
-            foreach (Window window in Application.Current.Windows)
-            {
-                if (window.DataContext == this)
-                {
-                    window.Close();
-                    break;
-                }
-            }
-        }
+            var existingTask = context.DayTasks.Find(task.DayTaskID);
 
-        private void UpdateCanSaveTask()
-        {
-            CanSaveTask = !string.IsNullOrWhiteSpace(TaskTitle) &&
-                         !string.IsNullOrWhiteSpace(StartTimeText) &&
-                         !string.IsNullOrWhiteSpace(EndTimeText);
+            if (existingTask == null)
+            {
+                if (task.Category != null)
+                {
+                    task.TaskCategoryID = task.Category.TaskCategoryID;
+                    task.Category = null;
+                }
+
+                context.DayTasks.Add(task);
+            }
+            else
+            {
+                existingTask.StartHour = task.StartHour;
+                existingTask.StartMinute = task.StartMinute;
+                existingTask.EndHour = task.EndHour;
+                existingTask.EndMinute = task.EndMinute;
+                existingTask.Title = task.Title;
+                existingTask.Comment = task.Comment;
+                existingTask.TaskCategoryID = task.Category?.TaskCategoryID;
+
+                context.DayTasks.Update(existingTask);
+            }
+
+            context.SaveChanges();
         }
+    }
+
+    public void UpdateTaskTitleByCategory(DayTask task)
+    {
+        if (task?.Category != null && !string.IsNullOrEmpty(task.Category.DefaultTask))
+        {
+            task.Title = task.Category.DefaultTask;
+            task.OnPropertyChanged(nameof(task.Title));
+
+            SaveTaskChanges(task);
+        }
+    }
+
+    private void LoadTaskSuggestions()
+    {
+        using var context = new AppDbContext();
+
+        TaskSuggestions = context.DayTasks
+            .Select(t => t.Title)
+            .Where(t => !string.IsNullOrEmpty(t))
+            .Distinct()
+            .OrderBy(t => t)
+            .ToList();
     }
 }
