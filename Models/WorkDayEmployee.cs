@@ -6,14 +6,16 @@ public class WorkDayEmployee
 {
     [Key]
     public int WorkDayEmployeeID { get; set; }
-    [Required]
-    public required int WorkDayID { get; set; }
-    [Required]
+    
+    public int WorkDayID { get; set; }
     public WorkDay WorkDay { get; set; }
-    [Required]
-    public required int EmployeeID { get; set; }
-    [Required]
+    
+    public int EmployeeID { get; set; }
     public Employee Employee { get; set; }
+    
     [Required]
-    public required string WorkDuration { get; set; } 
+    public string WorkDuration { get; set; }
+
+    public bool IncludeInPass { get; set; } = true;
+    public bool IncludeInSalary { get; set; } = true;
 }
