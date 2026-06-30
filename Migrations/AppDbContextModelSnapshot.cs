@@ -160,7 +160,7 @@ namespace FanShop.Migrations
 
                     b.HasIndex("WorkDayID");
 
-                    b.ToTable("WorkDayEmployees");
+                    b.ToTable("WorkDayEmployee");
                 });
 
             modelBuilder.Entity("FanShop.Models.DayTask", b =>
@@ -176,13 +176,13 @@ namespace FanShop.Migrations
             modelBuilder.Entity("FanShop.Models.WorkDayEmployee", b =>
                 {
                     b.HasOne("FanShop.Models.Employee", "Employee")
-                        .WithMany("WorkDayEmployees")
+                        .WithMany("WorkDayEmployee")
                         .HasForeignKey("EmployeeID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("FanShop.Models.WorkDay", "WorkDay")
-                        .WithMany("WorkDayEmployees")
+                        .WithMany("WorkDayEmployee")
                         .HasForeignKey("WorkDayID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -194,7 +194,7 @@ namespace FanShop.Migrations
 
             modelBuilder.Entity("FanShop.Models.Employee", b =>
                 {
-                    b.Navigation("WorkDayEmployees");
+                    b.Navigation("WorkDayEmployee");
                 });
 
             modelBuilder.Entity("FanShop.Models.TaskCategory", b =>
@@ -204,7 +204,7 @@ namespace FanShop.Migrations
 
             modelBuilder.Entity("FanShop.Models.WorkDay", b =>
                 {
-                    b.Navigation("WorkDayEmployees");
+                    b.Navigation("WorkDayEmployee");
                 });
 #pragma warning restore 612, 618
         }

@@ -115,8 +115,8 @@ public partial class App : Application
                     await db.Database.EnsureCreatedAsync();
                 }
 
-                await EnsureColumnAsync(db, "WorkDayEmployees", "IncludeInPass", "INTEGER NOT NULL DEFAULT 1");
-                await EnsureColumnAsync(db, "WorkDayEmployees", "IncludeInSalary", "INTEGER NOT NULL DEFAULT 1");
+                await EnsureColumnAsync(db, "WorkDayEmployee", "IncludeInPass", "INTEGER NOT NULL DEFAULT 1");
+                await EnsureColumnAsync(db, "WorkDayEmployee", "IncludeInSalary", "INTEGER NOT NULL DEFAULT 1");
             }
 
             _mainWindowViewModel = new MainWindowViewModel();

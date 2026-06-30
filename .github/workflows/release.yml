@@ -50,7 +50,8 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git tag $tag
-            git push origin $tag
+            $token = "${{ secrets.GH_PAT }}" 
+            git push https://$token@github.com/kihort-si/FanShop.git $tag
           } else {
             Write-Host "Tag $tag already exists."
           }

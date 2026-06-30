@@ -43,7 +43,7 @@ public partial class SelectEmployeeWindow : Window
 
         using var context = new AppDbContext();
         var workDay = context.WorkDays
-            .Include(x => x.WorkDayEmployees)
+            .Include(x => x.WorkDayEmployee)
             .FirstOrDefault(x => x.Date.Date == ParentViewModel.Date.Date);
 
         if (workDay == null)
@@ -56,7 +56,7 @@ public partial class SelectEmployeeWindow : Window
             context.SaveChanges();
         }
 
-        var existingAssignment = workDay.WorkDayEmployees.FirstOrDefault(x => x.EmployeeID == employee.EmployeeID);
+        var existingAssignment = workDay.WorkDayEmployee.FirstOrDefault(x => x.EmployeeID == employee.EmployeeID);
         if (existingAssignment == null)
         {
             existingAssignment = new WorkDayEmployee
@@ -65,7 +65,7 @@ public partial class SelectEmployeeWindow : Window
                 EmployeeID = employee.EmployeeID,
                 WorkDuration = workDuration
             };
-            context.WorkDayEmployees.Add(existingAssignment);
+            context.WorkDayEmployee.Add(existingAssignment);
             context.SaveChanges();
         }
 
