@@ -7,5 +7,5 @@ public class WorkDay
     [Key]
     public int WorkDayID { get; set; }
     public DateTime Date { get; set; }
-    public ICollection<WorkDayEmployee> WorkDayEmployees { get; set; } = new List<WorkDayEmployee>();
+    public ICollection<WorkDayEmployee> WorkDayEmployee { get; set; } = new List<WorkDayEmployee>();
 }
