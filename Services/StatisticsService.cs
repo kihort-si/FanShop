@@ -13,7 +13,7 @@ namespace FanShop.Services
             
             return context.WorkDays
                 .Where(wd => wd.Date >= firstDay && wd.Date <= lastDay)
-                .SelectMany(wd => wd.WorkDayEmployees)
+                .SelectMany(wd => wd.WorkDayEmployee)
                 .Select(wde => wde.EmployeeID)
                 .Distinct()
                 .Count();
@@ -26,7 +26,7 @@ namespace FanShop.Services
             
             return context.WorkDays
                 .Where(wd => wd.Date >= firstDay && wd.Date <= lastDay)
-                .Where(wd => wd.WorkDayEmployees.Any())
+                .Where(wd => wd.WorkDayEmployee.Any())
                 .Count();
         }
 
@@ -37,7 +37,7 @@ namespace FanShop.Services
 
             return context.WorkDays
                 .Where(wd => wd.Date >= firstDay && wd.Date <= lastDay)
-                .SelectMany(wd => wd.WorkDayEmployees)
+                .SelectMany(wd => wd.WorkDayEmployee)
                 .Count();
         }
 
@@ -47,13 +47,13 @@ namespace FanShop.Services
             var (firstDay, lastDay) = GetMonthBounds(year, month);
             var settings = Settings.Load();
         
-            var workDayEmployees = context.WorkDays
+            var WorkDayEmployee = context.WorkDays
                 .Where(wd => wd.Date >= firstDay && wd.Date <= lastDay)
-                .SelectMany(wd => wd.WorkDayEmployees)
+                .SelectMany(wd => wd.WorkDayEmployee)
                 .Where(wde => wde.IncludeInSalary)
                 .ToList();
 
-            var total = workDayEmployees
+            var total = WorkDayEmployee
                 .Sum(wde => wde.WorkDuration == "Целый день" ? (double)settings.DailySalary : (double)settings.DailySalary / 2);
 
             return $"{total:N0}₽";
@@ -65,14 +65,14 @@ namespace FanShop.Services
             var (firstDay, lastDay) = GetMonthBounds(year, month);
             var settings = Settings.Load();
 
-            var workDayEmployees = context.WorkDays
+            var WorkDayEmployee = context.WorkDays
                 .Where(wd => wd.Date >= firstDay && wd.Date <= lastDay)
-                .SelectMany(wd => wd.WorkDayEmployees)
+                .SelectMany(wd => wd.WorkDayEmployee)
                 .Where(wde => wde.IncludeInSalary)
                 .Include(wde => wde.Employee)
                 .ToList();
         
-            var statistics = workDayEmployees
+            var statistics = WorkDayEmployee
                 .GroupBy(wde => new { wde.Employee.FirstName, wde.Employee.Surname })
                 .Select(g => new
                 {

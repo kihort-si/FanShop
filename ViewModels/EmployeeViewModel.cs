@@ -96,7 +96,7 @@ public partial class EmployeeViewModel : BaseViewModel
         {
             return context.WorkDays
                 .Where(wd => wd.Date >= thirtyDaysAgo)
-                .SelectMany(wd => wd.WorkDayEmployees)
+                .SelectMany(wd => wd.WorkDayEmployee)
                 .Count(wde => wde.EmployeeID == employeeId);
         }
         catch
