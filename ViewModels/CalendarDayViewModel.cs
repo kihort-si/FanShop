@@ -24,13 +24,13 @@ public partial class CalendarDayViewModel : BaseViewModel
             {
                 using var context = new AppDbContext();
                 var workDay = context.WorkDays
-                    .Include(w => w.WorkDayEmployees)
+                    .Include(w => w.WorkDayEmployee)
                     .ThenInclude(wde => wde.Employee)
                     .FirstOrDefault(w => w.Date == Date);
 
                 _employees = workDay != null
                     ? new ObservableCollection<EmployeeWorkInfo>(
-                        workDay.WorkDayEmployees.Select(wde => new EmployeeWorkInfo
+                        workDay.WorkDayEmployee.Select(wde => new EmployeeWorkInfo
                         {
                             Employee = wde.Employee,
                             WorkDuration = wde.WorkDuration,
@@ -169,12 +169,12 @@ public partial class CalendarDayViewModel : BaseViewModel
             using var context = new AppDbContext();
 
             var workDay = context.WorkDays
-                .Include(w => w.WorkDayEmployees)
+                .Include(w => w.WorkDayEmployee)
                 .FirstOrDefault(w => w.Date == Date);
 
             if (workDay != null)
             {
-                var workDayEmployeeToRemove = workDay.WorkDayEmployees
+                var workDayEmployeeToRemove = workDay.WorkDayEmployee
                     .FirstOrDefault(wde => wde.EmployeeID == SelectedEmployee.Employee.EmployeeID);
 
                 if (workDayEmployeeToRemove != null)
@@ -396,7 +396,7 @@ public partial class EmployeeWorkInfo : ObservableObject
     {
         if (WorkDayEmployeeID == 0) return;
         using var context = new AppDbContext();
-        var wde = context.WorkDayEmployees.Find(WorkDayEmployeeID);
+        var wde = context.WorkDayEmployee.Find(WorkDayEmployeeID);
         if (wde == null) return;
         mutate(wde);
         context.SaveChanges();

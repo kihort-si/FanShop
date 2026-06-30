@@ -19,5 +19,5 @@ public class Employee
     [Required]
     public string Passport { get; set; }
     
-    public ICollection<WorkDayEmployee> WorkDayEmployees { get; set; } = new List<WorkDayEmployee>();
+    public ICollection<WorkDayEmployee> WorkDayEmployee { get; set; } = new List<WorkDayEmployee>();
 }
