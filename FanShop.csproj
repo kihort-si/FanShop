@@ -1,67 +1,49 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net8.0-windows</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <UseWPF>true</UseWPF>
-		<UseWindowsForms>true</UseWindowsForms>
         <ApplicationIcon>icon.ico</ApplicationIcon>
         <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
         <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
-      <PackageReference Include="EPPlus" Version="8.1.0" />
-      <PackageReference Include="Firebase.Database" Version="1.0.0" />
-      <PackageReference Include="HtmlAgilityPack" Version="1.12.2" />
-      <PackageReference Include="iExt.Microsoft.Xaml.Behaviors.Wpf" Version="2023.1228.1812-preview" />
-      <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-rc5.4" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.10" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.10">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.10" />
-      <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
-      <PackageReference Include="SQLite" Version="3.13.0" />
+        <!-- Avalonia -->
+        <PackageReference Include="Avalonia" Version="11.0.10" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.0.10" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.10" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.10" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.10" />
+
+        <!-- EF Core -->
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.2" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.2">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.2" />
+
+        <!-- Other dependencies -->
+        <PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
+        <PackageReference Include="EPPlus" Version="8.1.0" />
+        <PackageReference Include="Firebase.Database" Version="1.0.0" />
+        <PackageReference Include="HtmlAgilityPack" Version="1.12.2" />
+        <PackageReference Include="SkiaSharp" Version="2.88.9" />
+        <PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.*" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="Resources\fanshop_logo.png" />
-      <Content Include=".github\workflows\release.yml" />
-      <Content Include="Resources\fanshop_logo.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <None Remove="Resources\CSKA.png" />
-      <Content Include="Resources\menu_icon.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Resources\close_icon.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="icon.ico">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <None Remove="Resources\fullsize_icon.png" />
-      <None Remove="Resources\collapse_icon.png" />
-      <None Remove="Resources\fanshop_logo_blue_and_light_blue.png" />
-      <Content Include="Resources\fanshop_logo_blue_and_light_blue.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <None Remove="Resources\zenit_arena.png" />
-      <Content Include="Resources\zenit_arena.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Update="icon.ico" CopyToOutputDirectory="PreserveNewest" />
+        <AvaloniaResource Include="icon.ico" />
+        <AvaloniaResource Include="Resources/**/*" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include=".github\images\" />
+        <Folder Include="Migrations\" />
     </ItemGroup>
 
 </Project>

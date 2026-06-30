@@ -4,12 +4,9 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Windows;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
-using MessageBox = System.Windows.MessageBox;
-using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
 namespace FanShop.Services;
 
@@ -32,7 +29,6 @@ public static class TaskExportToExcel
     
             if (!tasks.Any())
             {
-                MessageBox.Show("Нет данных для экспорта.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
             
@@ -40,15 +36,18 @@ public static class TaskExportToExcel
                 ? $"Задачи_{StartDate:dd.MM.yyyy}.xlsx"
                 : $"Задачи_{StartDate:dd.MM.yyyy}-{EndDate:dd.MM.yyyy}.xlsx";
     
-            var saveFileDialog = new SaveFileDialog
+            var exportDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+            if (string.IsNullOrWhiteSpace(exportDirectory) || !Directory.Exists(exportDirectory))
             {
-                Filter = "Excel файлы (*.xlsx)|*.xlsx",
-                DefaultExt = ".xlsx",
-                FileName = fileName
-            };
-    
-            if (saveFileDialog.ShowDialog() != true)
-                return;
+                exportDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            }
+
+            if (string.IsNullOrWhiteSpace(exportDirectory) || !Directory.Exists(exportDirectory))
+            {
+                exportDirectory = Directory.GetCurrentDirectory();
+            }
+
+            var targetPath = Path.Combine(exportDirectory, fileName);
     
             using var package = new ExcelPackage();
     
@@ -174,14 +173,11 @@ public static class TaskExportToExcel
                 summarySheet.Cells.AutoFitColumns();
             }
     
-            package.SaveAs(new FileInfo(saveFileDialog.FileName));
-    
-            MessageBox.Show("Экспорт успешно выполнен!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+            package.SaveAs(new FileInfo(targetPath));
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Ошибка при экспорте: {ex.Message}");
-            MessageBox.Show($"Ошибка при экспорте: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }

@@ -8,6 +8,7 @@ public class AppDbContext : DbContext
 {
     public DbSet<Employee> Employees { get; set; }
     public DbSet<WorkDay> WorkDays { get; set; }
+    public DbSet<WorkDayEmployee> WorkDayEmployee { get; set; }
     public DbSet<DayTask> DayTasks { get; set; }
     public DbSet<TaskCategory> TaskCategories { get; set; }
     
@@ -32,12 +33,12 @@ public class AppDbContext : DbContext
     
         modelBuilder.Entity<WorkDayEmployee>()
             .HasOne(wde => wde.WorkDay)
-            .WithMany(w => w.WorkDayEmployees)
+            .WithMany(w => w.WorkDayEmployee)
             .HasForeignKey(wde => wde.WorkDayID);
     
         modelBuilder.Entity<WorkDayEmployee>()
             .HasOne(wde => wde.Employee)
-            .WithMany(e => e.WorkDayEmployees)
+            .WithMany(e => e.WorkDayEmployee)
             .HasForeignKey(wde => wde.EmployeeID);
         
         modelBuilder.Entity<DayTask>()
