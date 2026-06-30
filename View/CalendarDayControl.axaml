@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FanShop.View.CalendarDayControl">
+    <Button Classes="cell"
+            Command="{Binding ShowDayDetailsCommand}"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
+        <Border Classes="day-frame"
+                BorderBrush="#E2ECF5"
+                BorderThickness="1"
+                CornerRadius="10"
+                Padding="8"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Background="{Binding HasMatch, Converter={StaticResource BoolToBackgroundConverter}}">
+            <Grid RowDefinitions="Auto,*,Auto">
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Text="{Binding Date.Day}"
+                               FontWeight="Bold"
+                               Foreground="{Binding ., Converter={StaticResource DateToTodayColorConverter}}" />
+                    <Border Grid.Column="1"
+                            Width="18"
+                            Height="18"
+                            CornerRadius="9"
+                            Background="#FFC107"
+                            IsVisible="{Binding ShowChangeNotice}">
+                        <TextBlock Text="?" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" />
+                    </Border>
+                </Grid>
+
+                <StackPanel Grid.Row="1" Spacing="3" IsVisible="{Binding IsEmployeeView}">
+                    <ItemsControl ItemsSource="{Binding DisplayedEmployees}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#D9F1FB" CornerRadius="4" Padding="4,2" Margin="0, 0,0,2">
+                                    <TextBlock Text="{Binding}" FontSize="11" TextTrimming="CharacterEllipsis" Foreground="MidnightBlue" />
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock Text="{Binding AdditionalEmployeesText}"
+                               HorizontalAlignment="Center"
+                               FontSize="10"
+                               Foreground="#5D77A1"
+                               IsVisible="{Binding IsAdditionalEmployeesTextVisible}" />
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Spacing="3" IsVisible="{Binding IsEmployeeView, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                    <ItemsControl ItemsSource="{Binding DisplayedTasks}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#113C66" CornerRadius="4" Padding="4,2" Margin="0, 0,0,2">
+                                    <TextBlock Text="{Binding}" FontSize="11" Foreground="White" TextTrimming="CharacterEllipsis" />
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock Text="{Binding AdditionalTasksText}"
+                               FontSize="10"
+                               Foreground="#113C66"
+                               IsVisible="{Binding IsAdditionalTasksTextVisible}" />
+                </StackPanel>
+
+                <StackPanel Grid.Row="2" Spacing="2" HorizontalAlignment="Center" IsVisible="{Binding HasMatch}">
+                    <Image Source="{Binding Match.Logo}" Height="40" Stretch="Uniform" />
+                    <TextBlock Text="{Binding Match.TeamName}" HorizontalAlignment="Center" FontWeight="SemiBold" FontSize="11" Foreground="MidnightBlue" />
+                    <TextBlock Text="{Binding Match.SartTime}" HorizontalAlignment="Center" FontSize="11" Foreground="MidnightBlue" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Button>
+</UserControl>

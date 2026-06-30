@@ -1,12 +1,13 @@
-﻿using System.Globalization;
-using System.Windows.Data;
+using Avalonia.Data.Converters;
+using System;
+using System.Globalization;
 
 namespace FanShop.Converters;
 
 public class ShiftToRussian : IValueConverter
 {
-    public static ShiftToRussian Instance { get; } = new ShiftToRussian();
-    
+    public static readonly ShiftToRussian Instance = new();
+
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is int shift)
@@ -20,7 +21,7 @@ public class ShiftToRussian : IValueConverter
     {
         throw new NotImplementedException();
     }
-    
+
     private string FormatedShifts(int shifts)
     {
         return shifts switch

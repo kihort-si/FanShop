@@ -1,0 +1,199 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+             x:Class="FanShop.View.EmployeeCostAnalyticsControl">
+    <ScrollViewer>
+        <StackPanel Margin="20" Spacing="16">
+            <Grid ColumnDefinitions="*">
+                <StackPanel>
+                    <TextBlock Text="Аналитика затрат на сотрудников" FontSize="26" FontWeight="Bold" />
+                    <TextBlock Text="Управленческий отчет по ЗП и матчевой нагрузке" Foreground="#6E7E8F" />
+                </StackPanel>
+            </Grid>
+            
+            <Grid ColumnDefinitions="Auto,Auto,Auto,Auto" Margin="0,8,0,16">
+                <DatePicker Grid.Column="0"
+                            SelectedDate="{Binding StartDateSelection}" />
+
+                <DatePicker Grid.Column="1"
+                            Margin="8,0,0,0"
+                            SelectedDate="{Binding EndDateSelection}" />
+
+                <Button Grid.Column="2"
+                        Margin="8,0,0,0"
+                        Content="Обновить"
+                        Command="{Binding UpdateAnalyticsCommand}" />
+
+                <Button Grid.Column="3"
+                        Classes="excel"
+                        Margin="8,0,0,0"
+                        Content="Экспорт Excel"
+                        Click="ExportButton_Click" />
+            </Grid>
+
+            <ItemsControl ItemsSource="{Binding KpiItems}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Width="210" Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="14" Padding="14" Margin="0,0,10,10">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{Binding Title}" Foreground="#6E7E8F" />
+                                <TextBlock Text="{Binding Value}" FontSize="24" FontWeight="Bold" Foreground="#0A6DAE" />
+                                <TextBlock Text="{Binding Description}" TextWrapping="Wrap" FontSize="12" Foreground="#6E7E8F" />
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Grid ColumnDefinitions="1.1*,0.9*" RowDefinitions="360,360">
+                <Border Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="14" Padding="14" Margin="0,0,8,8">
+                    <Grid RowDefinitions="Auto,*">
+                        <TextBlock Text="Динамика затрат по месяцам" FontSize="18" FontWeight="Bold" />
+                        <lvc:CartesianChart Grid.Row="1"
+                                            Series="{Binding SalaryByMonthSeries}"
+                                            XAxes="{Binding SalaryByMonthXAxes}"
+                                            YAxes="{Binding SalaryByMonthYAxes}" />
+                    </Grid>
+                </Border>
+
+                <Border Grid.Column="1" Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="14" Padding="14" Margin="8,0,0,8">
+                    <Grid RowDefinitions="Auto,*">
+                        <TextBlock Text="Структура выходов" FontSize="18" FontWeight="Bold" />
+                        <lvc:PieChart Grid.Row="1" Series="{Binding WorkTypeSeries}" />
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="1" Grid.ColumnSpan="2" Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="14" Padding="14" Margin="0,8,0,0">
+                    <Grid RowDefinitions="Auto,*">
+                        <TextBlock Text="Нагрузка по матчам" FontSize="18" FontWeight="Bold" />
+                        <ItemsControl ItemsSource="{Binding MatchLegend}" Margin="0, 25">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,12,4">
+                                        <Border Width="16"
+                                                Height="16"
+                                                Background="{Binding Color}" />
+
+                                        <TextBlock Margin="6,0,0,0"
+                                                   Text="{Binding Text}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                            <lvc:CartesianChart MinWidth="{Binding MatchLoadChartWidth}"
+                                                Series="{Binding MatchLoadSeries}"
+                                                XAxes="{Binding MatchLoadXAxes}" />
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <Border Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="14" Padding="14">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Выводы" FontSize="18" FontWeight="Bold" />
+                    <ItemsControl ItemsSource="{Binding ManagementInsights}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="White" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,0,0,8">
+                                    <Grid ColumnDefinitions="150,*">
+                                        <TextBlock Text="{Binding Severity}" Foreground="#0A6DAE" FontWeight="SemiBold" />
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="{Binding Title}" FontWeight="Bold" />
+                                            <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Foreground="#44515F" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+                
+            <Border Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="14" Padding="14">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Матчевые окна и причины затрат" FontSize="18" FontWeight="Bold" />
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                        <DataGrid ItemsSource="{Binding MatchAnalyses}" AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="True" MinHeight="220">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn Header="Матч" Width="220" SortMemberPath="MatchDate">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{Binding HighlightBackground}"
+                                                    BorderBrush="{Binding HighlightBorder}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="8"
+                                                    Padding="8,6"
+                                                    Margin="0,2">
+                                                <StackPanel Spacing="2">
+                                                    <TextBlock Text="{Binding MatchTitle}" FontWeight="SemiBold" />
+                                                    <TextBlock Text="{Binding Situation}" FontSize="11" Foreground="#5F6C78" TextWrapping="Wrap" />
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="Окно" Binding="{Binding PreparationWindow}" Width="120" />
+                                <DataGridTextColumn Header="Дней" Binding="{Binding WindowDays}" Width="90" />
+                                <DataGridTextColumn Header="Раб. дней" Binding="{Binding WorkDays}" Width="110" />
+                                <DataGridTextColumn Header="Сотрудников" Binding="{Binding UniqueEmployees}" Width="130" />
+                                <DataGridTextColumn Header="Выходов" Binding="{Binding TotalShifts}" Width="100" />
+                                <DataGridTextColumn Header="ЗП" Binding="{Binding TotalSalaryText}" SortMemberPath="TotalSalary" Width="110" />
+                                <DataGridTextColumn Header="Объяснение" Binding="{Binding Explanation}" Width="Auto" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </ScrollViewer>
+                </StackPanel>
+            </Border>
+
+            <Border Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="14" Padding="14">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Сотрудники: оплачиваемые, вне матчей и вне ЗП" FontSize="18" FontWeight="Bold" />
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                        <DataGrid MinWidth="1280" ItemsSource="{Binding EmployeeSummaries}" AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="True" MinHeight="220">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Сотрудник" Binding="{Binding EmployeeName}" Width="300" />
+                                <DataGridTextColumn Header="В ЗП" Binding="{Binding PaidShifts}" Width="80" />
+                                <DataGridTextColumn Header="Вне ЗП" Binding="{Binding UnpaidShifts}" Width="90" />
+                                <DataGridTextColumn Header="Перед матчами" Binding="{Binding MatchRelatedShifts}" Width="130" />
+                                <DataGridTextColumn Header="Вне матчей" Binding="{Binding NonMatchShifts}" Width="110" />
+                                <DataGridTextColumn Header="Сумма" Binding="{Binding TotalSalaryText}" Width="100" />
+                                <DataGridTextColumn Header="Комментарий" Binding="{Binding Explanation}" Width="Auto" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </ScrollViewer>
+                </StackPanel>
+            </Border>
+
+            <Border Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="14" Padding="14">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Расшифровка каждого рабочего дня" FontSize="18" FontWeight="Bold" />
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                        <DataGrid MinWidth="1500" ItemsSource="{Binding WorkDayExplanations}" AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="True" MinHeight="360">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Дата" Binding="{Binding DateText}" Width="110" />
+                                <DataGridTextColumn Header="Сотрудник" Binding="{Binding EmployeeName}" Width="300" />
+                                <DataGridTextColumn Header="Занятость" Binding="{Binding WorkDuration}" Width="120" />
+                                <DataGridTextColumn Header="Тип" Binding="{Binding WorkType}" Width="80" />
+                                <DataGridTextColumn Header="Сумма" Binding="{Binding SalaryAmountText}" Width="90" />
+                                <DataGridTextColumn Header="Матч/категория" Binding="{Binding RelatedMatch}" Width="Auto" />
+                                <DataGridTextColumn Header="Объяснение" Binding="{Binding Context}" Width="Auto" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </ScrollViewer>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
