@@ -248,14 +248,14 @@ public partial class EmployeeCostAnalyticsViewModel : BaseViewModel
             }
             
             using var context = new AppDbContext();
-            var workDayEmployees = context.WorkDayEmployees
+            var WorkDayEmployee = context.WorkDayEmployee
                 .Where(item => item.WorkDay.Date >= windowStart && item.WorkDay.Date <= match.Date)
                 .Include(workDayEmployee => workDayEmployee.WorkDay)
                 .ToList();
 
             var firstDayOfWork = match.Date.AddDays(-1);
 
-            foreach (var workDayEmployee in workDayEmployees)
+            foreach (var workDayEmployee in WorkDayEmployee)
             {
                 if (workDayEmployee.WorkDay.Date < firstDayOfWork) firstDayOfWork = workDayEmployee.WorkDay.Date;
             }
@@ -284,13 +284,13 @@ public partial class EmployeeCostAnalyticsViewModel : BaseViewModel
         IReadOnlyList<MatchPreparationWindow> windows)
     {
         using var context = new AppDbContext();
-        var workDayEmployees = context.WorkDayEmployees
+        var WorkDayEmployee = context.WorkDayEmployee
             .Include(item => item.WorkDay)
             .Include(item => item.Employee)
             .Where(item => item.WorkDay.Date >= start && item.WorkDay.Date <= end)
             .ToList();
 
-        return workDayEmployees.Select(item =>
+        return WorkDayEmployee.Select(item =>
         {
             var date = item.WorkDay.Date.Date;
             var window = windows.FirstOrDefault(candidate => candidate.Contains(date));
