@@ -369,7 +369,16 @@ public partial class CalendarDayViewModel : BaseViewModel
 public partial class EmployeeWorkInfo : ObservableObject
 {
     public required Employee Employee { get; set; }
-    public required string WorkDuration { get; set; }
+    // public required string WorkDuration { get; set; }
+    
+    [ObservableProperty]
+    private string _workDuration = "Целый день";
+    
+    public IReadOnlyList<string> WorkDurations { get; } =
+    [
+        "Целый день",
+        "Полдня"
+    ];
 
     public int WorkDayEmployeeID { get; set; }
 
@@ -389,6 +398,25 @@ public partial class EmployeeWorkInfo : ObservableObject
     partial void OnIncludeInSalaryChanged(bool value)
     {
         PersistFlag(wde => wde.IncludeInSalary = value);
+        StatisticsChangedCallback?.Invoke();
+    }
+    
+    partial void OnWorkDurationChanged(string value)
+    {
+        if (WorkDayEmployeeID == 0)
+            return;
+
+        using var context = new AppDbContext();
+
+        var wde = context.WorkDayEmployee.Find(WorkDayEmployeeID);
+
+        if (wde == null)
+            return;
+
+        wde.WorkDuration = value;
+
+        context.SaveChanges();
+
         StatisticsChangedCallback?.Invoke();
     }
 

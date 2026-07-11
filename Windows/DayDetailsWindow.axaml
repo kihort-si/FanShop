@@ -32,7 +32,51 @@
                     <DataGridTextColumn Header="Фамилия" Binding="{Binding Surname}" Width="*" IsReadOnly="True" />
                     <DataGridTextColumn Header="Имя" Binding="{Binding FirstName}" Width="*" IsReadOnly="True" />
                     <DataGridTextColumn Header="Дата рождения" Binding="{Binding DateOfBirth}" Width="*" IsReadOnly="True" />
-                    <DataGridTextColumn Header="Занятость" Binding="{Binding WorkDuration}" Width="*" IsReadOnly="True" />
+                    <DataGridTemplateColumn Header="Занятость" Width="130">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ComboBox
+                                    ItemsSource="{Binding WorkDurations}"
+                                    SelectedItem="{Binding WorkDuration, Mode=TwoWay}"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Padding="14,0, 0, 0"
+                                    Width="130"
+                                    HorizontalContentAlignment="Stretch">
+
+                                    <ComboBox.Styles>
+
+                                        <Style Selector="ComboBox">
+                                            <Setter Property="BorderThickness" Value="0"/>
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="CornerRadius" Value="0"/>
+                                            <Setter Property="Padding" Value="14, 0"/>
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+                                        </Style>
+
+                                        <Style Selector="ComboBox /template/ ToggleButton">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="BorderThickness" Value="0"/>
+                                        </Style>
+
+                                        <Style Selector="ComboBox:pointerover /template/ ToggleButton">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                        </Style>
+
+                                        <Style Selector="ComboBox:pressed /template/ ToggleButton">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                        </Style>
+
+                                        <Style Selector="ComboBox:focus">
+                                            <Setter Property="BorderThickness" Value="0"/>
+                                        </Style>
+
+                                    </ComboBox.Styles>
+
+                                </ComboBox>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridCheckBoxColumn Header="В пропуск" Binding="{Binding IncludeInPass}" Width="110" />
                     <DataGridCheckBoxColumn Header="В зарплату" Binding="{Binding IncludeInSalary}" Width="110" />
                 </DataGrid.Columns>
