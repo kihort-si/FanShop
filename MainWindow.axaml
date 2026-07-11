@@ -8,6 +8,7 @@
         MinWidth="960"
         MinHeight="640"
         WindowStartupLocation="CenterScreen"
+        WindowState="FullScreen"
         Background="{StaticResource BrandSurfaceAlt}"
         Icon="/icon.ico"
         ExtendClientAreaToDecorationsHint="True"
@@ -157,7 +158,7 @@
                             <Button Classes="menu-item" Command="{Binding OpenPassTemplateCommand}">
                                 <StackPanel>
                                     <TextBlock Text="Шаблон пропуска" FontWeight="SemiBold" />
-                                    <TextBlock Text="Открыть или добавить болванку .docx" FontSize="12" Foreground="{StaticResource BrandTextSubtle}" />
+                                    <TextBlock Text="Открыть или изменить .docx" FontSize="12" Foreground="{StaticResource BrandTextSubtle}" />
                                 </StackPanel>
                             </Button>
                             <Button Classes="menu-item" Command="{Binding OpenFaqTabCommand}">
