@@ -169,31 +169,41 @@ namespace FanShop.Services
             string currentDir = Path.GetDirectoryName(appPath);
             string appExeName = Path.GetFileName(appPath);
             string batPath = Path.Combine(Path.GetTempPath(), "update_fanshop.bat");
+            var filesToDelete = Directory
+                .GetFiles(tempExtractPath, "*", SearchOption.TopDirectoryOnly)
+                .Select(Path.GetFileName)
+                .Where(f => !string.IsNullOrWhiteSpace(f))
+                .ToList();
+            var deleteCommands = string.Join(
+                Environment.NewLine,
+                filesToDelete.Select(f =>
+                    $@"del /Q ""{Path.Combine(currentDir, f)}"" >nul 2>&1"));
 
             string script = $@"
-        @echo off
-        echo Обновление FanShop...
-        timeout /t 3 /nobreak > nul
-        
-        REM Убедимся, что процесс завершен
-        taskkill /f /im ""{appExeName}"" /t >nul 2>&1
-        
-        REM Дополнительная пауза для освобождения файлов
-        timeout /t 2 /nobreak > nul
-        
-        REM Копируем файлы обновления
-        xcopy /E /Y /I ""{tempExtractPath}\*"" ""{currentDir}\""
-        
-        REM Удаляем временную папку
-        rmdir /S /Q ""{tempExtractPath}""
-        
-        REM Запускаем обновленное приложение
-        start """" ""{Path.Combine(currentDir, appExeName)}""
-        
-        REM Удаляем файл скрипта
-        timeout /t 1 /nobreak > nul
-        del ""%~f0""
-        ";
+                @echo off
+                echo Обновление FanShop...
+
+                timeout /t 3 /nobreak > nul
+
+                taskkill /f /im ""{appExeName}"" /t >nul 2>&1
+
+                timeout /t 2 /nobreak > nul
+
+                REM Удаляем старые файлы версии
+                {deleteCommands}
+
+                REM Копируем файлы обновления
+                xcopy /E /Y /I ""{tempExtractPath}\*"" ""{currentDir}\""
+
+                REM Удаляем временную папку
+                rmdir /S /Q ""{tempExtractPath}""
+
+                REM Запускаем обновленное приложение
+                start """" ""{Path.Combine(currentDir, appExeName)}""
+
+                timeout /t 1 /nobreak > nul
+                del ""%~f0""
+                ";
 
             File.WriteAllText(batPath, script);
         }
