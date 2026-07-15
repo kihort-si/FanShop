@@ -16,10 +16,13 @@
     <list default="true" id="e54c70c9-ddf7-45c1-ae2c-936fb33afdcc" name="Changes" comment="">
       <change afterPath="$PROJECT_DIR$/Models/Position.cs" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/Models/SalaryHistory.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Models/Shop.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ViewModels/ConfirmDialogViewModel.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Windows/ConfirmDialog.axaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Windows/ConfirmDialog.axaml.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.FanShop/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.FanShop/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MainWindow.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/MainWindow.axaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ViewModels/CalendarDayViewModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ViewModels/CalendarDayViewModel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Windows/DayDetailsWindow.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/Windows/DayDetailsWindow.axaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FanShop.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/FanShop.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ViewModels/EmployeeViewModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ViewModels/EmployeeViewModel.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,6 +38,11 @@
     <option name="firstShow" value="false" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -54,8 +62,11 @@
     <setting file="file://$PROJECT_DIR$/AssemblyInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Models/Position.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Models/SalaryHistory.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Models/Shop.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Services/TaskExportToExcel.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file:///var/folders/7q/yv1cx4tx1vsf604nxhm397l00000gn/T/SourceGeneratedDocuments/1B490B3EEDF935818A148AC8/CommunityToolkit.Mvvm.SourceGenerators/CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator/FanShop.ViewModels.EmployeeWorkInfo.g.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/ViewModels/ConfirmDialogViewModel.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/ViewModels/WhatsNewViewModel.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Windows/WhatsNewWindow.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
@@ -66,27 +77,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET Project.FanShop.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "cidr.known.project.marker": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "/Users/nikita/RiderProjects/FanShop",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET Project.FanShop.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;develop&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/nikita/RiderProjects/FanShop&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="FanShop" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
@@ -118,7 +130,33 @@
       <option name="presentableId" value="Default" />
       <updated>1782843173214</updated>
       <workItem from="1782843174779" duration="28000" />
+      <workItem from="1784116117586" duration="5230000" />
     </task>
+    <task id="LOCAL-00001" summary="Refactor WorkDuration handling in EmployeeWorkInfo and update UI to use ComboBox for selection">
+      <option name="closed" value="true" />
+      <created>1783765184587</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1783765184587</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Enhance update script to delete old version files before copying new updates">
+      <option name="closed" value="true" />
+      <created>1784057958735</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1784057958735</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Add WhatsNew feature to inform users of updates and changes">
+      <option name="closed" value="true" />
+      <created>1784117077035</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1784117077035</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -128,6 +166,10 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="Refactor WorkDuration handling in EmployeeWorkInfo and update UI to use ComboBox for selection" />
+    <MESSAGE value="Enhance update script to delete old version files before copying new updates" />
+    <MESSAGE value="Add WhatsNew feature to inform users of updates and changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add WhatsNew feature to inform users of updates and changes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
