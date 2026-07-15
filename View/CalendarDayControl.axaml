@@ -23,7 +23,8 @@
                             Height="18"
                             CornerRadius="9"
                             Background="#FFC107"
-                            IsVisible="{Binding ShowChangeNotice}">
+                            IsVisible="{Binding ShowChangeNotice}"
+                            ToolTip.Tip="Дата и время матча могут измениться">
                         <TextBlock Text="?" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" />
                     </Border>
                 </Grid>

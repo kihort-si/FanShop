@@ -8,7 +8,7 @@
         MinWidth="960"
         MinHeight="640"
         WindowStartupLocation="CenterScreen"
-        WindowState="FullScreen"
+        WindowState="Maximized"
         Background="{StaticResource BrandSurfaceAlt}"
         Icon="/icon.ico"
         ExtendClientAreaToDecorationsHint="True"

@@ -1,0 +1,103 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="FanShop.Windows.WhatsNewWindow"
+        Width="700"
+        Height="500"
+        CanResize="False"
+        SystemDecorations="None"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent"
+        Title="Что нового">
+
+    <Border CornerRadius="16"
+            Margin="20"
+            BoxShadow="0 0 34 0 #40000000"
+            Background="White">
+
+        <Grid RowDefinitions="Auto,*,Auto">
+
+            <Border Background="{StaticResource BrandPrimary}"
+                    CornerRadius="16,16,0,0">
+
+                <Grid>
+
+                    <Image Source="/Resources/whatsnew-header.png"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Top"
+                           Width="210"
+                           Opacity="0.15"
+                           IsHitTestVisible="False"/>
+
+                    <StackPanel Spacing="8">
+
+                        <TextBlock Text="Что нового"
+                                   FontSize="28"
+                                   FontWeight="Bold"
+                                   Foreground="White"
+                                   Padding="20,20,0,0"/>
+
+                        <TextBlock Text="{Binding Version}"
+                                   Foreground="White"
+                                   Opacity="0.7"
+                                   Padding="20,0,0,10"/>
+
+                    </StackPanel>
+
+                </Grid>
+
+            </Border>
+
+
+            <Border Grid.Row="1"
+                    Margin="20"
+                    Padding="16"
+                    CornerRadius="12"
+                    Background="#fafafa">
+
+                <ScrollViewer>
+
+                    <ItemsControl ItemsSource="{Binding Sections}">
+
+                        <ItemsControl.ItemTemplate>
+
+                            <DataTemplate>
+
+                                <StackPanel Margin="0,0,0,16"
+                                            Spacing="4">
+
+                                    <TextBlock Text="{Binding Title}"
+                                               FontSize="18"
+                                               FontWeight="Bold"
+                                               Foreground="{StaticResource BrandPrimary}" />
+
+                                    <TextBlock Text="{Binding Description}"
+                                               TextWrapping="Wrap"
+                                               FontSize="14"
+                                               Opacity="0.85" />
+
+                                </StackPanel>
+
+                            </DataTemplate>
+
+                        </ItemsControl.ItemTemplate>
+
+                    </ItemsControl>
+
+                </ScrollViewer>
+
+            </Border>
+
+            <Button Grid.Row="2"
+                    HorizontalAlignment="Right"
+                    Width="82"
+                    Content="Понятно"
+                    Command="{Binding CloseCommand}"
+                    CommandParameter="{Binding $parent[Window]}"
+                    Margin="20" />
+
+        </Grid>
+    </Border>
+
+</Window>
