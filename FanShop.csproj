@@ -46,4 +46,11 @@
         <Folder Include="Migrations\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="Windows\ConfirmDialog.axaml.cs">
+        <DependentUpon>ConfirmDialog.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
+
 </Project>
