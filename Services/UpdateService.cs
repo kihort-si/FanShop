@@ -207,6 +207,16 @@ namespace FanShop.Services
 
             File.WriteAllText(batPath, script);
         }
+        
+        public static string GetAppVersion()
+        {
+            var version = Assembly
+                .GetExecutingAssembly()
+                .GetName()
+                .Version;
+
+            return $"{version?.Major}.{version?.Minor}.{version?.Build}";
+        }
     }
 
     public class ReleaseInfo

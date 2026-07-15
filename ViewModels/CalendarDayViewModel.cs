@@ -369,7 +369,6 @@ public partial class CalendarDayViewModel : BaseViewModel
 public partial class EmployeeWorkInfo : ObservableObject
 {
     public required Employee Employee { get; set; }
-    // public required string WorkDuration { get; set; }
     
     [ObservableProperty]
     private string _workDuration = "Целый день";

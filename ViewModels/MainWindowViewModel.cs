@@ -1,11 +1,14 @@
 using System.Collections.ObjectModel;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FanShop.Models;
 using FanShop.Services;
 using FanTabItem = FanShop.Utils.TabItem;
 using FanShop.View;
+using FanShop.Windows;
 
 namespace FanShop.ViewModels;
 
@@ -89,6 +92,65 @@ public partial class MainWindowViewModel : BaseViewModel
         };
 
         OpenTab(tabItem);
+    }
+    
+    public async Task CheckWhatsNew()
+    {
+        var settings = Settings.Load();
+
+        string currentVersion = UpdateService.GetAppVersion();
+
+        if (settings.LastSeenWhatsNewVersion == currentVersion)
+            return;
+
+        await OpenWhatsNewWindow(currentVersion);
+
+        settings.LastSeenWhatsNewVersion = currentVersion;
+        settings.Save();
+    }
+    
+    private async Task OpenWhatsNewWindow(string version)
+    {
+        var vm = new WhatsNewViewModel
+        {
+            Version = $"Версия {version}",
+            Sections = new ObservableCollection<WhatsNewSection>
+            {
+                new WhatsNewSection
+                {
+                    Title = "Изменен масштаб приложения",
+                    Description = "Изменен масштаб приложения для улучшения отображения на разных экранах. Теперь интерфейс будет выглядеть более гармонично и удобно на различных устройствах."
+                },
+                new WhatsNewSection
+                {
+                    Title = "Улучшен механизм обрновления",
+                    Description = "Теперь процесс обновления стал более стабильным и надежным, обеспечивая пользователям более плавный опыт при получении новых функций и исправлений."
+                },
+                new WhatsNewSection()
+                {
+                    Title = "Добавлена возможность открытия шаблона пропуска для печати",
+                    Description = "Теперь вы можете без проблем менять шаблон прямо в меню приложения, что позволяет более гибко настраивать внешний вид пропусков и адаптировать их под ваши нужды."
+                }
+            }
+        };
+
+        var window = new WhatsNewWindow
+        {
+            DataContext = vm
+        };
+        
+        var owner = GetCurrentOwner();
+        if (owner != null)
+        {
+            Console.WriteLine(owner?.Title);
+            Console.WriteLine(owner == window);
+            Console.WriteLine(owner?.IsVisible);
+            await window.ShowDialog(owner);
+        }
+        else
+        {
+            window.Show();
+        }
     }
 
     [RelayCommand]
@@ -300,5 +362,12 @@ public partial class MainWindowViewModel : BaseViewModel
         }
 
         return null;
+    }
+    
+    private static Window? GetCurrentOwner()
+    {
+        return (Application.Current?.ApplicationLifetime
+                as IClassicDesktopStyleApplicationLifetime)?
+            .MainWindow;
     }
 }

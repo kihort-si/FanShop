@@ -20,9 +20,14 @@ public partial class MainWindow : Window
         Activated += OnWindowActivated;
     }
 
-    private void OnWindowOpened(object? sender, System.EventArgs e)
+    private async void OnWindowOpened(object? sender, EventArgs e)
     {
         _mainWindowViewModel = DataContext as MainWindowViewModel;
+
+        if (DataContext is MainWindowViewModel vm)
+        {
+            await vm.CheckWhatsNew();
+        }
     }
 
     private async void OnWindowActivated(object? sender, EventArgs e)
