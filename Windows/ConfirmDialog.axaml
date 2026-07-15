@@ -1,0 +1,62 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="FanShop.Windows.ConfirmDialog"
+        Width="420"
+        Height="320"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        SystemDecorations="None"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        TransparencyLevelHint="Transparent">
+
+    <Border Background="White"
+            CornerRadius="16"
+            BorderBrush="{StaticResource BrandBorder}"
+            Margin="20"
+            BoxShadow="0 0 34 0 #40000000"
+            BorderThickness="1">
+
+        <Grid RowDefinitions="Auto,*,Auto">
+
+            <Border Background="#D32F2F"
+                    CornerRadius="16,16,0,0">
+
+                <TextBlock Text="Подтверждение"
+                           Foreground="White"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           Margin="20,16"/>
+
+            </Border>
+
+            <TextBlock Grid.Row="1"
+                       Text="{Binding Message}"
+                       TextWrapping="Wrap"
+                       Margin="20"
+                       VerticalAlignment="Center"/>
+
+            <StackPanel Grid.Row="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Margin="20"
+                        Spacing="10">
+
+                <Button Content="Отмена"
+                        Width="80"
+                        Command="{Binding CancelCommand}"
+                        CommandParameter="{Binding $parent[Window]}" />
+
+                <Button Content="Удалить"
+                        Width="85"
+                        Classes="danger"
+                        Command="{Binding ConfirmCommand}"
+                        CommandParameter="{Binding $parent[Window]}" />
+
+            </StackPanel>
+
+        </Grid>
+
+    </Border>
+
+</Window>

@@ -1,9 +1,12 @@
 using System.Collections.ObjectModel;
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FanShop.Models;
 using FanShop.Services;
 using FanShop.View;
+using FanShop.Windows;
 
 namespace FanShop.ViewModels;
 
@@ -65,19 +68,54 @@ public partial class EmployeeViewModel : BaseViewModel
     private bool CanEditEmployee => SelectedEmployee != null;
 
     [RelayCommand(CanExecute = nameof(CanRemoveEmployee))]
-    private void RemoveEmployee()
+    private async Task RemoveEmployee()
     {
-        using var context = new AppDbContext();
-        if (SelectedEmployee != null)
+        if (SelectedEmployee == null)
+            return;
+
+        var dialog = new ConfirmDialog();
+
+        dialog.DataContext = new ConfirmDialogViewModel
         {
-            var employee = context.Employees.Find(SelectedEmployee.EmployeeID);
-            if (employee != null)
-            {
-                context.Employees.Remove(employee);
-                context.SaveChanges();
-                Employees.Remove(SelectedEmployee);
-            }
+            Message =
+                "Вы действительно хотите удалить сотрудника " +
+                $"{SelectedEmployee.Surname} {SelectedEmployee.FirstName}?" + Environment.NewLine +
+                Environment.NewLine +
+                "Это действие нельзя отменить." + Environment.NewLine +
+                Environment.NewLine +
+                "Если у сотрудника были смены, то они также будут удалены. Аналита данных за период его работы также станет неактуальна."
+        };
+
+        var owner =
+            (Application.Current?.ApplicationLifetime
+                as IClassicDesktopStyleApplicationLifetime)?
+            .MainWindow;
+
+        bool confirmed = false;
+
+        if (owner != null)
+        {
+            confirmed = await dialog.ShowDialog<bool>(owner);
         }
+
+        if (!confirmed)
+            return;
+
+        using var context = new AppDbContext();
+
+        var employee = context.Employees.Find(SelectedEmployee.EmployeeID);
+
+        if (employee != null)
+        {
+            context.Employees.Remove(employee);
+            context.SaveChanges();
+            Employees.Remove(SelectedEmployee);
+        }
+    }
+
+    private void ShowConfirmDialog()
+    {
+        
     }
 
     private bool CanRemoveEmployee => SelectedEmployee != null;
