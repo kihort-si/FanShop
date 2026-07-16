@@ -142,9 +142,6 @@ public partial class MainWindowViewModel : BaseViewModel
         var owner = GetCurrentOwner();
         if (owner != null)
         {
-            Console.WriteLine(owner?.Title);
-            Console.WriteLine(owner == window);
-            Console.WriteLine(owner?.IsVisible);
             await window.ShowDialog(owner);
         }
         else
