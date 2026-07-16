@@ -25,7 +25,8 @@
 
                     <Image Source="/Resources/whatsnew-header.png"
                            HorizontalAlignment="Right"
-                           VerticalAlignment="Top"
+                           VerticalAlignment="Stretch"
+                           Stretch="UniformToFill"
                            Width="210"
                            Opacity="0.15"
                            IsHitTestVisible="False"/>

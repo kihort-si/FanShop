@@ -123,7 +123,7 @@ public partial class MainWindowViewModel : BaseViewModel
                 },
                 new WhatsNewSection
                 {
-                    Title = "Улучшен механизм обрновления",
+                    Title = "Улучшен механизм обновления",
                     Description = "Теперь процесс обновления стал более стабильным и надежным, обеспечивая пользователям более плавный опыт при получении новых функций и исправлений."
                 },
                 new WhatsNewSection()
