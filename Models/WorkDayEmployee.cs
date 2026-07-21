@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace FanShop.Models;
 
@@ -18,4 +19,8 @@ public class WorkDayEmployee
 
     public bool IncludeInPass { get; set; } = true;
     public bool IncludeInSalary { get; set; } = true;
+    public int PositionID { get; set; }
+    public Position Position { get; set; } = null!;
+    [Precision(18, 2)]
+    public decimal SalaryAtMoment { get; set; }
 }

@@ -3,7 +3,4 @@ obj/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
-/Models/Position.cs
-/Models/SalaryHistory.cs
-/Models/Shop.cs
 /.idea/
