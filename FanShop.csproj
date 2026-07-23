@@ -16,7 +16,7 @@
         <PackageReference Include="Avalonia" Version="11.0.10" />
         <PackageReference Include="Avalonia.Desktop" Version="11.0.10" />
         <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.10" />
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.10" />
+<!--        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.10" />-->
         <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.10" />
         <PackageReference Include="Material.Icons.Avalonia" Version="2.4.0" />
 
@@ -51,6 +51,22 @@
     <ItemGroup>
       <Compile Update="Windows\ConfirmDialog.axaml.cs">
         <DependentUpon>ConfirmDialog.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Windows\ChangeSalaryWindow.axaml.cs">
+        <DependentUpon>ChangeSalaryWindow.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Windows\InfoDialog.axaml.cs">
+        <DependentUpon>InfoDialog.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Windows\EditNameDialog.axaml.cs">
+        <DependentUpon>EditNameDialog.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Windows\AgreeDialog.axaml.cs">
+        <DependentUpon>AgreeDialog.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
     </ItemGroup>

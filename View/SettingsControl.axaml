@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="FanShop.View.SettingsControl">
     <ScrollViewer>
         <StackPanel Margin="24" Spacing="12" MaxWidth="760">
@@ -9,11 +10,105 @@
             <TextBox Watermark="Телефон" Text="{Binding ResponsiblePhoneNumber}" />
             <TextBox Watermark="Должность" Text="{Binding ResponsiblePosition}" />
             <TextBox Watermark="Цель визита" Text="{Binding VisitGoal}" />
-            <NumericUpDown Minimum="0" Maximum="100000" Increment="500" Value="{Binding DailySalary}" FormatString="F0" />
             <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
                 <Button Content="Сохранить" Command="{Binding SaveCommand}" />
                 <Button Classes="ghost" Content="Отмена" Command="{Binding CancelCommand}" />
             </StackPanel>
+            
+            <TextBlock Text="Магазины" FontSize="24" FontWeight="Bold" />
+            <ItemsControl ItemsSource="{Binding Shops}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+
+                        <Border Classes="Card"
+                                Padding="12"
+                                CornerRadius="16"
+                                Background="#EAEAEA"
+                                Margin="0,0,0,12">
+
+                            <StackPanel Spacing="8">
+
+                                <Grid ColumnDefinitions="*,Auto,Auto">
+
+                                    <TextBlock Grid.Column="0"
+                                               Text="{Binding ShopName}"
+                                               FontSize="18"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center"/>
+
+                                    <Button Grid.Column="1"
+                                            Classes="icon"
+                                            Command="{Binding $parent[UserControl].DataContext.EditShopNameCommand}"
+                                            CommandParameter="{Binding}"
+                                            Margin="0,0,10,0">
+                                        <materialIcons:MaterialIcon Kind="Pencil" />
+                                    </Button>
+
+                                    <Button Grid.Column="2"
+                                            Classes="danger"
+                                            Command="{Binding $parent[UserControl].DataContext.DeleteShopCommand}"
+                                            CommandParameter="{Binding}">
+                                        <materialIcons:MaterialIcon Kind="Delete"/>
+                                    </Button>
+
+                                </Grid>
+
+                                <ItemsControl ItemsSource="{Binding Positions}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+
+                                            <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto"
+                                                  Margin="0,10,0,0">
+
+                                                    <TextBlock Grid.Column="0"
+                                                               Text="{Binding PositionName}"
+                                                               VerticalAlignment="Center"
+                                                               Margin="0,0,10,0"/>
+
+                                                    <TextBlock Grid.Column="1"
+                                                               Text="{Binding CurrentSalary, StringFormat='{}{0:N0} ₽'}"
+                                                               VerticalAlignment="Center"
+                                                               Margin="0,0,10,0"/>
+
+                                                    <Button Grid.Column="2"
+                                                            Command="{Binding $parent[UserControl].DataContext.EditPositionNameCommand}"
+                                                            CommandParameter="{Binding}"
+                                                            Margin="0,0,10,0">
+                                                        <materialIcons:MaterialIcon Kind="Pencil" />
+                                                    </Button>
+
+                                                    <Button Grid.Column="3"
+                                                            Content="Изменить ЗП"
+                                                            Command="{Binding $parent[UserControl].DataContext.ChangeSalaryCommand}"
+                                                            CommandParameter="{Binding}"
+                                                            Margin="0,0,10,0"/>
+
+                                                    <Button Grid.Column="4"
+                                                            Classes="danger"
+                                                            Command="{Binding $parent[UserControl].DataContext.DeletePositionCommand}"
+                                                            CommandParameter="{Binding}">
+                                                        <materialIcons:MaterialIcon Kind="Delete"/>
+                                                    </Button>
+
+                                                </Grid>
+
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <Button Content="Добавить должность"
+                                        Command="{Binding AddPositionCommand}" />
+
+                            </StackPanel>
+
+                        </Border>
+
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Button Content="Создать магазин"
+                    Command="{Binding AddShopCommand}" />
         </StackPanel>
     </ScrollViewer>
 </UserControl>

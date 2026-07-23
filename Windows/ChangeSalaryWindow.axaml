@@ -1,0 +1,69 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="FanShop.Windows.ChangeSalaryWindow"
+        Width="420"
+        Height="260"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        SystemDecorations="None"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        TransparencyLevelHint="Transparent"
+        Title="Изменение зарплаты">
+
+    <Border Background="White"
+            CornerRadius="16"
+            BorderBrush="{StaticResource BrandBorder}"
+            Margin="20"
+            BoxShadow="0 0 34 0 #40000000"
+            BorderThickness="1">
+            
+            <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+                <Border Background="{StaticResource BrandPrimary}"
+                        CornerRadius="16,16,0,0">
+
+                        <TextBlock Text="Изменение зарплаты"
+                                   Foreground="White"
+                                   FontSize="20"
+                                   FontWeight="Bold"
+                                   Margin="20,16"/>
+
+                </Border>
+
+                <StackPanel Grid.Row="1"
+                            Margin="20"
+                            Spacing="12">
+
+                    <NumericUpDown
+                        Value="{Binding NewSalary}"
+                        Minimum="0"
+                        Maximum="100000"
+                        Increment="500"
+                        FormatString="F0"/>
+
+                    <DatePicker
+                        SelectedDate="{Binding StartDate}"/>
+
+                </StackPanel>
+
+                <StackPanel Grid.Row="3"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            Spacing="8"
+                            Margin="20, 0, 20, 20">
+
+                    <Button Content="Отмена"
+                            Command="{Binding CancelCommand}"
+                            CommandParameter="{Binding $parent[Window]}"/>
+
+                    <Button Content="Сохранить"
+                            Command="{Binding ConfirmCommand}"
+                            CommandParameter="{Binding $parent[Window]}"/>
+
+                </StackPanel>
+
+            </Grid>
+    </Border>
+
+</Window>

@@ -44,6 +44,26 @@ public partial class SelectEmployeeWindow : Window
 
         var selectedItem = WorkDurationComboBox.SelectedItem as ComboBoxItem;
         var workDuration = selectedItem?.Content?.ToString() ?? "Целый день";
+        var selectedPosition = viewModel.SelectedPosition;
+
+        if (selectedPosition == null)
+        {
+            DialogService.ShowInfo(
+                "Не выбрана должность.");
+            return;
+        }
+
+        if (SelectionOnly)
+        {
+            SelectedEmployee = employee;
+            SelectedWorkDuration = workDuration;
+            SelectedPosition = selectedPosition;
+            Close(true);
+            return;
+        }
+
+        if (ParentViewModel == null)
+            return;
 
         using var context = new AppDbContext();
         var workDay = context.WorkDays
@@ -60,23 +80,49 @@ public partial class SelectEmployeeWindow : Window
             context.SaveChanges();
         }
 
-        var existingAssignment = workDay.WorkDayEmployee.FirstOrDefault(x => x.EmployeeID == employee.EmployeeID);
+        var existingAssignment = context.WorkDayEmployee
+            .FirstOrDefault(x =>
+                x.WorkDayID == workDay.WorkDayID &&
+                x.EmployeeID == employee.EmployeeID);
+        var salaryService = new SalaryService(context);
+
         if (existingAssignment == null)
         {
             existingAssignment = new WorkDayEmployee
             {
                 WorkDayID = workDay.WorkDayID,
                 EmployeeID = employee.EmployeeID,
-                WorkDuration = workDuration
+                WorkDuration = workDuration,
+                PositionID = selectedPosition.PositionID,
+                SalaryAtMoment = salaryService.GetSalaryForShift(
+                    selectedPosition.PositionID,
+                    ParentViewModel.Date,
+                    workDuration)
             };
 
             context.WorkDayEmployee.Add(existingAssignment);
+            context.SaveChanges();
+        } else
+        {
+            existingAssignment.WorkDuration = workDuration;
+            existingAssignment.PositionID = selectedPosition.PositionID;
+
+            existingAssignment.SalaryAtMoment =
+                salaryService.GetSalaryForShift(
+                    selectedPosition.PositionID,
+                    ParentViewModel.Date,
+                    workDuration);
+
             context.SaveChanges();
         }
 
         if (!ParentViewModel.Employees.Any(x => x.Employee.EmployeeID == employee.EmployeeID))
         {
-            ParentViewModel.AddEmployeeToDay(employee, workDuration, existingAssignment.WorkDayEmployeeID);
+            ParentViewModel.AddEmployeeToDay(
+            employee,
+            workDuration,
+            existingAssignment.WorkDayEmployeeID,
+            selectedPosition.PositionName);
         }
 
         Close(true);

@@ -17,6 +17,7 @@ public partial class EmployeeViewModel : BaseViewModel
 
     public EmployeeViewModel()
     {
+        LoadShops();
         RefreshEmployees();
     }
 
@@ -28,18 +29,78 @@ public partial class EmployeeViewModel : BaseViewModel
 
     [ObservableProperty]
     private Employee? _selectedEmployee;
+    
+    [ObservableProperty]
+    private Shop? _selectedShop;
+
+    [ObservableProperty]
+    private Position? _selectedPosition;
+
+    [ObservableProperty]
+    private ObservableCollection<Shop> _shops = new();
+
+    [ObservableProperty]
+    private ObservableCollection<Position> _availablePositions = new();
+
+    [ObservableProperty]
+    private bool _canSelectPosition;
 
     public EmployeeViewModel(MainWindowViewModel mainWindowViewModel)
     {
         _mainWindowViewModel = mainWindowViewModel;
-
+        LoadShops();
         RefreshEmployees();
     }
+    
+    private void LoadShops()
+    {
+        using var context = new AppDbContext();
 
+        Shops.Clear();
+
+        foreach (var shop in context.Shops.OrderBy(x => x.ShopName))
+        {
+            Shops.Add(shop);
+        }
+
+        SelectedShop = Shops.FirstOrDefault();
+    }
+    
     partial void OnSelectedEmployeeChanged(Employee? value)
     {
         RemoveEmployeeCommand.NotifyCanExecuteChanged();
         EditEmployeeCommand.NotifyCanExecuteChanged();
+    }
+    
+    partial void OnSelectedShopChanged(Shop? value)
+    {
+        AvailablePositions.Clear();
+
+        if (value == null)
+            return;
+
+        using var context = new AppDbContext();
+
+        var positions = context.Positions
+            .Where(x => x.ShopID == value.ShopID)
+            .OrderBy(x => x.PositionName)
+            .ToList();
+
+        foreach (var position in positions)
+        {
+            AvailablePositions.Add(position);
+        }
+
+        if (AvailablePositions.Count == 1)
+        {
+            SelectedPosition = AvailablePositions[0];
+            CanSelectPosition = false;
+        }
+        else
+        {
+            SelectedPosition = AvailablePositions.FirstOrDefault();
+            CanSelectPosition = true;
+        }
     }
 
     [RelayCommand]

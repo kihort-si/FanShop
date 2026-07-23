@@ -10,7 +10,6 @@ public class Settings
     public string ResponsiblePhoneNumber { get; set; } = "";
     public string ResponsiblePosition { get; set; } = "Управляющий магазином Фаншоп";
     public string VisitGoal { get; set; } = "";
-    public decimal DailySalary { get; set; } = 0;
     public string LastSeenWhatsNewVersion { get; set; } = "";
     
     private static readonly string SettingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FanShop", "settings.json");

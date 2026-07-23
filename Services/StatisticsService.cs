@@ -44,17 +44,19 @@ namespace FanShop.Services
         public string GetTotalSalary(int year, int month)
         {
             using var context = new AppDbContext();
+
             var (firstDay, lastDay) = GetMonthBounds(year, month);
-            var settings = Settings.Load();
-        
-            var WorkDayEmployee = context.WorkDays
+
+            var workDayEmployees = context.WorkDays
                 .Where(wd => wd.Date >= firstDay && wd.Date <= lastDay)
                 .SelectMany(wd => wd.WorkDayEmployee)
                 .Where(wde => wde.IncludeInSalary)
                 .ToList();
 
-            var total = WorkDayEmployee
-                .Sum(wde => wde.WorkDuration == "Целый день" ? (double)settings.DailySalary : (double)settings.DailySalary / 2);
+            var total = workDayEmployees.Sum(wde =>
+                wde.WorkDuration == "Целый день"
+                    ? wde.SalaryAtMoment
+                    : wde.SalaryAtMoment / 2m);
 
             return $"{total:N0}₽";
         }
@@ -78,7 +80,10 @@ namespace FanShop.Services
                 {
                     EmployeeName = $"{g.Key.FirstName} {g.Key.Surname}",
                     WorkDaysCount = g.Count(),
-                    SalaryAmount = g.Sum(wde => wde.WorkDuration == "Целый день" ? settings.DailySalary : settings.DailySalary / 2)
+                    SalaryAmount = g.Sum(wde =>
+                        wde.WorkDuration == "Целый день"
+                            ? wde.SalaryAtMoment
+                            : wde.SalaryAtMoment / 2m)
                 })
                 .OrderByDescending(x => x.SalaryAmount)
                 .Select(x => new EmployeeStatistic

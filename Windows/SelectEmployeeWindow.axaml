@@ -41,11 +41,42 @@
 
             <Border Grid.Column="1" Margin="12,0,0,0" Background="#F9FBFD" BorderBrush="{StaticResource BrandBorder}" BorderThickness="1" CornerRadius="12" Padding="12">
                 <StackPanel Spacing="10">
-                    <TextBlock Text="Занятость" FontWeight="Bold" />
+
+                    <TextBlock Text="Занятость"
+                               FontWeight="Bold" />
+
                     <ComboBox x:Name="WorkDurationComboBox" SelectedIndex="0">
                         <ComboBoxItem Content="Целый день" />
                         <ComboBoxItem Content="Полдня" />
                     </ComboBox>
+
+                    <Separator/>
+
+                    <TextBlock Text="Магазин"
+                               FontWeight="Bold" />
+
+                    <ComboBox ItemsSource="{Binding Shops}"
+                              SelectedItem="{Binding SelectedShop}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding ShopName}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <TextBlock Text="Должность"
+                               FontWeight="Bold" />
+
+                    <ComboBox ItemsSource="{Binding AvailablePositions}"
+                              SelectedItem="{Binding SelectedPosition}"
+                              IsEnabled="{Binding CanSelectPosition}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding PositionName}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
                 </StackPanel>
             </Border>
         </Grid>

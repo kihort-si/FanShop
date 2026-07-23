@@ -18,7 +18,6 @@ namespace FanShop.ViewModels;
 public partial class EmployeeCostAnalyticsViewModel : BaseViewModel
 {
     private readonly MainWindowViewModel _mainWindowViewModel;
-    private readonly decimal _dailySalary;
     private bool _isInitializing;
 
     [ObservableProperty]
@@ -74,7 +73,6 @@ public partial class EmployeeCostAnalyticsViewModel : BaseViewModel
     public EmployeeCostAnalyticsViewModel(MainWindowViewModel mainWindowViewModel)
     {
         _mainWindowViewModel = mainWindowViewModel;
-        _dailySalary = Settings.Load().DailySalary;
 
         _isInitializing = true;
         EndDate = DateTime.Today;
@@ -295,7 +293,12 @@ public partial class EmployeeCostAnalyticsViewModel : BaseViewModel
             var date = item.WorkDay.Date.Date;
             var window = windows.FirstOrDefault(candidate => candidate.Contains(date));
             var matchDay = windows.FirstOrDefault(candidate => candidate.Match.Date == date);
-            var salaryAmount = item.IncludeInSalary ? CalculateSalary(item.WorkDuration) : 0m;
+            var salaryAmount =
+                item.IncludeInSalary
+                    ? (item.WorkDuration == "Целый день"
+                        ? item.SalaryAtMoment
+                        : item.SalaryAtMoment / 2m)
+                    : 0m;
 
             return new WorkDayCostExplanation
             {
@@ -310,11 +313,6 @@ public partial class EmployeeCostAnalyticsViewModel : BaseViewModel
                 Context = BuildContext(date, window, matchDay, item.IncludeInSalary)
             };
         }).ToList();
-    }
-
-    private decimal CalculateSalary(string workDuration)
-    {
-        return workDuration == "Целый день" ? _dailySalary : _dailySalary / 2;
     }
 
     private static string BuildContext(

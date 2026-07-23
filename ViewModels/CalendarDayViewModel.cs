@@ -337,7 +337,11 @@ public partial class CalendarDayViewModel : BaseViewModel
         MainViewModel?.RefreshStatistics();
     }
 
-    public void AddEmployeeToDay(Employee employee, string workDuration, int workDayEmployeeId)
+    public void AddEmployeeToDay(
+        Employee employee,
+        string workDuration,
+        int workDayEmployeeId,
+        string positionName)
     {
         if (Employees.Any(x => x.Employee.EmployeeID == employee.EmployeeID))
             return;
@@ -347,12 +351,15 @@ public partial class CalendarDayViewModel : BaseViewModel
             Employee = employee,
             WorkDuration = workDuration,
             WorkDayEmployeeID = workDayEmployeeId,
+            PositionName = positionName,
             StatisticsChangedCallback = NotifyMainControlOfChanges
         });
 
         OnPropertyChanged(nameof(Employees));
         OnPropertyChanged(nameof(DisplayedEmployees));
+
         PrintPassCommand.NotifyCanExecuteChanged();
+
         NotifyMainControlOfChanges();
     }
 }
@@ -368,6 +375,10 @@ public partial class EmployeeWorkInfo : ObservableObject
         "Целый день",
         "Полдня"
     ];
+
+    public int PositionID { get; set; }
+
+    [ObservableProperty] private string _positionName = string.Empty;
 
     public int WorkDayEmployeeID { get; set; }
 
@@ -402,6 +413,18 @@ public partial class EmployeeWorkInfo : ObservableObject
             return;
 
         wde.WorkDuration = value;
+
+        var salaryService = new SalaryService(context);
+
+        var workDate = context.WorkDays
+            .Where(x => x.WorkDayID == wde.WorkDayID)
+            .Select(x => x.Date)
+            .First();
+
+        wde.SalaryAtMoment = salaryService.GetSalaryForShift(
+            wde.PositionID,
+            workDate,
+            value);
 
         context.SaveChanges();
 
