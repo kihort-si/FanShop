@@ -21,7 +21,6 @@
                 <TextBlock Text="Информация о дне" FontSize="24" FontWeight="Bold" />
                 <TextBlock Text="{Binding Date, Converter={StaticResource RussianDateConverter}}" Foreground="#6E7E8F" />
             </StackPanel>
-            <Button Grid.Column="1" Classes="ghost" Content="Закрыть" Click="CloseButton_Click" />
         </Grid>
 
         <Border Grid.Row="1" Background="#F9FBFD" BorderBrush="{StaticResource BrandBorder}" BorderThickness="1" CornerRadius="12" Padding="12">

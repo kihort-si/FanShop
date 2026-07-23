@@ -65,25 +65,19 @@ public partial class CalendarDayViewModel : BaseViewModel
         set => SetProperty(ref _tasks, value);
     }
 
-    [ObservableProperty]
-    private EmployeeWorkInfo? _selectedEmployee;
+    [ObservableProperty] private EmployeeWorkInfo? _selectedEmployee;
 
-    [ObservableProperty]
-    private MatchInfo? _match;
+    [ObservableProperty] private MatchInfo? _match;
 
-    [ObservableProperty]
-    private bool _hasMatch;
+    [ObservableProperty] private bool _hasMatch;
 
     public bool ShowChangeNotice => HasMatch && Match != null && Match.CanChange;
 
-    [ObservableProperty]
-    private bool _isCurrentMonth;
+    [ObservableProperty] private bool _isCurrentMonth;
 
-    [ObservableProperty]
-    private bool _isBlackoutMode;
+    [ObservableProperty] private bool _isBlackoutMode;
 
-    [ObservableProperty]
-    private bool _isEmployeeView;
+    [ObservableProperty] private bool _isEmployeeView;
 
     public MainViewModel? MainViewModel { get; set; }
 
@@ -106,6 +100,9 @@ public partial class CalendarDayViewModel : BaseViewModel
     [RelayCommand]
     private void ShowDayDetails()
     {
+        if (MainViewModel?.TryAddMultiShift(this) == true)
+            return;
+
         if (!HasMatch)
         {
             var dayDetailsWindow = new DayDetailsWindow
@@ -113,7 +110,8 @@ public partial class CalendarDayViewModel : BaseViewModel
                 DataContext = this
             };
 
-            if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop &&
+            if (Avalonia.Application.Current?.ApplicationLifetime is
+                    Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop &&
                 desktop.MainWindow != null)
             {
                 dayDetailsWindow.ShowDialog(desktop.MainWindow);
@@ -125,10 +123,7 @@ public partial class CalendarDayViewModel : BaseViewModel
 
             SetBlackoutMode(true);
 
-            dayDetailsWindow.Closed += (s, e) =>
-            {
-                SetBlackoutMode(false);
-            };
+            dayDetailsWindow.Closed += (s, e) => { SetBlackoutMode(false); };
         }
     }
 
@@ -242,7 +237,7 @@ public partial class CalendarDayViewModel : BaseViewModel
             dayTasksWindow.Show();
         }
     }
-    
+
     [RelayCommand]
     private void CloseWindow()
     {
@@ -262,16 +257,14 @@ public partial class CalendarDayViewModel : BaseViewModel
         }
 
         return desktop.Windows
-            .OfType<DayDetailsWindow>()
-            .LastOrDefault(window => ReferenceEquals(window.DataContext, this))
-            ?? desktop.MainWindow;
+                   .OfType<DayDetailsWindow>()
+                   .LastOrDefault(window => ReferenceEquals(window.DataContext, this))
+               ?? desktop.MainWindow;
     }
 
-    [ObservableProperty]
-    private string _additionalEmployeesText = string.Empty;
+    [ObservableProperty] private string _additionalEmployeesText = string.Empty;
 
-    [ObservableProperty]
-    private bool _isAdditionalEmployeesTextVisible;
+    [ObservableProperty] private bool _isAdditionalEmployeesTextVisible;
 
     public IEnumerable<object> DisplayedEmployees
     {
@@ -304,11 +297,9 @@ public partial class CalendarDayViewModel : BaseViewModel
             return "сотрудников";
     }
 
-    [ObservableProperty]
-    private string _additionalTasksText = string.Empty;
+    [ObservableProperty] private string _additionalTasksText = string.Empty;
 
-    [ObservableProperty]
-    private bool _isAdditionalTasksTextVisible;
+    [ObservableProperty] private bool _isAdditionalTasksTextVisible;
 
     public IEnumerable<object> DisplayedTasks
     {
@@ -369,10 +360,9 @@ public partial class CalendarDayViewModel : BaseViewModel
 public partial class EmployeeWorkInfo : ObservableObject
 {
     public required Employee Employee { get; set; }
-    
-    [ObservableProperty]
-    private string _workDuration = "Целый день";
-    
+
+    [ObservableProperty] private string _workDuration = "Целый день";
+
     public IReadOnlyList<string> WorkDurations { get; } =
     [
         "Целый день",
@@ -381,11 +371,9 @@ public partial class EmployeeWorkInfo : ObservableObject
 
     public int WorkDayEmployeeID { get; set; }
 
-    [ObservableProperty]
-    private bool _includeInPass = true;
+    [ObservableProperty] private bool _includeInPass = true;
 
-    [ObservableProperty]
-    private bool _includeInSalary = true;
+    [ObservableProperty] private bool _includeInSalary = true;
 
     public Action? StatisticsChangedCallback { get; set; }
 
@@ -394,12 +382,13 @@ public partial class EmployeeWorkInfo : ObservableObject
     public string DateOfBirth => Employee.DateOfBirth;
 
     partial void OnIncludeInPassChanged(bool value) => PersistFlag(wde => wde.IncludeInPass = value);
+
     partial void OnIncludeInSalaryChanged(bool value)
     {
         PersistFlag(wde => wde.IncludeInSalary = value);
         StatisticsChangedCallback?.Invoke();
     }
-    
+
     partial void OnWorkDurationChanged(string value)
     {
         if (WorkDayEmployeeID == 0)

@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using FanShop.Models;
 using FanShop.ViewModels;
@@ -11,6 +12,39 @@ namespace FanShop.Services
     public static class PassDocumentGenerator
     {
         public static bool CreateWordPass(DateTime date, ObservableCollection<EmployeeWorkInfo> employees)
+        {
+            return CreateWordPass(date.ToString("dd MMMM yyyy"), date, employees);
+        }
+
+        public static bool CreateWordPassForDates(
+            IReadOnlyCollection<DateTime> dates,
+            ObservableCollection<EmployeeWorkInfo> employees)
+        {
+            if (dates.Count == 0)
+                return false;
+
+            var orderedDates = dates
+                .Select(x => x.Date)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToList();
+
+            var firstDate = orderedDates.First();
+            var lastDate = orderedDates.Last();
+
+            var culture = new CultureInfo("ru-RU");
+
+            var dateText = firstDate == lastDate
+                ? firstDate.ToString("d MMMM", culture)
+                : $"с {firstDate.ToString("d MMMM", culture)} по {lastDate.ToString("d MMMM", culture)}";
+            
+            return CreateWordPass(dateText, orderedDates[0], employees);
+        }
+
+        private static bool CreateWordPass(
+            string dateText,
+            DateTime fileDate,
+            ObservableCollection<EmployeeWorkInfo> employees)
         {
             string templatePath = PassTemplateService.TemplatePath;
             if (!File.Exists(templatePath))
@@ -29,7 +63,7 @@ namespace FanShop.Services
                 {
                     var settings = Settings.Load();
 
-                    ReplaceText(wordDoc, "{DATE}", date.ToString("dd MMMM yyyy"));
+                    ReplaceText(wordDoc, "{DATE}", dateText);
                     ReplaceText(wordDoc, "{HEAD}", settings.Head);
                     ReplaceText(wordDoc, "{RESPONSIBLE_POSITION}", settings.ResponsiblePosition);
                     ReplaceText(wordDoc, "{RESPONSIBLE_PERSON}", settings.ResponsiblePerson);
@@ -111,10 +145,10 @@ namespace FanShop.Services
             }
             catch (IOException ex) when (ex.Message.Contains("being used"))
             {
-                outputPath = Path.Combine(Path.GetTempPath(), $"пропуск_{date:yyyyMMdd}_{Guid.NewGuid():N}.docx");
+                outputPath = Path.Combine(Path.GetTempPath(), $"пропуск_{fileDate:yyyyMMdd}_{Guid.NewGuid():N}.docx");
                 File.Copy(templatePath, outputPath, true);
 
-                return CreateWordPass(date, employees);
+                return CreateWordPass(dateText, fileDate, employees);
             }
             catch (Exception)
             {

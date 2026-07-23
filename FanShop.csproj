@@ -18,6 +18,7 @@
         <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.10" />
         <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.10" />
         <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.10" />
+        <PackageReference Include="Material.Icons.Avalonia" Version="2.4.0" />
 
         <!-- EF Core -->
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.2" />
@@ -40,6 +41,7 @@
     <ItemGroup>
         <AvaloniaResource Include="icon.ico" />
         <AvaloniaResource Include="Resources/**/*" />
+        <AvaloniaResource Include="Resources\Fonts\*.ttf" />
     </ItemGroup>
 
     <ItemGroup>

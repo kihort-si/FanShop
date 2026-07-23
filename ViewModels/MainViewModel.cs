@@ -5,10 +5,15 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using Avalonia.Media.Imaging;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FanShop.Models;
 using FanShop.Services;
 using FanShop.ViewModels;
+using FanShop.Windows;
+using Microsoft.EntityFrameworkCore;
 
 namespace FanShop.ViewModels;
 
@@ -27,6 +32,19 @@ public partial class MainViewModel : BaseViewModel
     public ObservableCollection<MatchInfo> AllMatches { get; set; } = new();
 
     private DateTime _lastCalendarUpdateDate;
+    private Employee? _multiShiftEmployee;
+    private string _multiShiftWorkDuration = "Целый день";
+    private Position? _multiShiftPosition;
+    private readonly Dictionary<DateTime, int> _multiShiftAssignments = new();
+
+    [ObservableProperty]
+    private bool _isMultiShiftMode;
+
+    [ObservableProperty]
+    private DateTimeOffset? _selectedCalendarMonth;
+
+    [ObservableProperty]
+    private int _pickerYear;
 
     public string CurrentMonthName => new DateTime(_currentYear, _currentMonth, 1)
         .ToString("MMMM yyyy", new CultureInfo("ru-RU")).ToUpper();
@@ -77,10 +95,201 @@ public partial class MainViewModel : BaseViewModel
 
         _currentYear = DateTime.Now.Year;
         _currentMonth = DateTime.Now.Month;
+        _pickerYear = _currentYear;
+        _selectedCalendarMonth = new DateTimeOffset(new DateTime(_currentYear, _currentMonth, 1));
 
         _ = GenerateCalendar(_currentYear, _currentMonth);
         _lastCalendarUpdateDate = DateTime.Today;
     }
+
+    partial void OnSelectedCalendarMonthChanged(DateTimeOffset? value)
+    {
+        if (value == null)
+            return;
+
+        PickerYear = value.Value.Year;
+
+        if (value.Value.Year == _currentYear && value.Value.Month == _currentMonth)
+            return;
+
+        _ = GoToSelectedMonthAsync(value.Value.Year, value.Value.Month);
+    }
+
+    private async Task GoToSelectedMonthAsync(int year, int month)
+    {
+        _currentYear = year;
+        _currentMonth = month;
+        await GenerateCalendar(year, month);
+        NotifyCalendarPeriodChanged();
+    }
+
+    [RelayCommand]
+    private void PreviousPickerYear() => PickerYear--;
+
+    [RelayCommand]
+    private void NextPickerYear() => PickerYear++;
+
+    public async Task SelectCalendarMonthAsync(int month)
+    {
+        if (month is < 1 or > 12)
+            return;
+
+        await GoToSelectedMonthAsync(PickerYear, month);
+        SelectedCalendarMonth = new DateTimeOffset(new DateTime(PickerYear, month, 1));
+    }
+
+    private void NotifyCalendarPeriodChanged()
+    {
+        OnPropertyChanged(nameof(CurrentMonthName));
+        OnPropertyChanged(nameof(PreviousMonthName));
+        OnPropertyChanged(nameof(NextMonthName));
+        OnPropertyChanged(nameof(FormattedMonthTitle));
+        RefreshStatistics();
+    }
+
+    [RelayCommand]
+    private async Task StartMultiShiftMode()
+    {
+        if (IsMultiShiftMode)
+        {
+            await FinishMultiShiftModeAsync();
+            return;
+        }
+
+        var owner = GetMainWindow();
+        if (owner == null)
+            return;
+
+        var employeeViewModel = new EmployeeViewModel();
+        var window = new SelectEmployeeWindow
+        {
+            DataContext = employeeViewModel,
+            SelectionOnly = true
+        };
+
+        if (!await window.ShowDialog<bool>(owner) ||
+            window.SelectedEmployee == null ||
+            window.SelectedPosition == null)
+            return;
+
+        _multiShiftEmployee = window.SelectedEmployee;
+        _multiShiftWorkDuration = window.SelectedWorkDuration;
+        _multiShiftPosition = window.SelectedPosition;
+        _multiShiftAssignments.Clear();
+        IsMultiShiftMode = true;
+    }
+
+    public bool TryAddMultiShift(CalendarDayViewModel day)
+    {
+        if (!IsMultiShiftMode || _multiShiftEmployee == null || _multiShiftPosition == null)
+            return false;
+
+        using var context = new AppDbContext();
+        var date = day.Date.Date;
+        var workDay = context.WorkDays
+            .Include(x => x.WorkDayEmployee)
+            .FirstOrDefault(x => x.Date.Date == date);
+
+        if (workDay == null)
+        {
+            workDay = new WorkDay { Date = date };
+            context.WorkDays.Add(workDay);
+            context.SaveChanges();
+        }
+
+        var assignment = workDay.WorkDayEmployee
+            .FirstOrDefault(x => x.EmployeeID == _multiShiftEmployee.EmployeeID);
+        var salaryService = new SalaryService(context);
+
+        if (assignment == null)
+        {
+            assignment = new WorkDayEmployee
+            {
+                WorkDayID = workDay.WorkDayID,
+                EmployeeID = _multiShiftEmployee.EmployeeID,
+                IncludeInPass = true
+            };
+            context.WorkDayEmployee.Add(assignment);
+        }
+
+        assignment.WorkDuration = _multiShiftWorkDuration;
+        assignment.PositionID = _multiShiftPosition.PositionID;
+        assignment.IncludeInPass = true;
+        assignment.SalaryAtMoment = salaryService.GetSalaryForShift(
+            _multiShiftPosition.PositionID, date, _multiShiftWorkDuration);
+        context.SaveChanges();
+
+        _multiShiftAssignments[date] = assignment.WorkDayEmployeeID;
+        day.AddEmployeeToDay(
+            _multiShiftEmployee,
+            _multiShiftWorkDuration,
+            assignment.WorkDayEmployeeID,
+            _multiShiftPosition.PositionName);
+        var displayedAssignment = day.Employees
+            .FirstOrDefault(x => x.Employee.EmployeeID == _multiShiftEmployee.EmployeeID);
+        if (displayedAssignment != null && !displayedAssignment.IncludeInPass)
+            displayedAssignment.IncludeInPass = true;
+        return true;
+    }
+
+    private async Task FinishMultiShiftModeAsync()
+    {
+        if (_multiShiftEmployee == null || _multiShiftAssignments.Count == 0)
+        {
+            ResetMultiShiftMode();
+            return;
+        }
+
+        var owner = GetMainWindow();
+        var dialog = new AgreeDialog
+        {
+            DataContext = new AgreeDialogViewModel
+            {
+                Title = "Напечатать пропуск сразу?",
+                Message = $"Смены добавлены на {_multiShiftAssignments.Count} дн. Хотите распечатать пропуск на все дни эти?"
+            }
+        };
+        var shouldPrint = owner != null && await dialog.ShowDialog<bool>(owner);
+
+        if (shouldPrint && owner != null && await PassTemplateService.EnsureTemplateAsync(owner))
+        {
+            var employee = new EmployeeWorkInfo { Employee = _multiShiftEmployee, IncludeInPass = true };
+            var created = PassDocumentGenerator.CreateWordPassForDates(
+                _multiShiftAssignments.Keys.ToList(),
+                new ObservableCollection<EmployeeWorkInfo> { employee });
+
+            if (created)
+            {
+                using var context = new AppDbContext();
+                var ids = _multiShiftAssignments.Values.ToList();
+                var assignments = context.WorkDayEmployee.Where(x => ids.Contains(x.WorkDayEmployeeID)).ToList();
+                foreach (var assignment in assignments)
+                    assignment.IncludeInPass = false;
+                context.SaveChanges();
+
+                foreach (var day in CalendarDays.Where(x => _multiShiftAssignments.ContainsKey(x.Date.Date)))
+                {
+                    var item = day.Employees.FirstOrDefault(x => x.Employee.EmployeeID == _multiShiftEmployee.EmployeeID);
+                    if (item != null)
+                        item.IncludeInPass = false;
+                }
+            }
+        }
+
+        ResetMultiShiftMode();
+    }
+
+    private void ResetMultiShiftMode()
+    {
+        IsMultiShiftMode = false;
+        _multiShiftEmployee = null;
+        _multiShiftPosition = null;
+        _multiShiftAssignments.Clear();
+        RefreshStatistics();
+    }
+
+    private static Window? GetMainWindow() =>
+        (Avalonia.Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
 
     [RelayCommand]
     private async Task GoToPreviousMonth()
@@ -89,6 +298,7 @@ public partial class MainViewModel : BaseViewModel
         _currentYear = previousMonth.Year;
         _currentMonth = previousMonth.Month;
         await GenerateCalendar(_currentYear, _currentMonth);
+        SelectedCalendarMonth = new DateTimeOffset(new DateTime(_currentYear, _currentMonth, 1));
         OnPropertyChanged(nameof(CurrentMonthName));
         OnPropertyChanged(nameof(PreviousMonthName));
         OnPropertyChanged(nameof(NextMonthName));
@@ -103,6 +313,7 @@ public partial class MainViewModel : BaseViewModel
         _currentYear = nextMonth.Year;
         _currentMonth = nextMonth.Month;
         await GenerateCalendar(_currentYear, _currentMonth);
+        SelectedCalendarMonth = new DateTimeOffset(new DateTime(_currentYear, _currentMonth, 1));
         OnPropertyChanged(nameof(CurrentMonthName));
         OnPropertyChanged(nameof(PreviousMonthName));
         OnPropertyChanged(nameof(NextMonthName));
@@ -116,6 +327,7 @@ public partial class MainViewModel : BaseViewModel
         _currentYear = DateTime.Now.Year;
         _currentMonth = DateTime.Now.Month;
         await GenerateCalendar(_currentYear, _currentMonth);
+        SelectedCalendarMonth = new DateTimeOffset(new DateTime(_currentYear, _currentMonth, 1));
         OnPropertyChanged(nameof(CurrentMonthName));
         OnPropertyChanged(nameof(PreviousMonthName));
         OnPropertyChanged(nameof(NextMonthName));

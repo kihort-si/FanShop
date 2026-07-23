@@ -12,6 +12,10 @@ namespace FanShop.Windows;
 public partial class SelectEmployeeWindow : Window
 {
     public CalendarDayViewModel? ParentViewModel { get; set; }
+    public bool SelectionOnly { get; set; }
+    public Employee? SelectedEmployee { get; private set; }
+    public string SelectedWorkDuration { get; private set; } = "Целый день";
+    public Position? SelectedPosition { get; private set; }
 
     public SelectEmployeeWindow()
     {
@@ -35,7 +39,7 @@ public partial class SelectEmployeeWindow : Window
 
     private void SelectEmployee()
     {
-        if (DataContext is not EmployeeViewModel viewModel || viewModel.SelectedEmployee is not Employee employee || ParentViewModel == null)
+        if (DataContext is not EmployeeViewModel viewModel || viewModel.SelectedEmployee is not Employee employee)
             return;
 
         var selectedItem = WorkDurationComboBox.SelectedItem as ComboBoxItem;
@@ -65,6 +69,7 @@ public partial class SelectEmployeeWindow : Window
                 EmployeeID = employee.EmployeeID,
                 WorkDuration = workDuration
             };
+
             context.WorkDayEmployee.Add(existingAssignment);
             context.SaveChanges();
         }

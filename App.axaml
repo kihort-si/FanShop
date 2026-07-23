@@ -1,11 +1,14 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="using:FanShop.Converters"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="FanShop.App"
              RequestedThemeVariant="Light">
 
     <Application.Resources>
-        <FontFamily x:Key="AppFont">Segoe UI</FontFamily>
+        <FontFamily x:Key="AppFont">
+            avares://FanShop/Resources/Fonts/IBMPlexSans-Regular.ttf#IBM Plex Sans
+        </FontFamily>
 
         <SolidColorBrush x:Key="BrandPrimary" Color="#0A6DAE" />
         <SolidColorBrush x:Key="BrandPrimaryHover" Color="#0E7FC8" />
@@ -35,13 +38,16 @@
 
     <Application.Styles>
         <FluentTheme />
+        <avalonia:MaterialIconStyles />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
 
         <Style Selector="Window">
             <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
+            <Setter Property="FontWeight" Value="Medium" />
         </Style>
         <Style Selector="UserControl">
             <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
+            <Setter Property="FontWeight" Value="Medium" />
         </Style>
         
         <Style Selector="Button">
