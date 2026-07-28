@@ -70,7 +70,7 @@ public partial class SettingsViewModel : BaseViewModel
     {
         using var context = new AppDbContext();
 
-        var shops = context.Shops.ToList();
+        var shops = context.Shops.OrderByDescending(shop => shop.IsDefault).ThenBy(shop => shop.ShopName).ToList();
 
         Shops.Clear();
 
@@ -79,11 +79,14 @@ public partial class SettingsViewModel : BaseViewModel
             var shopVm = new ShopViewModel
             {
                 ShopID = shop.ShopID,
-                ShopName = shop.ShopName
+                ShopName = shop.ShopName,
+                IsDefault = shop.IsDefault
             };
 
             var positions = context.Positions
                 .Where(p => p.ShopID == shop.ShopID)
+                .OrderByDescending(position => position.IsDefault)
+                .ThenBy(position => position.PositionName)
                 .ToList();
 
             foreach (var position in positions)
@@ -100,6 +103,7 @@ public partial class SettingsViewModel : BaseViewModel
                     PositionID = position.PositionID,
                     PositionName = position.PositionName,
                     CurrentSalary = currentSalary,
+                    IsDefault = position.IsDefault,
                     Shop = shopVm
                 };
 
@@ -122,6 +126,7 @@ public partial class SettingsViewModel : BaseViewModel
             if (shop != null)
             {
                 shop.ShopName = shopVm.ShopName;
+                shop.IsDefault = shopVm.IsDefault;
             }
 
             foreach (var positionVm in shopVm.Positions)
@@ -132,6 +137,7 @@ public partial class SettingsViewModel : BaseViewModel
                 if (position != null)
                 {
                     position.PositionName = positionVm.PositionName;
+                    position.IsDefault = positionVm.IsDefault;
                 }
             }
         }
@@ -147,7 +153,8 @@ public partial class SettingsViewModel : BaseViewModel
         var shop = new Shop
         {
             ShopName = "Новый магазин",
-            OpenDate = DateTime.Today
+            OpenDate = DateTime.Today,
+            IsDefault = !context.Shops.Any()
         };
 
         context.Shops.Add(shop);
@@ -156,8 +163,40 @@ public partial class SettingsViewModel : BaseViewModel
         Shops.Add(new ShopViewModel
         {
             ShopID = shop.ShopID,
-            ShopName = shop.ShopName
+            ShopName = shop.ShopName,
+            IsDefault = shop.IsDefault
         });
+    }
+
+    [RelayCommand]
+    private void SetDefaultShop(ShopViewModel? selectedShop)
+    {
+        if (selectedShop == null)
+            return;
+
+        using var context = new AppDbContext();
+        foreach (var shop in context.Shops)
+            shop.IsDefault = shop.ShopID == selectedShop.ShopID;
+        context.SaveChanges();
+
+        foreach (var shop in Shops)
+            shop.IsDefault = shop.ShopID == selectedShop.ShopID;
+    }
+
+    [RelayCommand]
+    private void SetDefaultPosition(PositionViewModel? selectedPosition)
+    {
+        if (selectedPosition?.Shop == null)
+            return;
+
+        using var context = new AppDbContext();
+        var positions = context.Positions.Where(position => position.ShopID == selectedPosition.Shop.ShopID).ToList();
+        foreach (var position in positions)
+            position.IsDefault = position.PositionID == selectedPosition.PositionID;
+        context.SaveChanges();
+
+        foreach (var position in selectedPosition.Shop.Positions)
+            position.IsDefault = position.PositionID == selectedPosition.PositionID;
     }
     
     [RelayCommand]

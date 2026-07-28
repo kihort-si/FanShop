@@ -122,6 +122,7 @@ public partial class SelectEmployeeWindow : Window
             employee,
             workDuration,
             existingAssignment.WorkDayEmployeeID,
+            selectedPosition.PositionID,
             selectedPosition.PositionName);
         }
 

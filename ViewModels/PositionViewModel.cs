@@ -13,5 +13,11 @@ public partial class PositionViewModel : ObservableObject
     [ObservableProperty]
     private decimal _currentSalary;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DefaultLabel))]
+    private bool _isDefault;
+
+    public string DefaultLabel => IsDefault ? "По умолчанию" : "Сделать основной";
+
     public ShopViewModel? Shop { get; set; }
 }

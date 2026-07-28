@@ -30,6 +30,7 @@ public partial class MainViewModel : BaseViewModel
     public ObservableCollection<CalendarDayViewModel> CalendarDays { get; set; } = new();
 
     public ObservableCollection<MatchInfo> AllMatches { get; set; } = new();
+    public ObservableCollection<ShopFilterOption> EmployeeShopFilters { get; } = new();
 
     private DateTime _lastCalendarUpdateDate;
     private Employee? _multiShiftEmployee;
@@ -45,6 +46,9 @@ public partial class MainViewModel : BaseViewModel
 
     [ObservableProperty]
     private int _pickerYear;
+
+    [ObservableProperty]
+    private ShopFilterOption? _selectedEmployeeShopFilter;
 
     public string CurrentMonthName => new DateTime(_currentYear, _currentMonth, 1)
         .ToString("MMMM yyyy", new CultureInfo("ru-RU")).ToUpper();
@@ -97,9 +101,26 @@ public partial class MainViewModel : BaseViewModel
         _currentMonth = DateTime.Now.Month;
         _pickerYear = _currentYear;
         _selectedCalendarMonth = new DateTimeOffset(new DateTime(_currentYear, _currentMonth, 1));
+        LoadEmployeeShopFilters();
 
         _ = GenerateCalendar(_currentYear, _currentMonth);
         _lastCalendarUpdateDate = DateTime.Today;
+    }
+
+    private void LoadEmployeeShopFilters()
+    {
+        using var context = new AppDbContext();
+        EmployeeShopFilters.Clear();
+        EmployeeShopFilters.Add(new ShopFilterOption(null, "Все магазины"));
+        foreach (var shop in context.Shops.OrderByDescending(shop => shop.IsDefault).ThenBy(shop => shop.ShopName))
+            EmployeeShopFilters.Add(new ShopFilterOption(shop.ShopID, shop.ShopName));
+        SelectedEmployeeShopFilter = EmployeeShopFilters[0];
+    }
+
+    partial void OnSelectedEmployeeShopFilterChanged(ShopFilterOption? value)
+    {
+        foreach (var day in CalendarDays)
+            day.SetEmployeeShopFilter(value?.ShopID);
     }
 
     partial void OnSelectedCalendarMonthChanged(DateTimeOffset? value)
@@ -224,6 +245,7 @@ public partial class MainViewModel : BaseViewModel
             _multiShiftEmployee,
             _multiShiftWorkDuration,
             assignment.WorkDayEmployeeID,
+            _multiShiftPosition.PositionID,
             _multiShiftPosition.PositionName);
         var displayedAssignment = day.Employees
             .FirstOrDefault(x => x.Employee.EmployeeID == _multiShiftEmployee.EmployeeID);
@@ -490,6 +512,7 @@ public partial class MainViewModel : BaseViewModel
                 IsEmployeeView = IsEmployeeView,
                 MainViewModel = this
             };
+            calendarDay.SetEmployeeShopFilter(SelectedEmployeeShopFilter?.ShopID);
 
             var matchForThisDay = matchesForMonth.FirstOrDefault(m => DateTime.Parse(m.Time).Date == date.Date);
             if (matchForThisDay != null)
@@ -599,6 +622,8 @@ public class MatchInfoDto
     public string SartTime { get; set; } = string.Empty;
     public bool CanChange { get; set; }
 }
+
+public sealed record ShopFilterOption(int? ShopID, string Name);
 
 public class MatchInfo
 {

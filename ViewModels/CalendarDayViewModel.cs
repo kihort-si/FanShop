@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FanShop.Models;
@@ -26,20 +27,31 @@ public partial class CalendarDayViewModel : BaseViewModel
                 var workDay = context.WorkDays
                     .Include(w => w.WorkDayEmployee)
                     .ThenInclude(wde => wde.Employee)
+                    .Include(w => w.WorkDayEmployee)
+                    .ThenInclude(wde => wde.Position)
+                    .ThenInclude(position => position.Shop)
                     .FirstOrDefault(w => w.Date == Date);
 
-                _employees = workDay != null
-                    ? new ObservableCollection<EmployeeWorkInfo>(
-                        workDay.WorkDayEmployee.Select(wde => new EmployeeWorkInfo
+                _employees = new ObservableCollection<EmployeeWorkInfo>();
+                if (workDay != null)
+                {
+                    var shops = LoadWorkplaceShops(context);
+                    foreach (var wde in workDay.WorkDayEmployee)
+                    {
+                        var info = new EmployeeWorkInfo
                         {
                             Employee = wde.Employee,
                             WorkDuration = wde.WorkDuration,
                             WorkDayEmployeeID = wde.WorkDayEmployeeID,
                             IncludeInPass = wde.IncludeInPass,
                             IncludeInSalary = wde.IncludeInSalary,
-                            StatisticsChangedCallback = NotifyMainControlOfChanges
-                        }))
-                    : new ObservableCollection<EmployeeWorkInfo>();
+                            StatisticsChangedCallback = NotifyMainControlOfChanges,
+                            WorkplaceChangedCallback = NotifyEmployeeGroupsChanged
+                        };
+                        info.InitializeWorkplace(shops, wde.PositionID);
+                        _employees.Add(info);
+                    }
+                }
             }
 
             return _employees;
@@ -78,6 +90,8 @@ public partial class CalendarDayViewModel : BaseViewModel
     [ObservableProperty] private bool _isBlackoutMode;
 
     [ObservableProperty] private bool _isEmployeeView;
+
+    private int? _employeeShopFilterId;
 
     public MainViewModel? MainViewModel { get; set; }
 
@@ -185,6 +199,7 @@ public partial class CalendarDayViewModel : BaseViewModel
             NotifyMainControlOfChanges();
 
             OnPropertyChanged(nameof(Employees));
+            OnPropertyChanged(nameof(EmployeeGroups));
             OnPropertyChanged(nameof(DisplayedEmployees));
             PrintPassCommand.NotifyCanExecuteChanged();
         }
@@ -270,11 +285,19 @@ public partial class CalendarDayViewModel : BaseViewModel
     {
         get
         {
-            var displayed = Employees.Take(4).Select(e => e.FirstName).ToList();
-
-            if (Employees.Count > 4)
+            var filtered = Employees
+                .Where(employee => _employeeShopFilterId == null || employee.SelectedShop?.ShopID == _employeeShopFilterId)
+                .ToList();
+            var displayed = filtered.Take(4).Select(employee => new EmployeeCalendarChip
             {
-                AdditionalEmployeesText = $"Ещё {Employees.Count - 4} {GetEmployeesTextForm(Employees.Count - 4)}";
+                Name = employee.FirstName,
+                Background = GetShopChipBackground(employee.SelectedShop),
+                Foreground = GetShopChipForeground(employee.SelectedShop)
+            }).ToList();
+
+            if (filtered.Count > 4)
+            {
+                AdditionalEmployeesText = $"Ещё {filtered.Count - 4} {GetEmployeesTextForm(filtered.Count - 4)}";
                 IsAdditionalEmployeesTextVisible = true;
             }
             else
@@ -286,6 +309,24 @@ public partial class CalendarDayViewModel : BaseViewModel
             return displayed;
         }
     }
+
+    public void SetEmployeeShopFilter(int? shopId)
+    {
+        _employeeShopFilterId = shopId;
+        OnPropertyChanged(nameof(DisplayedEmployees));
+    }
+
+    private static IBrush GetShopChipBackground(Shop? shop)
+    {
+        if (shop?.IsDefault != false)
+            return Brush.Parse("#D9F1FB");
+
+        string[] palette = ["#C9E3F7", "#BCD8F2", "#D2E5FA", "#C5DCF0"];
+        return Brush.Parse(palette[Math.Abs(shop.ShopID) % palette.Length]);
+    }
+
+    private static IBrush GetShopChipForeground(Shop? shop) =>
+        shop?.IsDefault == false ? Brush.Parse("#174F7A") : Brushes.MidnightBlue;
 
     private string GetEmployeesTextForm(int count)
     {
@@ -337,25 +378,78 @@ public partial class CalendarDayViewModel : BaseViewModel
         MainViewModel?.RefreshStatistics();
     }
 
+    public IEnumerable<ShopEmployeeGroup> EmployeeGroups => Employees
+        .GroupBy(employee => new
+        {
+            ShopID = employee.SelectedShop?.ShopID ?? 0,
+            ShopName = employee.SelectedShop?.ShopName ?? "Магазин не выбран"
+        })
+        .OrderByDescending(group => group.Any(employee => employee.SelectedShop?.IsDefault == true))
+        .ThenBy(group => group.Key.ShopName)
+        .Select(group => new ShopEmployeeGroup
+        {
+            ShopName = group.Key.ShopName,
+            Positions = group
+                .GroupBy(employee => new
+                {
+                    PositionID = employee.SelectedPosition?.PositionID ?? 0,
+                    PositionName = employee.SelectedPosition?.PositionName ?? "Должность не выбрана"
+                })
+                .OrderBy(positionGroup => positionGroup.Count())
+                .ThenBy(positionGroup => positionGroup.Key.PositionName)
+                .Select(positionGroup => new PositionEmployeeGroup
+                {
+                    PositionName = positionGroup.Key.PositionName,
+                    Employees = positionGroup
+                        .OrderBy(employee => employee.Surname)
+                        .ThenBy(employee => employee.FirstName)
+                        .ToList()
+                })
+                .ToList()
+        })
+        .ToList();
+
+    private static List<Shop> LoadWorkplaceShops(AppDbContext context) => context.Shops
+        .AsNoTracking()
+        .Include(shop => shop.Positions)
+        .Where(shop => shop.Positions.Any())
+        .OrderByDescending(shop => shop.IsDefault)
+        .ThenBy(shop => shop.ShopName)
+        .ToList();
+
+    private void NotifyEmployeeGroupsChanged()
+    {
+        OnPropertyChanged(nameof(EmployeeGroups));
+        OnPropertyChanged(nameof(DisplayedEmployees));
+        NotifyMainControlOfChanges();
+    }
+
     public void AddEmployeeToDay(
         Employee employee,
         string workDuration,
         int workDayEmployeeId,
+        int positionId,
         string positionName)
     {
         if (Employees.Any(x => x.Employee.EmployeeID == employee.EmployeeID))
             return;
 
-        Employees.Add(new EmployeeWorkInfo
+        using var context = new AppDbContext();
+        var info = new EmployeeWorkInfo
         {
             Employee = employee,
             WorkDuration = workDuration,
             WorkDayEmployeeID = workDayEmployeeId,
+            PositionID = positionId,
             PositionName = positionName,
-            StatisticsChangedCallback = NotifyMainControlOfChanges
-        });
+            StatisticsChangedCallback = NotifyMainControlOfChanges,
+            WorkplaceChangedCallback = NotifyEmployeeGroupsChanged
+        };
+        info.InitializeWorkplace(LoadWorkplaceShops(context), positionId);
+        Employees.Add(info);
 
         OnPropertyChanged(nameof(Employees));
+        OnPropertyChanged(nameof(EmployeeGroups));
         OnPropertyChanged(nameof(DisplayedEmployees));
 
         PrintPassCommand.NotifyCanExecuteChanged();
@@ -380,6 +474,17 @@ public partial class EmployeeWorkInfo : ObservableObject
 
     [ObservableProperty] private string _positionName = string.Empty;
 
+    public ObservableCollection<Shop> AvailableShops { get; } = new();
+    public ObservableCollection<Position> AvailablePositions { get; } = new();
+
+    public bool HasMultipleShops => AvailableShops.Count > 1;
+    public bool HasMultiplePositions => AvailablePositions.Count > 1;
+
+    [ObservableProperty] private Shop? _selectedShop;
+    [ObservableProperty] private Position? _selectedPosition;
+
+    private bool _isInitializingWorkplace;
+
     public int WorkDayEmployeeID { get; set; }
 
     [ObservableProperty] private bool _includeInPass = true;
@@ -387,6 +492,7 @@ public partial class EmployeeWorkInfo : ObservableObject
     [ObservableProperty] private bool _includeInSalary = true;
 
     public Action? StatisticsChangedCallback { get; set; }
+    public Action? WorkplaceChangedCallback { get; set; }
 
     public string FirstName => Employee.FirstName;
     public string Surname => Employee.Surname;
@@ -431,6 +537,74 @@ public partial class EmployeeWorkInfo : ObservableObject
         StatisticsChangedCallback?.Invoke();
     }
 
+    public void InitializeWorkplace(IEnumerable<Shop> shops, int positionId)
+    {
+        _isInitializingWorkplace = true;
+        AvailableShops.Clear();
+        foreach (var shop in shops)
+            AvailableShops.Add(shop);
+        OnPropertyChanged(nameof(HasMultipleShops));
+
+        var position = AvailableShops.SelectMany(shop => shop.Positions)
+            .FirstOrDefault(item => item.PositionID == positionId);
+        SelectedShop = AvailableShops.FirstOrDefault(shop => shop.ShopID == position?.ShopID);
+        RefreshAvailablePositions();
+        SelectedPosition = AvailablePositions.FirstOrDefault(item => item.PositionID == positionId);
+        PositionID = SelectedPosition?.PositionID ?? positionId;
+        PositionName = SelectedPosition?.PositionName ?? PositionName;
+        _isInitializingWorkplace = false;
+    }
+
+    partial void OnSelectedShopChanged(Shop? value)
+    {
+        RefreshAvailablePositions();
+        if (_isInitializingWorkplace)
+            return;
+
+        SelectedPosition = AvailablePositions.FirstOrDefault(position => position.IsDefault)
+                           ?? AvailablePositions.FirstOrDefault();
+    }
+
+    partial void OnSelectedPositionChanged(Position? value)
+    {
+        if (_isInitializingWorkplace || value == null || WorkDayEmployeeID == 0)
+            return;
+
+        using var context = new AppDbContext();
+        var wde = context.WorkDayEmployee.Find(WorkDayEmployeeID);
+        if (wde == null)
+            return;
+
+        wde.PositionID = value.PositionID;
+        var workDate = context.WorkDays
+            .Where(day => day.WorkDayID == wde.WorkDayID)
+            .Select(day => day.Date)
+            .First();
+        wde.SalaryAtMoment = new SalaryService(context).GetSalaryForShift(
+            value.PositionID, workDate, wde.WorkDuration);
+        context.SaveChanges();
+
+        PositionID = value.PositionID;
+        PositionName = value.PositionName;
+        WorkplaceChangedCallback?.Invoke();
+    }
+
+    private void RefreshAvailablePositions()
+    {
+        AvailablePositions.Clear();
+        if (SelectedShop == null)
+        {
+            OnPropertyChanged(nameof(HasMultiplePositions));
+            return;
+        }
+
+        foreach (var position in SelectedShop.Positions
+                     .OrderByDescending(item => item.IsDefault)
+                     .ThenBy(item => item.PositionName))
+            AvailablePositions.Add(position);
+        OnPropertyChanged(nameof(HasMultiplePositions));
+    }
+
     private void PersistFlag(Action<WorkDayEmployee> mutate)
     {
         if (WorkDayEmployeeID == 0) return;
@@ -440,4 +614,24 @@ public partial class EmployeeWorkInfo : ObservableObject
         mutate(wde);
         context.SaveChanges();
     }
+}
+
+public sealed class ShopEmployeeGroup
+{
+    public string ShopName { get; init; } = string.Empty;
+    public IReadOnlyList<PositionEmployeeGroup> Positions { get; init; } = [];
+}
+
+public sealed class PositionEmployeeGroup
+{
+    public string PositionName { get; init; } = string.Empty;
+    public IReadOnlyList<EmployeeWorkInfo> Employees { get; init; } = [];
+    public double TableHeight => 42 + Employees.Count * 36;
+}
+
+public sealed class EmployeeCalendarChip
+{
+    public string Name { get; init; } = string.Empty;
+    public IBrush Background { get; init; } = Brushes.Transparent;
+    public IBrush Foreground { get; init; } = Brushes.MidnightBlue;
 }

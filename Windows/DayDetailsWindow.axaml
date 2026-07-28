@@ -1,8 +1,8 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="FanShop.Windows.DayDetailsWindow"
-        Width="900"
-        Height="620"
+        Width="1120"
+        Height="720"
         CanResize="False"
         SystemDecorations="None"
         WindowStartupLocation="CenterOwner"
@@ -10,6 +10,30 @@
         TransparencyLevelHint="Transparent"
         Background="Transparent"
         Title="Детали дня">
+    <Window.Styles>
+        <Style Selector="ComboBox.grid-editor">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="Padding" Value="8,0"/>
+        </Style>
+        <Style Selector="ComboBox.grid-editor /template/ ToggleButton">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="0"/>
+        </Style>
+        <Style Selector="ComboBox.grid-editor:pointerover /template/ ToggleButton">
+            <Setter Property="Background" Value="#EEF5FA"/>
+        </Style>
+        <Style Selector="ComboBox.grid-editor:focus /template/ ToggleButton">
+            <Setter Property="Background" Value="#EEF5FA"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+    </Window.Styles>
     <Border Margin="18"
             Padding="18"
             Background="White"
@@ -24,62 +48,92 @@
         </Grid>
 
         <Border Grid.Row="1" Background="#F9FBFD" BorderBrush="{StaticResource BrandBorder}" BorderThickness="1" CornerRadius="12" Padding="12">
-            <DataGrid ItemsSource="{Binding Employees}"
-                      SelectedItem="{Binding SelectedEmployee}"
-                      AutoGenerateColumns="False">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Фамилия" Binding="{Binding Surname}" Width="*" IsReadOnly="True" />
-                    <DataGridTextColumn Header="Имя" Binding="{Binding FirstName}" Width="*" IsReadOnly="True" />
-                    <DataGridTextColumn Header="Дата рождения" Binding="{Binding DateOfBirth}" Width="*" IsReadOnly="True" />
-                    <DataGridTemplateColumn Header="Занятость" Width="130">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <ComboBox
-                                    ItemsSource="{Binding WorkDurations}"
-                                    SelectedItem="{Binding WorkDuration, Mode=TwoWay}"
-                                    Background="Transparent"
-                                    BorderThickness="0"
-                                    Padding="14,0, 0, 0"
-                                    Width="130"
-                                    HorizontalContentAlignment="Stretch">
-
-                                    <ComboBox.Styles>
-
-                                        <Style Selector="ComboBox">
-                                            <Setter Property="BorderThickness" Value="0"/>
-                                            <Setter Property="Background" Value="Transparent"/>
-                                            <Setter Property="CornerRadius" Value="0"/>
-                                            <Setter Property="Padding" Value="14, 0"/>
-                                            <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
-                                        </Style>
-
-                                        <Style Selector="ComboBox /template/ ToggleButton">
-                                            <Setter Property="Background" Value="Transparent"/>
-                                            <Setter Property="BorderThickness" Value="0"/>
-                                        </Style>
-
-                                        <Style Selector="ComboBox:pointerover /template/ ToggleButton">
-                                            <Setter Property="Background" Value="Transparent"/>
-                                        </Style>
-
-                                        <Style Selector="ComboBox:pressed /template/ ToggleButton">
-                                            <Setter Property="Background" Value="Transparent"/>
-                                        </Style>
-
-                                        <Style Selector="ComboBox:focus">
-                                            <Setter Property="BorderThickness" Value="0"/>
-                                        </Style>
-
-                                    </ComboBox.Styles>
-
-                                </ComboBox>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridCheckBoxColumn Header="В пропуск" Binding="{Binding IncludeInPass}" Width="110" />
-                    <DataGridCheckBoxColumn Header="В зарплату" Binding="{Binding IncludeInSalary}" Width="110" />
-                </DataGrid.Columns>
-            </DataGrid>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding EmployeeGroups}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="White" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="10" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <Border Background="#EAF4FB" CornerRadius="10,10,0,0" Padding="14,10">
+                                        <TextBlock Text="{Binding ShopName}" FontSize="18" FontWeight="Bold" Foreground="#0A6DAE"/>
+                                    </Border>
+                                    <ItemsControl ItemsSource="{Binding Positions}" Margin="10">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Margin="0,0,0,12">
+                                                    <TextBlock Text="{Binding PositionName}" FontSize="14" FontWeight="SemiBold"
+                                                               Foreground="#52677A" Margin="4,0,0,6"/>
+                                                    <DataGrid ItemsSource="{Binding Employees}"
+                                                              SelectedItem="{Binding DataContext.SelectedEmployee, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}"
+                                                              AutoGenerateColumns="False"
+                                                              Height="{Binding TableHeight}">
+                                                        <DataGrid.Columns>
+                                                            <DataGridTextColumn Header="Фамилия" Binding="{Binding Surname}" Width="*" IsReadOnly="True"/>
+                                                            <DataGridTextColumn Header="Имя" Binding="{Binding FirstName}" Width="*" IsReadOnly="True"/>
+                                                            <DataGridTextColumn Header="Дата рождения" Binding="{Binding DateOfBirth}" Width="132" IsReadOnly="True"/>
+                                                            <DataGridTemplateColumn Header="Магазин" Width="150">
+                                                                <DataGridTemplateColumn.CellTemplate>
+                                                                    <DataTemplate>
+                                                                        <Grid>
+                                                                            <TextBlock Text="{Binding SelectedShop.ShopName}"
+                                                                                       Padding="8,0"
+                                                                                       VerticalAlignment="Center"
+                                                                                       IsVisible="{Binding HasMultipleShops, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                                                            <ComboBox Classes="grid-editor"
+                                                                                      ItemsSource="{Binding AvailableShops}"
+                                                                                      SelectedItem="{Binding SelectedShop, Mode=TwoWay}"
+                                                                                      IsVisible="{Binding HasMultipleShops}">
+                                                                                <ComboBox.ItemTemplate>
+                                                                                    <DataTemplate><TextBlock Text="{Binding ShopName}"/></DataTemplate>
+                                                                                </ComboBox.ItemTemplate>
+                                                                            </ComboBox>
+                                                                        </Grid>
+                                                                    </DataTemplate>
+                                                                </DataGridTemplateColumn.CellTemplate>
+                                                            </DataGridTemplateColumn>
+                                                            <DataGridTemplateColumn Header="Должность" Width="160">
+                                                                <DataGridTemplateColumn.CellTemplate>
+                                                                    <DataTemplate>
+                                                                        <Grid>
+                                                                            <TextBlock Text="{Binding SelectedPosition.PositionName}"
+                                                                                       Padding="8,0"
+                                                                                       VerticalAlignment="Center"
+                                                                                       IsVisible="{Binding HasMultiplePositions, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                                                            <ComboBox Classes="grid-editor"
+                                                                                      ItemsSource="{Binding AvailablePositions}"
+                                                                                      SelectedItem="{Binding SelectedPosition, Mode=TwoWay}"
+                                                                                      IsVisible="{Binding HasMultiplePositions}">
+                                                                                <ComboBox.ItemTemplate>
+                                                                                    <DataTemplate><TextBlock Text="{Binding PositionName}"/></DataTemplate>
+                                                                                </ComboBox.ItemTemplate>
+                                                                            </ComboBox>
+                                                                        </Grid>
+                                                                    </DataTemplate>
+                                                                </DataGridTemplateColumn.CellTemplate>
+                                                            </DataGridTemplateColumn>
+                                                            <DataGridTemplateColumn Header="Занятость" Width="130">
+                                                                <DataGridTemplateColumn.CellTemplate>
+                                                                    <DataTemplate>
+                                                                        <ComboBox Classes="grid-editor"
+                                                                                  ItemsSource="{Binding WorkDurations}"
+                                                                                  SelectedItem="{Binding WorkDuration, Mode=TwoWay}"/>
+                                                                    </DataTemplate>
+                                                                </DataGridTemplateColumn.CellTemplate>
+                                                            </DataGridTemplateColumn>
+                                                            <DataGridCheckBoxColumn Header="Пропуск" Binding="{Binding IncludeInPass}" Width="92"/>
+                                                            <DataGridCheckBoxColumn Header="Зарплата" Binding="{Binding IncludeInSalary}" Width="97"/>
+                                                        </DataGrid.Columns>
+                                                    </DataGrid>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
         </Border>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" Margin="0,12,0,0">

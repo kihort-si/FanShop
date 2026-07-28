@@ -52,7 +52,7 @@ namespace FanShop.Migrations
 
                     b.HasIndex("TaskCategoryID");
 
-                    b.ToTable("DayTasks");
+                    b.ToTable("DayTasks", (string)null);
                 });
 
             modelBuilder.Entity("FanShop.Models.Employee", b =>
@@ -87,7 +87,7 @@ namespace FanShop.Migrations
 
                     b.HasKey("EmployeeID");
 
-                    b.ToTable("Employees");
+                    b.ToTable("Employees", (string)null);
                 });
 
             modelBuilder.Entity("FanShop.Models.Position", b =>
@@ -108,7 +108,7 @@ namespace FanShop.Migrations
 
                     b.HasIndex("ShopID");
 
-                    b.ToTable("Positions");
+                    b.ToTable("Positions", (string)null);
                 });
 
             modelBuilder.Entity("FanShop.Models.SalaryHistory", b =>
@@ -133,7 +133,7 @@ namespace FanShop.Migrations
 
                     b.HasIndex("PositionID");
 
-                    b.ToTable("SalaryHistories");
+                    b.ToTable("SalaryHistories", (string)null);
                 });
 
             modelBuilder.Entity("FanShop.Models.Shop", b =>
@@ -155,7 +155,7 @@ namespace FanShop.Migrations
 
                     b.HasKey("ShopID");
 
-                    b.ToTable("Shops");
+                    b.ToTable("Shops", (string)null);
                 });
 
             modelBuilder.Entity("FanShop.Models.TaskCategory", b =>
@@ -183,7 +183,7 @@ namespace FanShop.Migrations
 
                     b.HasKey("TaskCategoryID");
 
-                    b.ToTable("TaskCategories");
+                    b.ToTable("TaskCategories", (string)null);
                 });
 
             modelBuilder.Entity("FanShop.Models.WorkDay", b =>
@@ -197,7 +197,7 @@ namespace FanShop.Migrations
 
                     b.HasKey("WorkDayID");
 
-                    b.ToTable("WorkDays");
+                    b.ToTable("WorkDays", (string)null);
                 });
 
             modelBuilder.Entity("FanShop.Models.WorkDayEmployee", b =>
@@ -237,7 +237,7 @@ namespace FanShop.Migrations
 
                     b.HasIndex("WorkDayID");
 
-                    b.ToTable("WorkDayEmployee");
+                    b.ToTable("WorkDayEmployee", (string)null);
                 });
 
             modelBuilder.Entity("FanShop.Models.DayTask", b =>

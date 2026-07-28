@@ -28,7 +28,7 @@
 
                             <StackPanel Spacing="8">
 
-                                <Grid ColumnDefinitions="*,Auto,Auto">
+                                <Grid ColumnDefinitions="*,Auto,Auto,Auto">
 
                                     <TextBlock Grid.Column="0"
                                                Text="{Binding ShopName}"
@@ -37,6 +37,12 @@
                                                VerticalAlignment="Center"/>
 
                                     <Button Grid.Column="1"
+                                            Content="{Binding DefaultLabel}"
+                                            Command="{Binding $parent[UserControl].DataContext.SetDefaultShopCommand}"
+                                            CommandParameter="{Binding}"
+                                            Margin="0,0,10,0"/>
+
+                                    <Button Grid.Column="2"
                                             Classes="icon"
                                             Command="{Binding $parent[UserControl].DataContext.EditShopNameCommand}"
                                             CommandParameter="{Binding}"
@@ -44,7 +50,7 @@
                                         <materialIcons:MaterialIcon Kind="Pencil" />
                                     </Button>
 
-                                    <Button Grid.Column="2"
+                                    <Button Grid.Column="3"
                                             Classes="danger"
                                             Command="{Binding $parent[UserControl].DataContext.DeleteShopCommand}"
                                             CommandParameter="{Binding}">
@@ -57,7 +63,7 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
 
-                                            <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto"
+                                            <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto"
                                                   Margin="0,10,0,0">
 
                                                     <TextBlock Grid.Column="0"
@@ -71,19 +77,25 @@
                                                                Margin="0,0,10,0"/>
 
                                                     <Button Grid.Column="2"
+                                                            Content="{Binding DefaultLabel}"
+                                                            Command="{Binding $parent[UserControl].DataContext.SetDefaultPositionCommand}"
+                                                            CommandParameter="{Binding}"
+                                                            Margin="0,0,10,0"/>
+
+                                                    <Button Grid.Column="3"
                                                             Command="{Binding $parent[UserControl].DataContext.EditPositionNameCommand}"
                                                             CommandParameter="{Binding}"
                                                             Margin="0,0,10,0">
                                                         <materialIcons:MaterialIcon Kind="Pencil" />
                                                     </Button>
 
-                                                    <Button Grid.Column="3"
+                                                    <Button Grid.Column="4"
                                                             Content="Изменить ЗП"
                                                             Command="{Binding $parent[UserControl].DataContext.ChangeSalaryCommand}"
                                                             CommandParameter="{Binding}"
                                                             Margin="0,0,10,0"/>
 
-                                                    <Button Grid.Column="4"
+                                                    <Button Grid.Column="5"
                                                             Classes="danger"
                                                             Command="{Binding $parent[UserControl].DataContext.DeletePositionCommand}"
                                                             CommandParameter="{Binding}">

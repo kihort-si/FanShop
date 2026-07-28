@@ -15,6 +15,8 @@ public class Shop
 
     public DateTime? CloseDate { get; set; }
 
+    public bool IsDefault { get; set; }
+
     public ICollection<Position> Positions { get; set; }
         = new List<Position>();
 }

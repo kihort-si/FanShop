@@ -14,6 +14,12 @@ public partial class ShopViewModel : ObservableObject
     private string _shopName = string.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DefaultLabel))]
+    private bool _isDefault;
+
+    public string DefaultLabel => IsDefault ? "По умолчанию" : "Сделать основным";
+
+    [ObservableProperty]
     private ObservableCollection<PositionViewModel> _positions = new();
 
     [RelayCommand]
@@ -24,7 +30,8 @@ public partial class ShopViewModel : ObservableObject
         var position = new Position
         {
             ShopID = ShopID,
-            PositionName = "Новая должность"
+            PositionName = "Новая должность",
+            IsDefault = !context.Positions.Any(item => item.ShopID == ShopID)
         };
 
         context.Positions.Add(position);
@@ -43,7 +50,9 @@ public partial class ShopViewModel : ObservableObject
         {
             PositionID = position.PositionID,
             PositionName = position.PositionName,
-            CurrentSalary = 0
+            CurrentSalary = 0,
+            IsDefault = position.IsDefault,
+            Shop = this
         });
     }
 

@@ -15,6 +15,8 @@ public class Position
     [MaxLength(50)]
     public string PositionName { get; set; } = string.Empty;
 
+    public bool IsDefault { get; set; }
+
     public ICollection<SalaryHistory> SalaryHistories { get; set; }
         = new List<SalaryHistory>();
 }

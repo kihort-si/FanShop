@@ -58,7 +58,7 @@ public partial class EmployeeViewModel : BaseViewModel
 
         Shops.Clear();
 
-        foreach (var shop in context.Shops.OrderBy(x => x.ShopName))
+        foreach (var shop in context.Shops.OrderByDescending(x => x.IsDefault).ThenBy(x => x.ShopName))
         {
             Shops.Add(shop);
         }
@@ -83,7 +83,8 @@ public partial class EmployeeViewModel : BaseViewModel
 
         var positions = context.Positions
             .Where(x => x.ShopID == value.ShopID)
-            .OrderBy(x => x.PositionName)
+            .OrderByDescending(x => x.IsDefault)
+            .ThenBy(x => x.PositionName)
             .ToList();
 
         foreach (var position in positions)
@@ -98,7 +99,8 @@ public partial class EmployeeViewModel : BaseViewModel
         }
         else
         {
-            SelectedPosition = AvailablePositions.FirstOrDefault();
+            SelectedPosition = AvailablePositions.FirstOrDefault(x => x.IsDefault)
+                               ?? AvailablePositions.FirstOrDefault();
             CanSelectPosition = true;
         }
     }

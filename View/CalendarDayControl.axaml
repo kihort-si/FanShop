@@ -33,8 +33,8 @@
                     <ItemsControl ItemsSource="{Binding DisplayedEmployees}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="#D9F1FB" CornerRadius="4" Padding="4,2" Margin="0, 0,0,2">
-                                    <TextBlock Text="{Binding}" FontSize="11" TextTrimming="CharacterEllipsis" Foreground="MidnightBlue" />
+                                <Border Background="{Binding Background}" CornerRadius="4" Padding="4,2" Margin="0, 0,0,2">
+                                    <TextBlock Text="{Binding Name}" FontSize="11" TextTrimming="CharacterEllipsis" Foreground="{Binding Foreground}" />
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
