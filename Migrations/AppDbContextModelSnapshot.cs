@@ -52,7 +52,7 @@ namespace FanShop.Migrations
 
                     b.HasIndex("TaskCategoryID");
 
-                    b.ToTable("DayTasks", (string)null);
+                    b.ToTable("DayTasks");
                 });
 
             modelBuilder.Entity("FanShop.Models.Employee", b =>
@@ -87,13 +87,16 @@ namespace FanShop.Migrations
 
                     b.HasKey("EmployeeID");
 
-                    b.ToTable("Employees", (string)null);
+                    b.ToTable("Employees");
                 });
 
             modelBuilder.Entity("FanShop.Models.Position", b =>
                 {
                     b.Property<int>("PositionID")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDefault")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("PositionName")
@@ -108,7 +111,7 @@ namespace FanShop.Migrations
 
                     b.HasIndex("ShopID");
 
-                    b.ToTable("Positions", (string)null);
+                    b.ToTable("Positions");
                 });
 
             modelBuilder.Entity("FanShop.Models.SalaryHistory", b =>
@@ -133,7 +136,7 @@ namespace FanShop.Migrations
 
                     b.HasIndex("PositionID");
 
-                    b.ToTable("SalaryHistories", (string)null);
+                    b.ToTable("SalaryHistories");
                 });
 
             modelBuilder.Entity("FanShop.Models.Shop", b =>
@@ -145,6 +148,9 @@ namespace FanShop.Migrations
                     b.Property<DateTime?>("CloseDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("OpenDate")
                         .HasColumnType("TEXT");
 
@@ -155,7 +161,7 @@ namespace FanShop.Migrations
 
                     b.HasKey("ShopID");
 
-                    b.ToTable("Shops", (string)null);
+                    b.ToTable("Shops");
                 });
 
             modelBuilder.Entity("FanShop.Models.TaskCategory", b =>
@@ -183,7 +189,7 @@ namespace FanShop.Migrations
 
                     b.HasKey("TaskCategoryID");
 
-                    b.ToTable("TaskCategories", (string)null);
+                    b.ToTable("TaskCategories");
                 });
 
             modelBuilder.Entity("FanShop.Models.WorkDay", b =>
@@ -197,7 +203,7 @@ namespace FanShop.Migrations
 
                     b.HasKey("WorkDayID");
 
-                    b.ToTable("WorkDays", (string)null);
+                    b.ToTable("WorkDays");
                 });
 
             modelBuilder.Entity("FanShop.Models.WorkDayEmployee", b =>
@@ -237,7 +243,7 @@ namespace FanShop.Migrations
 
                     b.HasIndex("WorkDayID");
 
-                    b.ToTable("WorkDayEmployee", (string)null);
+                    b.ToTable("WorkDayEmployee");
                 });
 
             modelBuilder.Entity("FanShop.Models.DayTask", b =>

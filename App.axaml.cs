@@ -105,20 +105,8 @@ public partial class App : Application
             await using (var db = new AppDbContext())
             {
                 await db.Database.EnsureCreatedAsync();
-                try
-                {
-                    await db.Employees.AnyAsync();
-                }
-                catch (Microsoft.Data.Sqlite.SqliteException)
-                {
-                    await db.Database.EnsureDeletedAsync();
-                    await db.Database.EnsureCreatedAsync();
-                }
-
-                await EnsureColumnAsync(db, "WorkDayEmployee", "IncludeInPass", "INTEGER NOT NULL DEFAULT 1");
-                await EnsureColumnAsync(db, "WorkDayEmployee", "IncludeInSalary", "INTEGER NOT NULL DEFAULT 1");
-                await EnsureColumnAsync(db, "Shops", "IsDefault", "INTEGER NOT NULL DEFAULT 0");
-                await EnsureColumnAsync(db, "Positions", "IsDefault", "INTEGER NOT NULL DEFAULT 0");
+                await PrepareLegacyDatabaseForMigrationsAsync(db);
+                await db.Database.MigrateAsync();
             }
 
             _mainWindowViewModel = new MainWindowViewModel();
@@ -216,24 +204,118 @@ public partial class App : Application
         }
     }
 
-    private static async Task EnsureColumnAsync(AppDbContext db, string table, string column, string columnDef)
+    private static readonly string[] LegacyMigrationIds =
+    [
+        "20250820142259_AddTaskCategory",
+        "20250820160455_AddTask",
+        "20250820181811_ChangeTask",
+        "20250820183424_ChangeTask2",
+        "20250824124029_AddTaskAdnTaskCategories",
+        "20260629221316_AddEmployeeAnalytics",
+        "20260630174547_RenameWorkDayEmployeesBack"
+    ];
+
+    private const string ShopMigrationId =
+        "20260721083755_AddShopPositionSalaryHistory";
+
+    private const string DefaultWorkplaceMigrationId =
+        "20260729214056_AddDefaultWorkplaceFlags";
+
+    private static async Task PrepareLegacyDatabaseForMigrationsAsync(AppDbContext db)
+    {
+        // Versions up to 2.0.1 created the database with EnsureCreated().
+        // Such a database already has the schema, but no EF migration history.
+        // Register the schema that is actually present before calling Migrate().
+        if (!await TableExistsAsync(db, "Employees"))
+            return;
+
+        await db.Database.ExecuteSqlRawAsync(
+            """
+            CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory" (
+                "MigrationId" TEXT NOT NULL CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY,
+                "ProductVersion" TEXT NOT NULL
+            );
+            """);
+
+        if (await TableExistsAsync(db, "WorkDayEmployee"))
+        {
+            foreach (var migrationId in LegacyMigrationIds)
+                await RegisterMigrationAsync(db, migrationId);
+        }
+
+        var hasWorkplaceSchema =
+            await TableExistsAsync(db, "Shops") &&
+            await TableExistsAsync(db, "Positions") &&
+            await TableExistsAsync(db, "SalaryHistories") &&
+            await ColumnExistsAsync(db, "WorkDayEmployee", "PositionID") &&
+            await ColumnExistsAsync(db, "WorkDayEmployee", "SalaryAtMoment");
+
+        if (hasWorkplaceSchema)
+            await RegisterMigrationAsync(db, ShopMigrationId);
+
+        var hasDefaultWorkplaceFlags =
+            hasWorkplaceSchema &&
+            await ColumnExistsAsync(db, "Shops", "IsDefault") &&
+            await ColumnExistsAsync(db, "Positions", "IsDefault");
+
+        if (hasDefaultWorkplaceFlags)
+            await RegisterMigrationAsync(db, DefaultWorkplaceMigrationId);
+    }
+
+    private static async Task RegisterMigrationAsync(
+        AppDbContext db,
+        string migrationId)
+    {
+        await db.Database.ExecuteSqlInterpolatedAsync(
+            $"""
+             INSERT OR IGNORE INTO "__EFMigrationsHistory"
+                 ("MigrationId", "ProductVersion")
+             VALUES ({migrationId}, {"8.0.2"});
+             """);
+    }
+
+    private static async Task<bool> TableExistsAsync(
+        AppDbContext db,
+        string table)
     {
         var connection = db.Database.GetDbConnection();
         if (connection.State != System.Data.ConnectionState.Open)
             await connection.OpenAsync();
 
-        await using var probe = connection.CreateCommand();
-        probe.CommandText = $"PRAGMA table_info(\"{table}\");";
-        await using var reader = await probe.ExecuteReaderAsync();
+        await using var command = connection.CreateCommand();
+        command.CommandText =
+            """
+            SELECT COUNT(*)
+            FROM sqlite_master
+            WHERE type = 'table' AND name = $name;
+            """;
+
+        var parameter = command.CreateParameter();
+        parameter.ParameterName = "$name";
+        parameter.Value = table;
+        command.Parameters.Add(parameter);
+
+        return Convert.ToInt32(await command.ExecuteScalarAsync()) > 0;
+    }
+
+    private static async Task<bool> ColumnExistsAsync(
+        AppDbContext db,
+        string table,
+        string column)
+    {
+        var connection = db.Database.GetDbConnection();
+        if (connection.State != System.Data.ConnectionState.Open)
+            await connection.OpenAsync();
+
+        await using var command = connection.CreateCommand();
+        command.CommandText = $"PRAGMA table_info(\"{table}\");";
+        await using var reader = await command.ExecuteReaderAsync();
         while (await reader.ReadAsync())
         {
             if (string.Equals(reader.GetString(1), column, StringComparison.OrdinalIgnoreCase))
-                return;
+                return true;
         }
-        await reader.CloseAsync();
 
-        await using var alter = connection.CreateCommand();
-        alter.CommandText = $"ALTER TABLE \"{table}\" ADD COLUMN \"{column}\" {columnDef};";
-        await alter.ExecuteNonQueryAsync();
+        return false;
     }
 }
