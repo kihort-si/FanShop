@@ -1,75 +1,166 @@
-﻿name: Release Workflow
+name: Release Workflow
 
 on:
   push:
     branches:
       - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   release:
     runs-on: windows-latest
-    
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Get latest release tag
-        id: get_latest_release
-        run: |
-          $latest_release_tag = (Invoke-RestMethod "https://api.github.com/repos/${{ github.repository }}/releases/latest").tag_name
-          echo "Latest release tag: $latest_release_tag"
-          echo "latest_release_tag=$latest_release_tag" | Out-File -FilePath $env:GITHUB_ENV -Append
-
-      - name: Get version from AssemblyInfo.cs
-        id: get_assembly_version
-        run: |
-          $version = Select-String -Path AssemblyInfo.cs -Pattern '\[assembly: AssemblyVersion\("([^"]+)"\)\]' | ForEach-Object { $_.Matches[0].Groups[1].Value }
-          echo "Assembly version: $version"
-          echo "assembly_version=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
-
-      - name: Compare versions
-        id: compare_versions
-        run: |
-          $verA = $env:assembly_version
-          $verB = $env:latest_release_tag
-          if ($verB.StartsWith('v')) {
-            $verB = $verB.Substring(1)
-          }
-          if (([Version]$verA) -le ([Version]$verB)) {
-            Write-Host "Assembly version is not greater than the latest release tag. Exiting..."
-            exit 1
-          }
-          Write-Host "Assembly version is greater than the latest release tag."
-          
-      - name: Create and push tag if not exists
-        run: |
-          $version = $env:assembly_version
-          $tag = "v$version"
-          git fetch --tags
-          if (-not (git tag -l $tag)) {
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git tag $tag
-            $token = "${{ secrets.GH_PAT }}" 
-            git push https://$token@github.com/kihort-si/FanShop.git $tag
-          } else {
-            Write-Host "Tag $tag already exists."
-          }
-
-      - name: Build project
-        run: |
-          dotnet build --configuration Release
-
-      - name: Archive Release files
-        run: |
-          $archive_name = "FanShop$env:assembly_version.zip"
-          Compress-Archive -Path .\bin\Release\* -DestinationPath $archive_name
-          echo "Archive name: $archive_name"
-          echo "archive_name=$archive_name" | Out-File -FilePath $env:GITHUB_ENV -Append
-
-      - name: Create a new release and upload the archive
-        uses: softprops/action-gh-release@v1
+        uses: actions/checkout@v4
         with:
-          files: ${{ env.archive_name }}
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Read version from AssemblyInfo.cs
+        id: version
+        shell: pwsh
+        run: |
+          $assemblyInfo = Get-Content -Path "AssemblyInfo.cs" -Raw
+          $match = [regex]::Match(
+            $assemblyInfo,
+            '\[assembly:\s*AssemblyVersion\("(?<version>\d+\.\d+\.\d+(?:\.\d+)?)"\)\]'
+          )
+
+          if (-not $match.Success) {
+            throw "AssemblyVersion was not found in AssemblyInfo.cs."
+          }
+
+          $version = $match.Groups["version"].Value
+          $tag = "v$version"
+          $archiveName = "FanShop$version.zip"
+
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "tag=$tag" >> $env:GITHUB_OUTPUT
+          "archive_name=$archiveName" >> $env:GITHUB_OUTPUT
+
+          Write-Host "Release version: $version"
+          Write-Host "Release tag: $tag"
+          Write-Host "Archive name: $archiveName"
+
+      - name: Check whether release already exists
+        id: existing_release
+        shell: pwsh
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          gh release view $env:RELEASE_TAG --repo "${{ github.repository }}" 2>$null
+
+          if ($LASTEXITCODE -eq 0) {
+            "exists=true" >> $env:GITHUB_OUTPUT
+            Write-Host "Release $env:RELEASE_TAG already exists. Nothing to publish."
+          }
+          else {
+            "exists=false" >> $env:GITHUB_OUTPUT
+            Write-Host "Release $env:RELEASE_TAG does not exist and will be created."
+          }
+
+      - name: Restore dependencies
+        if: steps.existing_release.outputs.exists != 'true'
+        run: dotnet restore FanShop.csproj --runtime win-x64
+
+      - name: Publish Windows application
+        if: steps.existing_release.outputs.exists != 'true'
+        shell: pwsh
+        run: |
+          dotnet publish FanShop.csproj `
+            --configuration Release `
+            --runtime win-x64 `
+            --self-contained false `
+            --no-restore `
+            --output artifacts/publish
+
+      - name: Add Resources and icon to release files
+        if: steps.existing_release.outputs.exists != 'true'
+        shell: pwsh
+        run: |
+          Copy-Item -Path "Resources" `
+            -Destination "artifacts/publish/Resources" `
+            -Recurse `
+            -Force
+
+          Copy-Item -Path "icon.ico" `
+            -Destination "artifacts/publish/icon.ico" `
+            -Force
+
+      - name: Verify published Windows application
+        if: steps.existing_release.outputs.exists != 'true'
+        shell: pwsh
+        run: |
+          $executable = Resolve-Path "artifacts/publish/FanShop.exe"
+          $process = Start-Process `
+            -FilePath $executable `
+            -WorkingDirectory "artifacts/publish" `
+            -PassThru
+
+          Start-Sleep -Seconds 10
+          $process.Refresh()
+
+          if ($process.HasExited) {
+            throw "FanShop.exe exited during the smoke test with code $($process.ExitCode)."
+          }
+
+          Stop-Process -Id $process.Id -Force
+          $process.WaitForExit()
+          Write-Host "FanShop.exe started successfully on Windows."
+
+      - name: Create release archive
+        if: steps.existing_release.outputs.exists != 'true'
+        shell: pwsh
+        env:
+          ARCHIVE_NAME: ${{ steps.version.outputs.archive_name }}
+        run: |
+          $archivePath = Join-Path "artifacts" $env:ARCHIVE_NAME
+
+          Compress-Archive `
+            -Path "artifacts/publish/*" `
+            -DestinationPath $archivePath `
+            -CompressionLevel Optimal
+
+          $entries = [System.IO.Compression.ZipFile]::OpenRead(
+            (Resolve-Path $archivePath)
+          )
+
+          try {
+            $entryNames = $entries.Entries.FullName
+
+            if ("FanShop.exe" -notin $entryNames) {
+              throw "FanShop.exe is missing from the release archive."
+            }
+
+            if ("icon.ico" -notin $entryNames) {
+              throw "icon.ico is missing from the release archive."
+            }
+
+            if (-not ($entryNames | Where-Object { $_ -like "Resources/*" })) {
+              throw "Resources directory is missing from the release archive."
+            }
+          }
+          finally {
+            $entries.Dispose()
+          }
+
+          Write-Host "Archive created: $archivePath"
+
+      - name: Create GitHub release
+        if: steps.existing_release.outputs.exists != 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: FanShop ${{ steps.version.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          generate_release_notes: true
+          files: artifacts/${{ steps.version.outputs.archive_name }}
