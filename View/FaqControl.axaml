@@ -1,61 +1,307 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:icons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="FanShop.View.FaqControl">
-    <ScrollViewer>
-        <StackPanel Margin="24" Spacing="16" MaxWidth="860">
-            <TextBlock Text="FAQ" FontSize="24" FontWeight="Bold" />
-            <Border Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="12" Padding="16">
-                <StackPanel Spacing="10">
-                    <TextBlock Text="Как добавить нового сотрудника?" FontWeight="Bold"/>
-                    <TextBlock Text="Откройте меню «Сотрудники», нажмите кнопку «Добавить», заполните данные и сохраните изменения."
-                               TextWrapping="Wrap"/>
 
-                    <TextBlock Text="Как изменить данные существующего сотрудника?" FontWeight="Bold" Margin="0,8,0,0"/>
-                    <TextBlock Text="Откройте меню «Сотрудники», выберите сотрудника, нажмите «Изменить», внесите изменения и сохраните их."
-                               TextWrapping="Wrap"/>
+    <UserControl.Styles>
+        <Style Selector="Border.faq-card">
+            <Setter Property="Background" Value="{StaticResource BrandSurface}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrandBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Padding" Value="18" />
+        </Style>
+        <Style Selector="TextBlock.section-title">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="{StaticResource BrandText}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="TextBlock.question">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource BrandText}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        <Style Selector="TextBlock.answer">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Foreground" Value="{StaticResource BrandTextSubtle}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="LineHeight" Value="20" />
+        </Style>
+        <Style Selector="Expander.faq-item">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+        </Style>
+        <Style Selector="Expander.faq-item > TextBlock">
+            <Setter Property="Margin" Value="0,5,0,10" />
+        </Style>
+    </UserControl.Styles>
 
-                    <TextBlock Text="Что делать, если отображается некорректное расписание матчей?" FontWeight="Bold" Margin="0,8,0,0"/>
-                    <TextBlock Text="Нажмите кнопку «Обновить расписание», проверьте подключение к интернету. Если проблема сохраняется, обратитесь в техническую поддержку."
-                               TextWrapping="Wrap"/>
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="24" Spacing="16" MaxWidth="980"
+                    HorizontalAlignment="Center">
 
-                    <TextBlock Text="Как добавить сотруднику смену в конкретный день?" FontWeight="Bold" Margin="0,8,0,0"/>
-                    <TextBlock Text="Дважды кликните по нужному дню в календаре, нажмите «Добавить», выберите сотрудника и укажите время работы."
-                               TextWrapping="Wrap"/>
+            <Border CornerRadius="16" Padding="24">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                        <GradientStop Color="#075A91" Offset="0" />
+                        <GradientStop Color="#009EE1" Offset="1" />
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Spacing="7">
+                        <TextBlock Text="Центр помощи"
+                                   FontSize="28"
+                                   FontWeight="Bold"
+                                   Foreground="White" />
+                        <TextBlock Text="Короткие ответы о календаре, сменах, магазинах, пропусках и аналитике"
+                                   FontSize="14"
+                                   Foreground="#E8F7FF"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                    <Border Grid.Column="1"
+                            Width="64" Height="64"
+                            Margin="20,0,0,0"
+                            CornerRadius="32"
+                            Background="#25FFFFFF">
+                        <icons:MaterialIcon Kind="FrequentlyAskedQuestions"
+                                            Width="34" Height="34"
+                                            Foreground="White"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" />
+                    </Border>
+                </Grid>
+            </Border>
 
-                    <TextBlock Text="Как удалить сотруднику смену в конкретный день?" FontWeight="Bold" Margin="0,8,0,0"/>
-                    <TextBlock Text="Откройте нужный день, выберите сотрудника в списке назначенных и нажмите «Удалить»."
-                               TextWrapping="Wrap"/>
+            <Border Classes="faq-card" Background="#EFF8FE" BorderBrush="#B9DFF3">
+                <Grid ColumnDefinitions="Auto,*">
+                    <Border Width="40" Height="40" CornerRadius="20"
+                            Background="{StaticResource BrandAccent}">
+                        <icons:MaterialIcon Kind="LightbulbOnOutline"
+                                            Width="22" Height="22"
+                                            Foreground="White"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="14,0,0,0" Spacing="3">
+                        <TextBlock Text="Новые возможности"
+                                   FontSize="15" FontWeight="Bold"
+                                   Foreground="{StaticResource BrandPrimary}" />
+                        <TextBlock Classes="answer"
+                                   Text="Теперь можно назначать одного сотрудника сразу на несколько дней, вести магазины и должности, фильтровать календарь по магазину и смотреть детализацию затрат в аналитике." />
+                    </StackPanel>
+                </Grid>
+            </Border>
 
-                    <TextBlock Text="Как распечатать пропуск?" FontWeight="Bold" Margin="0,8,0,0"/>
-                    <TextBlock Text="Откройте нужный день, убедитесь, что сотрудники добавлены, затем нажмите кнопку «Пропуск». Будет создан Word-документ для печати."
-                               TextWrapping="Wrap"/>
+            <Border Classes="faq-card">
+                <StackPanel Spacing="7">
+                    <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,5">
+                        <icons:MaterialIcon Kind="CalendarMonth" Width="24" Height="24"
+                                            Foreground="{StaticResource BrandPrimary}" />
+                        <TextBlock Classes="section-title" Text="Календарь и смены" />
+                    </StackPanel>
 
-                    <TextBlock Text="Как изменить шаблон пропуска?" FontWeight="Bold" Margin="0,8,0,0"/>
-                    <TextBlock Text="Откройте папку с шаблонами пропусков и измените используемый шаблон документа."
-                               TextWrapping="Wrap"/>
+                    <Expander Classes="faq-item" IsExpanded="True">
+                        <Expander.Header>
+                            <TextBlock Classes="question" Text="Как добавить смену на один день?" />
+                        </Expander.Header>
+                        <TextBlock Classes="answer"
+                                   Text="Дважды нажмите на нужный день, выберите «Добавить», затем сотрудника, магазин, должность и занятость. Если магазин или должность только одни, они подставятся автоматически." />
+                    </Expander>
 
-                    <TextBlock Text="Как вести тайминг?" FontWeight="Bold" Margin="0,8,0,0"/>
-                    <TextBlock Text="Создайте категории в разделе «Тайминг», затем откройте нужный день, нажмите «Тайминг» и добавьте задачи с указанием времени выполнения."
-                               TextWrapping="Wrap"/>
+                    <Expander Classes="faq-item">
+                        <Expander.Header>
+                            <TextBlock Classes="question" Text="Как назначить сотрудника сразу на несколько дней?" />
+                        </Expander.Header>
+                        <TextBlock Classes="answer"
+                                   Text="Нажмите кнопку с сотрудниками и плюсом над календарём, выберите сотрудника, а затем последовательно нажимайте на нужные дни. Повторное нажатие на кнопку с галочкой завершит режим. После этого программа предложит создать один пропуск на все выбранные дни." />
+                    </Expander>
 
-                    <TextBlock Text="Как изменить категорию задач?" FontWeight="Bold" Margin="0,8,0,0"/>
-                    <TextBlock Text="Откройте раздел «Тайминг», выберите категорию, нажмите «Изменить», внесите изменения и сохраните их."
-                               TextWrapping="Wrap"/>
+                    <Expander Classes="faq-item">
+                        <Expander.Header>
+                            <TextBlock Classes="question" Text="Как быстро перейти к другому месяцу или году?" />
+                        </Expander.Header>
+                        <TextBlock Classes="answer"
+                                   Text="Нажмите кнопку с календарём в верхней панели, выберите год стрелками и нужный месяц в таблице. Кнопка с домиком возвращает к текущему месяцу." />
+                    </Expander>
 
-                    <TextBlock Text="Как посмотреть аналитику задач?" FontWeight="Bold" Margin="0,8,0,0"/>
-                    <TextBlock Text="Откройте раздел «Тайминг», нажмите «Аналитика» и выберите период для анализа."
-                               TextWrapping="Wrap"/>
+                    <Expander Classes="faq-item">
+                        <Expander.Header>
+                            <TextBlock Classes="question" Text="Как изменить или удалить уже назначенную смену?" />
+                        </Expander.Header>
+                        <TextBlock Classes="answer"
+                                   Text="Откройте день двойным нажатием. В таблице можно сразу изменить магазин, должность, занятость и признаки включения в пропуск или зарплату. Для удаления выделите сотрудника и нажмите «Удалить»." />
+                    </Expander>
 
-                    <TextBlock Text="Как экспортировать тайминг в Excel?" FontWeight="Bold" Margin="0,8,0,0"/>
-                    <TextBlock Text="Экспорт доступен как из окна тайминга конкретного дня, так и из раздела аналитики по выбранному периоду."
-                               TextWrapping="Wrap"/>
-
-                    <TextBlock Text="Как изменить режим отображения календаря?" FontWeight="Bold" Margin="0,8,0,0"/>
-                    <TextBlock Text="Нажмите кнопку в правом верхнем углу календаря для переключения между отображением сотрудников и задач."
-                               TextWrapping="Wrap"/>
-
+                    <Expander Classes="faq-item">
+                        <Expander.Header>
+                            <TextBlock Classes="question" Text="Почему имена в календаре имеют разные оттенки синего?" />
+                        </Expander.Header>
+                        <TextBlock Classes="answer"
+                                   Text="Оттенок плашки помогает отличить сотрудников разных магазинов. Кнопка фильтра справа позволяет показать всех сотрудников или только выбранный магазин. Фильтр доступен в режиме отображения сотрудников." />
+                    </Expander>
                 </StackPanel>
             </Border>
+
+            <Border Classes="faq-card">
+                <StackPanel Spacing="7">
+                    <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,5">
+                        <icons:MaterialIcon Kind="Store" Width="24" Height="24"
+                                            Foreground="{StaticResource BrandPrimary}" />
+                        <TextBlock Classes="section-title" Text="Магазины, должности и сотрудники" />
+                    </StackPanel>
+
+                    <Expander Classes="faq-item">
+                        <Expander.Header>
+                            <TextBlock Classes="question" Text="Где добавить магазин и должности?" />
+                        </Expander.Header>
+                        <TextBlock Classes="answer"
+                                   Text="Откройте «Настройки». Там можно создавать магазины, добавлять должности внутри каждого магазина, изменять их и задавать зарплату. Изменения сразу появляются во всех окнах выбора." />
+                    </Expander>
+
+                    <Expander Classes="faq-item">
+                        <Expander.Header>
+                            <TextBlock Classes="question" Text="Для чего нужны магазин и должность по умолчанию?" />
+                        </Expander.Header>
+                        <TextBlock Classes="answer"
+                                   Text="Основной магазин выбирается автоматически при добавлении смены и показывается первым в деталях дня. Для каждого магазина можно отметить основную должность — она подставится при выборе или смене магазина." />
+                    </Expander>
+
+                    <Expander Classes="faq-item">
+                        <Expander.Header>
+                            <TextBlock Classes="question" Text="Как перенести сотрудника в другой магазин только на конкретный день?" />
+                        </Expander.Header>
+                        <TextBlock Classes="answer"
+                                   Text="Откройте детали нужного дня и измените магазин прямо в строке сотрудника. Должность сменится на основную для нового магазина, после чего при необходимости можно выбрать другую. Карточка самого сотрудника при этом не изменяется." />
+                    </Expander>
+
+                    <Expander Classes="faq-item">
+                        <Expander.Header>
+                            <TextBlock Classes="question" Text="Как добавить или отредактировать сотрудника?" />
+                        </Expander.Header>
+                        <TextBlock Classes="answer"
+                                   Text="Откройте раздел «Сотрудники». Кнопка «Добавить» создаёт новую карточку, а «Изменить» редактирует выбранную. Перед удалением программа попросит подтверждение." />
+                    </Expander>
+                </StackPanel>
+            </Border>
+
+            <Border Classes="faq-card">
+                <StackPanel Spacing="7">
+                    <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,5">
+                        <icons:MaterialIcon Kind="BadgeAccountOutline" Width="24" Height="24"
+                                            Foreground="{StaticResource BrandPrimary}" />
+                        <TextBlock Classes="section-title" Text="Пропуска и зарплата" />
+                    </StackPanel>
+
+                    <Expander Classes="faq-item">
+                        <Expander.Header>
+                            <TextBlock Classes="question" Text="Как сформировать пропуск?" />
+                        </Expander.Header>
+                        <TextBlock Classes="answer"
+                                   Text="Откройте нужный день, проверьте отметки в столбце «Пропуск» и нажмите «Пропуск». Будет создан Word-документ только для отмеченных сотрудников. После успешной печати эти смены больше не будут предлагаться для повторного включения." />
+                    </Expander>
+
+                    <Expander Classes="faq-item">
+                        <Expander.Header>
+                            <TextBlock Classes="question" Text="Что происходит с пропуском при множественном добавлении?" />
+                        </Expander.Header>
+                        <TextBlock Classes="answer"
+                                   Text="При завершении режима можно сразу сформировать общий документ на выбранные дни. Если отказаться, смены сохранятся, а отметки «Пропуск» останутся включёнными — документ можно создать позже." />
+                    </Expander>
+
+                    <Expander Classes="faq-item">
+                        <Expander.Header>
+                            <TextBlock Classes="question" Text="Как изменить шаблон пропуска?" />
+                        </Expander.Header>
+                        <TextBlock Classes="answer"
+                                   Text="Выберите в главном меню «Шаблон пропуска». Откроется используемый DOCX-файл, который можно отредактировать и сохранить." />
+                    </Expander>
+
+                    <Expander Classes="faq-item">
+                        <Expander.Header>
+                            <TextBlock Classes="question" Text="Как исключить смену из расчёта зарплаты?" />
+                        </Expander.Header>
+                        <TextBlock Classes="answer"
+                                   Text="В деталях дня снимите отметку в столбце «Зарплата». Смена останется в календаре, но будет показана в аналитике как не включённая в зарплату." />
+                    </Expander>
+                </StackPanel>
+            </Border>
+
+            <Border Classes="faq-card">
+                <StackPanel Spacing="7">
+                    <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,5">
+                        <icons:MaterialIcon Kind="ChartBoxOutline" Width="24" Height="24"
+                                            Foreground="{StaticResource BrandPrimary}" />
+                        <TextBlock Classes="section-title" Text="Аналитика и Excel" />
+                    </StackPanel>
+
+                    <Expander Classes="faq-item">
+                        <Expander.Header>
+                            <TextBlock Classes="question" Text="Что показывает аналитика затрат?" />
+                        </Expander.Header>
+                        <TextBlock Classes="answer"
+                                   Text="Раздел показывает общие итоги за выбранный период: сотрудников, смены, включённые и не включённые в зарплату выходы и итоговую сумму. Также доступны разрезы по матчам, сотрудникам и отдельным сменам." />
+                    </Expander>
+
+                    <Expander Classes="faq-item">
+                        <Expander.Header>
+                            <TextBlock Classes="question" Text="Где посмотреть статистику по магазинам и должностям?" />
+                        </Expander.Header>
+                        <TextBlock Classes="answer"
+                                   Text="В аналитике затрат дополнительные таблицы появляются автоматически, когда настроено несколько магазинов или должностей. Общая суммарная статистика при этом сохраняется. Та же детализация включается в экспорт Excel." />
+                    </Expander>
+
+                    <Expander Classes="faq-item">
+                        <Expander.Header>
+                            <TextBlock Classes="question" Text="Как выгрузить данные в Excel?" />
+                        </Expander.Header>
+                        <TextBlock Classes="answer"
+                                   Text="Выберите период, нажмите «Обновить», а затем «Экспорт Excel». Для тайминга экспорт также доступен из аналитики задач и из окна конкретного дня." />
+                    </Expander>
+                </StackPanel>
+            </Border>
+
+            <Border Classes="faq-card">
+                <StackPanel Spacing="7">
+                    <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,5">
+                        <icons:MaterialIcon Kind="TimerOutline" Width="24" Height="24"
+                                            Foreground="{StaticResource BrandPrimary}" />
+                        <TextBlock Classes="section-title" Text="Тайминг и расписание матчей" />
+                    </StackPanel>
+
+                    <Expander Classes="faq-item">
+                        <Expander.Header>
+                            <TextBlock Classes="question" Text="Как вести тайминг задач?" />
+                        </Expander.Header>
+                        <TextBlock Classes="answer"
+                                   Text="Сначала создайте категории в разделе «Тайминг». Затем откройте нужный день, нажмите «Тайминг» и добавляйте задачи с временем выполнения. Кнопка со стрелками над календарём переключает отображение сотрудников и задач." />
+                    </Expander>
+
+                    <Expander Classes="faq-item">
+                        <Expander.Header>
+                            <TextBlock Classes="question" Text="Как посмотреть аналитику задач?" />
+                        </Expander.Header>
+                        <TextBlock Classes="answer"
+                                   Text="В разделе «Тайминг» нажмите «Аналитика» и выберите период. Результат можно просмотреть в программе или экспортировать в Excel." />
+                    </Expander>
+
+                    <Expander Classes="faq-item">
+                        <Expander.Header>
+                            <TextBlock Classes="question" Text="Что делать, если расписание матчей устарело?" />
+                        </Expander.Header>
+                        <TextBlock Classes="answer"
+                                   Text="Выберите в главном меню «Обновить расписание» и проверьте подключение к интернету. Помните, что дата и время будущего матча могут быть изменены организаторами." />
+                    </Expander>
+                </StackPanel>
+            </Border>
+
+            <TextBlock Text="Не нашли ответ? Проверьте подсказки при наведении на кнопки — они объясняют действие элементов календаря."
+                       Margin="8,2,8,12"
+                       FontSize="12"
+                       Foreground="{StaticResource BrandTextSubtle}"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap" />
         </StackPanel>
     </ScrollViewer>
 </UserControl>

@@ -17,7 +17,11 @@ public static class EmployeeAnalyticsExportToExcel
         IReadOnlyCollection<MatchCostAnalysis> matches,
         IReadOnlyCollection<EmployeeCostSummary> employees,
         IReadOnlyCollection<WorkDayCostExplanation> workDays,
-        IReadOnlyCollection<ManagementInsight> insights)
+        IReadOnlyCollection<ManagementInsight> insights,
+        IReadOnlyCollection<WorkplaceCostSummary> shopSummaries,
+        IReadOnlyCollection<WorkplaceCostSummary> positionSummaries,
+        bool showShopBreakdown,
+        bool showPositionBreakdown)
     {
         try
         {
@@ -42,7 +46,16 @@ public static class EmployeeAnalyticsExportToExcel
 
             CreateMatchesSheet(package, matches);
             CreateEmployeesSheet(package, employees);
-            CreateWorkDaysSheet(package, workDays);
+            CreateWorkDaysSheet(package, workDays, showShopBreakdown, showPositionBreakdown);
+            if (showShopBreakdown || showPositionBreakdown)
+            {
+                CreateWorkplaceBreakdownSheet(
+                    package,
+                    shopSummaries,
+                    positionSummaries,
+                    showShopBreakdown,
+                    showPositionBreakdown);
+            }
             CreateInsightsSheet(package, insights);
             
             CreateAnalysisSheet(
@@ -543,7 +556,9 @@ public static class EmployeeAnalyticsExportToExcel
     
     private static void CreateWorkDaysSheet(
         ExcelPackage package,
-        IReadOnlyCollection<WorkDayCostExplanation> workDays)
+        IReadOnlyCollection<WorkDayCostExplanation> workDays,
+        bool showShopBreakdown,
+        bool showPositionBreakdown)
     {
         var ws = package.Workbook.Worksheets.Add("Рабочие дни");
 
@@ -555,8 +570,19 @@ public static class EmployeeAnalyticsExportToExcel
         ws.Cells["F1"].Value = "Матч";
         ws.Cells["G1"].Value = "Тип";
         ws.Cells["H1"].Value = "Контекст";
+        var lastColumn = 8;
+        if (showShopBreakdown)
+        {
+            lastColumn++;
+            ws.Cells[1, lastColumn].Value = "Магазин";
+        }
+        if (showPositionBreakdown)
+        {
+            lastColumn++;
+            ws.Cells[1, lastColumn].Value = "Должность";
+        }
 
-        ApplyHeaderStyle(ws.Cells["A1:H1"]);
+        ApplyHeaderStyle(ws.Cells[1, 1, 1, lastColumn]);
 
         int row = 2;
 
@@ -572,18 +598,23 @@ public static class EmployeeAnalyticsExportToExcel
             ws.Cells[row, 6].Value = item.RelatedMatch;
             ws.Cells[row, 7].Value = item.WorkType;
             ws.Cells[row, 8].Value = item.Context;
+            var column = 8;
+            if (showShopBreakdown)
+                ws.Cells[row, ++column].Value = item.ShopName;
+            if (showPositionBreakdown)
+                ws.Cells[row, ++column].Value = item.PositionName;
 
             ws.Cells[row, 5].Style.Numberformat.Format = "#,##0 ₽";
 
-            ApplyRowStyle(ws.Cells[row, 1, row, 8]);
+            ApplyRowStyle(ws.Cells[row, 1, row, lastColumn]);
 
             if (!item.IncludeInSalary)
             {
-                PaintRow(ws.Cells[row, 1, row, 8], "#FDECEC");
+                PaintRow(ws.Cells[row, 1, row, lastColumn], "#FDECEC");
             }
             else if (item.RelatedMatch != "Не перед матчем")
             {
-                PaintRow(ws.Cells[row, 1, row, 8], "#EEF8FF");
+                PaintRow(ws.Cells[row, 1, row, lastColumn], "#EEF8FF");
             }
 
             row++;
@@ -595,7 +626,91 @@ public static class EmployeeAnalyticsExportToExcel
 
         ws.View.FreezePanes(2, 1);
 
-        ws.Cells[1, 1, row - 1, 8].AutoFilter = true;
+        ws.Cells[1, 1, row - 1, lastColumn].AutoFilter = true;
+    }
+
+    private static void CreateWorkplaceBreakdownSheet(
+        ExcelPackage package,
+        IReadOnlyCollection<WorkplaceCostSummary> shops,
+        IReadOnlyCollection<WorkplaceCostSummary> positions,
+        bool showShops,
+        bool showPositions)
+    {
+        var ws = package.Workbook.Worksheets.Add("Магазины и должности");
+        ws.View.ShowGridLines = false;
+
+        ws.Cells["A1:G1"].Merge = true;
+        ws.Cells["A1"].Value = "Затраты по магазинам и должностям";
+        ws.Cells["A1"].Style.Font.Bold = true;
+        ws.Cells["A1"].Style.Font.Size = 20;
+
+        var row = 3;
+        if (showShops)
+        {
+            ws.Cells[row, 1].Value = "По магазинам";
+            ws.Cells[row, 1].Style.Font.Bold = true;
+            ws.Cells[row, 1].Style.Font.Size = 15;
+            row += 2;
+            WriteWorkplaceHeader(ws, row, false);
+            row++;
+            foreach (var item in shops)
+            {
+                WriteWorkplaceRow(ws, row++, item, false);
+            }
+            row += 2;
+        }
+
+        if (showPositions)
+        {
+            ws.Cells[row, 1].Value = "По должностям";
+            ws.Cells[row, 1].Style.Font.Bold = true;
+            ws.Cells[row, 1].Style.Font.Size = 15;
+            row += 2;
+            WriteWorkplaceHeader(ws, row, true);
+            row++;
+            foreach (var item in positions)
+            {
+                WriteWorkplaceRow(ws, row++, item, true);
+            }
+        }
+
+        ws.Cells.AutoFitColumns();
+        ws.Column(1).Width = 24;
+        ws.Column(2).Width = showPositions ? 24 : 14;
+        ws.View.FreezePanes(3, 1);
+    }
+
+    private static void WriteWorkplaceHeader(ExcelWorksheet ws, int row, bool includePosition)
+    {
+        var column = 1;
+        ws.Cells[row, column++].Value = "Магазин";
+        if (includePosition)
+            ws.Cells[row, column++].Value = "Должность";
+        ws.Cells[row, column++].Value = "Сотрудников";
+        ws.Cells[row, column++].Value = "Смен";
+        ws.Cells[row, column++].Value = "В ЗП";
+        ws.Cells[row, column++].Value = "Вне ЗП";
+        ws.Cells[row, column].Value = "Затраты";
+        ApplyHeaderStyle(ws.Cells[row, 1, row, column]);
+    }
+
+    private static void WriteWorkplaceRow(
+        ExcelWorksheet ws,
+        int row,
+        WorkplaceCostSummary item,
+        bool includePosition)
+    {
+        var column = 1;
+        ws.Cells[row, column++].Value = item.ShopName;
+        if (includePosition)
+            ws.Cells[row, column++].Value = item.PositionName;
+        ws.Cells[row, column++].Value = item.UniqueEmployees;
+        ws.Cells[row, column++].Value = item.TotalShifts;
+        ws.Cells[row, column++].Value = item.PaidShifts;
+        ws.Cells[row, column++].Value = item.UnpaidShifts;
+        ws.Cells[row, column].Value = (double)item.TotalSalary;
+        ws.Cells[row, column].Style.Numberformat.Format = "#,##0 \"₽\"";
+        ApplyRowStyle(ws.Cells[row, 1, row, column]);
     }
     
     private static void CreateInsightsSheet(

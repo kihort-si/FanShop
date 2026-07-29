@@ -48,6 +48,18 @@ public partial class EmployeeCostAnalyticsViewModel : BaseViewModel
     private ObservableCollection<WorkDayCostExplanation> _workDayExplanations = new();
 
     [ObservableProperty]
+    private ObservableCollection<WorkplaceCostSummary> _shopSummaries = new();
+
+    [ObservableProperty]
+    private ObservableCollection<WorkplaceCostSummary> _positionSummaries = new();
+
+    [ObservableProperty]
+    private bool _showShopBreakdown;
+
+    [ObservableProperty]
+    private bool _showPositionBreakdown;
+
+    [ObservableProperty]
     private List<ISeries> _salaryByMonthSeries = new();
 
     [ObservableProperty]
@@ -140,6 +152,7 @@ public partial class EmployeeCostAnalyticsViewModel : BaseViewModel
         KpiItems = new ObservableCollection<CostKpiItem>(BuildKpis(records, matches));
         MatchAnalyses = new ObservableCollection<MatchCostAnalysis>(BuildMatchAnalyses(windows, records));
         EmployeeSummaries = new ObservableCollection<EmployeeCostSummary>(BuildEmployeeSummaries(records));
+        BuildWorkplaceSummaries(records);
         WorkDayExplanations = new ObservableCollection<WorkDayCostExplanation>(
             records.OrderBy(record => record.Date).ThenBy(record => record.EmployeeName));
         ManagementInsights = new ObservableCollection<ManagementInsight>(BuildInsights(records, matches, MatchAnalyses));
@@ -167,7 +180,11 @@ public partial class EmployeeCostAnalyticsViewModel : BaseViewModel
             MatchAnalyses,
             EmployeeSummaries,
             WorkDayExplanations,
-            ManagementInsights);
+            ManagementInsights,
+            ShopSummaries,
+            PositionSummaries,
+            ShowShopBreakdown,
+            ShowPositionBreakdown);
     }
 
     [RelayCommand]
@@ -285,6 +302,8 @@ public partial class EmployeeCostAnalyticsViewModel : BaseViewModel
         var WorkDayEmployee = context.WorkDayEmployee
             .Include(item => item.WorkDay)
             .Include(item => item.Employee)
+            .Include(item => item.Position)
+            .ThenInclude(position => position.Shop)
             .Where(item => item.WorkDay.Date >= start && item.WorkDay.Date <= end)
             .ToList();
 
@@ -304,6 +323,10 @@ public partial class EmployeeCostAnalyticsViewModel : BaseViewModel
             {
                 Date = date,
                 EmployeeName = $"{item.Employee.Surname} {item.Employee.FirstName} {item.Employee.LastName}",
+                ShopID = item.Position?.ShopID ?? 0,
+                ShopName = item.Position?.Shop?.ShopName ?? "Магазин не указан",
+                PositionID = item.PositionID,
+                PositionName = item.Position?.PositionName ?? "Должность не указана",
                 WorkDuration = item.WorkDuration,
                 IncludeInSalary = item.IncludeInSalary,
                 IncludeInPass = item.IncludeInPass,
@@ -313,6 +336,65 @@ public partial class EmployeeCostAnalyticsViewModel : BaseViewModel
                 Context = BuildContext(date, window, matchDay, item.IncludeInSalary)
             };
         }).ToList();
+    }
+
+    private void BuildWorkplaceSummaries(IReadOnlyList<WorkDayCostExplanation> records)
+    {
+        using var context = new AppDbContext();
+        var shops = context.Shops
+            .Include(shop => shop.Positions)
+            .OrderByDescending(shop => shop.IsDefault)
+            .ThenBy(shop => shop.ShopName)
+            .ToList();
+
+        ShowShopBreakdown = shops.Count > 1;
+        var shopsWithSeveralPositions = shops
+            .Where(shop => shop.Positions.Count > 1)
+            .Select(shop => shop.ShopID)
+            .ToHashSet();
+        ShowPositionBreakdown = shopsWithSeveralPositions.Count > 0;
+
+        ShopSummaries = ShowShopBreakdown
+            ? new ObservableCollection<WorkplaceCostSummary>(
+                shops.Select(shop => BuildWorkplaceSummary(
+                        shop.ShopName,
+                        string.Empty,
+                        records.Where(record => record.ShopID == shop.ShopID)))
+                    .OrderByDescending(summary => summary.TotalSalary)
+                    .ThenBy(summary => summary.ShopName))
+            : new ObservableCollection<WorkplaceCostSummary>();
+
+        PositionSummaries = ShowPositionBreakdown
+            ? new ObservableCollection<WorkplaceCostSummary>(
+                shops.Where(shop => shopsWithSeveralPositions.Contains(shop.ShopID))
+                    .SelectMany(shop => shop.Positions.Select(position => BuildWorkplaceSummary(
+                        shop.ShopName,
+                        position.PositionName,
+                        records.Where(record => record.PositionID == position.PositionID))))
+                    .OrderBy(summary => summary.ShopName)
+                    .ThenByDescending(summary => summary.TotalSalary)
+                    .ThenBy(summary => summary.PositionName))
+            : new ObservableCollection<WorkplaceCostSummary>();
+    }
+
+    private static WorkplaceCostSummary BuildWorkplaceSummary(
+        string shopName,
+        string positionName,
+        IEnumerable<WorkDayCostExplanation> source)
+    {
+        var records = source.ToList();
+        var salary = records.Sum(record => record.SalaryAmount);
+        return new WorkplaceCostSummary
+        {
+            ShopName = shopName,
+            PositionName = positionName,
+            PaidShifts = records.Count(record => record.IncludeInSalary),
+            UnpaidShifts = records.Count(record => !record.IncludeInSalary),
+            TotalShifts = records.Count,
+            UniqueEmployees = records.Select(record => record.EmployeeName).Distinct().Count(),
+            TotalSalary = salary,
+            TotalSalaryText = FormatMoney(salary)
+        };
     }
 
     private static string BuildContext(
@@ -917,6 +999,10 @@ public class WorkDayCostExplanation
     public DateTime Date { get; set; }
     public string DateText => Date.ToString("dd.MM.yyyy");
     public string EmployeeName { get; set; } = string.Empty;
+    public int ShopID { get; set; }
+    public string ShopName { get; set; } = string.Empty;
+    public int PositionID { get; set; }
+    public string PositionName { get; set; } = string.Empty;
     public string WorkDuration { get; set; } = string.Empty;
     public bool IncludeInSalary { get; set; }
     public bool IncludeInPass { get; set; }
@@ -925,6 +1011,18 @@ public class WorkDayCostExplanation
     public string RelatedMatch { get; set; } = string.Empty;
     public string WorkType { get; set; } = string.Empty;
     public string Context { get; set; } = string.Empty;
+}
+
+public class WorkplaceCostSummary
+{
+    public string ShopName { get; set; } = string.Empty;
+    public string PositionName { get; set; } = string.Empty;
+    public int PaidShifts { get; set; }
+    public int UnpaidShifts { get; set; }
+    public int TotalShifts { get; set; }
+    public int UniqueEmployees { get; set; }
+    public decimal TotalSalary { get; set; }
+    public string TotalSalaryText { get; set; } = string.Empty;
 }
 
 internal class MatchAnalysisSource

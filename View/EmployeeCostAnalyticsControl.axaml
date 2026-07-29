@@ -50,6 +50,43 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
+            <Border Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1"
+                    CornerRadius="14" Padding="14" IsVisible="{Binding ShowShopBreakdown}">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Затраты по магазинам" FontSize="18" FontWeight="Bold" />
+                    <DataGrid ItemsSource="{Binding ShopSummaries}" AutoGenerateColumns="False"
+                              IsReadOnly="True" CanUserSortColumns="True" MinHeight="150">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Магазин" Binding="{Binding ShopName}" Width="*" />
+                            <DataGridTextColumn Header="Сотрудников" Binding="{Binding UniqueEmployees}" Width="130" />
+                            <DataGridTextColumn Header="Смен" Binding="{Binding TotalShifts}" Width="90" />
+                            <DataGridTextColumn Header="В ЗП" Binding="{Binding PaidShifts}" Width="90" />
+                            <DataGridTextColumn Header="Вне ЗП" Binding="{Binding UnpaidShifts}" Width="90" />
+                            <DataGridTextColumn Header="Затраты" Binding="{Binding TotalSalaryText}" Width="130" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </Border>
+
+            <Border Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1"
+                    CornerRadius="14" Padding="14" IsVisible="{Binding ShowPositionBreakdown}">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Затраты по должностям" FontSize="18" FontWeight="Bold" />
+                    <DataGrid ItemsSource="{Binding PositionSummaries}" AutoGenerateColumns="False"
+                              IsReadOnly="True" CanUserSortColumns="True" MinHeight="150">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Магазин" Binding="{Binding ShopName}" Width="*" />
+                            <DataGridTextColumn Header="Должность" Binding="{Binding PositionName}" Width="*" />
+                            <DataGridTextColumn Header="Сотрудников" Binding="{Binding UniqueEmployees}" Width="130" />
+                            <DataGridTextColumn Header="Смен" Binding="{Binding TotalShifts}" Width="90" />
+                            <DataGridTextColumn Header="В ЗП" Binding="{Binding PaidShifts}" Width="90" />
+                            <DataGridTextColumn Header="Вне ЗП" Binding="{Binding UnpaidShifts}" Width="90" />
+                            <DataGridTextColumn Header="Затраты" Binding="{Binding TotalSalaryText}" Width="130" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </Border>
+
             <Grid ColumnDefinitions="1.1*,0.9*" RowDefinitions="360,360">
                 <Border Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="14" Padding="14" Margin="0,0,8,8">
                     <Grid RowDefinitions="Auto,*">

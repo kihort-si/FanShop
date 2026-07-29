@@ -1,9 +1,12 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:icons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         x:Class="FanShop.Windows.WhatsNewWindow"
-        Width="700"
-        Height="500"
-        CanResize="False"
+        Width="760"
+        Height="620"
+        MinWidth="640"
+        MinHeight="480"
+        CanResize="True"
         SystemDecorations="None"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
@@ -11,94 +14,178 @@
         Background="Transparent"
         Title="Что нового">
 
-    <Border CornerRadius="16"
-            Margin="20"
-            BoxShadow="0 0 34 0 #40000000"
-            Background="White">
+    <Window.Styles>
+        <Style Selector="Border.update-card">
+            <Setter Property="Background" Value="{StaticResource BrandSurface}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrandBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Padding" Value="16" />
+            <Setter Property="Margin" Value="0,0,0,10" />
+        </Style>
+        <Style Selector="TextBlock.update-title">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="{StaticResource BrandText}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        <Style Selector="TextBlock.update-description">
+            <Setter Property="Margin" Value="0,5,0,0" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="LineHeight" Value="20" />
+            <Setter Property="Foreground" Value="{StaticResource BrandTextSubtle}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+    </Window.Styles>
 
+    <Border Margin="20"
+            CornerRadius="18"
+            BorderBrush="#D3E4F0"
+            BorderThickness="1"
+            BoxShadow="0 8 36 0 #40000000"
+            Background="{StaticResource BrandSurfaceAlt}">
         <Grid RowDefinitions="Auto,*,Auto">
 
-            <Border Background="{StaticResource BrandPrimary}"
-                    CornerRadius="16,16,0,0">
+            <Border CornerRadius="17,17,0,0"
+                    ClipToBounds="True">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                        <GradientStop Color="#075A91" Offset="0" />
+                        <GradientStop Color="#009EE1" Offset="1" />
+                    </LinearGradientBrush>
+                </Border.Background>
 
-                <Grid>
-
+                <Grid MinHeight="164">
                     <Image Source="/Resources/whatsnew-header.png"
+                           Width="428"
                            HorizontalAlignment="Right"
                            VerticalAlignment="Stretch"
-                           Stretch="UniformToFill"
-                           Width="210"
-                           Opacity="0.15"
-                           IsHitTestVisible="False"/>
+                           Stretch="Uniform"
+                           Opacity="0.16"
+                           IsHitTestVisible="False" />
 
-                    <StackPanel Spacing="8">
+                    <StackPanel Margin="26,23,210,23"
+                                Spacing="8"
+                                VerticalAlignment="Center">
+                        <Border Background="#25FFFFFF"
+                                CornerRadius="12"
+                                Padding="10,4"
+                                HorizontalAlignment="Left">
+                            <TextBlock Text="{Binding Version}"
+                                       FontSize="12"
+                                       FontWeight="SemiBold"
+                                       Foreground="White" />
+                        </Border>
 
-                        <TextBlock Text="Что нового"
-                                   FontSize="28"
+                        <TextBlock Text="Что нового?"
+                                   FontSize="30"
                                    FontWeight="Bold"
-                                   Foreground="White"
-                                   Padding="20,20,0,0"/>
+                                   Foreground="White" />
 
-                        <TextBlock Text="{Binding Version}"
-                                   Foreground="White"
-                                   Opacity="0.7"
-                                   Padding="20,0,0,10"/>
-
+                        <TextBlock Text="Больше порядка в сменах, быстрее работа с календарём и подробнее аналитика"
+                                   MaxWidth="520"
+                                   FontSize="14"
+                                   LineHeight="20"
+                                   Foreground="#E8F7FF"
+                                   TextWrapping="Wrap" />
                     </StackPanel>
-
                 </Grid>
-
             </Border>
 
-
-            <Border Grid.Row="1"
-                    Margin="20"
-                    Padding="16"
-                    CornerRadius="12"
-                    Background="#fafafa">
-
-                <ScrollViewer>
+            <ScrollViewer Grid.Row="1"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="24,20,24,14">
+                    <Border Background="#E8F5FC"
+                            BorderBrush="#B9DFF3"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            Padding="14"
+                            Margin="0,0,0,14">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Border Width="38"
+                                    Height="38"
+                                    CornerRadius="19"
+                                    Background="{StaticResource BrandAccent}">
+                                <icons:MaterialIcon Kind="RocketLaunchOutline"
+                                                    Width="21"
+                                                    Height="21"
+                                                    Foreground="White"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="2">
+                                <TextBlock Text="Обновление уже готово к работе"
+                                           FontSize="14"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource BrandPrimary}" />
+                                <TextBlock Text="Ниже — только самое важное. Все подробные инструкции доступны в обновлённом разделе FAQ."
+                                           FontSize="12"
+                                           Foreground="{StaticResource BrandTextSubtle}"
+                                           TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
 
                     <ItemsControl ItemsSource="{Binding Sections}">
-
                         <ItemsControl.ItemTemplate>
-
                             <DataTemplate>
+                                <Border Classes="update-card">
+                                    <Grid ColumnDefinitions="Auto,*">
+                                        <Border Width="42"
+                                                Height="42"
+                                                CornerRadius="10"
+                                                Background="#E5F3FB"
+                                                VerticalAlignment="Top">
+                                            <icons:MaterialIcon Kind="CheckDecagramOutline"
+                                                                Width="23"
+                                                                Height="23"
+                                                                Foreground="{StaticResource BrandPrimary}"
+                                                                HorizontalAlignment="Center"
+                                                                VerticalAlignment="Center" />
+                                        </Border>
 
-                                <StackPanel Margin="0,0,0,16"
-                                            Spacing="4">
-
-                                    <TextBlock Text="{Binding Title}"
-                                               FontSize="18"
-                                               FontWeight="Bold"
-                                               Foreground="{StaticResource BrandPrimary}" />
-
-                                    <TextBlock Text="{Binding Description}"
-                                               TextWrapping="Wrap"
-                                               FontSize="14"
-                                               Opacity="0.85" />
-
-                                </StackPanel>
-
+                                        <StackPanel Grid.Column="1"
+                                                    Margin="14,0,0,0">
+                                            <TextBlock Classes="update-title"
+                                                       Text="{Binding Title}" />
+                                            <TextBlock Classes="update-description"
+                                                       Text="{Binding Description}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
                             </DataTemplate>
-
                         </ItemsControl.ItemTemplate>
-
                     </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
 
-                </ScrollViewer>
+            <Border Grid.Row="2"
+                    Background="{StaticResource BrandSurface}"
+                    BorderBrush="{StaticResource BrandBorder}"
+                    BorderThickness="0,1,0,0"
+                    CornerRadius="0,0,17,17"
+                    Padding="24,14">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="7"
+                                VerticalAlignment="Center">
+                        <icons:MaterialIcon Kind="BookOpenPageVariantOutline"
+                                            Width="17"
+                                            Height="17"
+                                            Foreground="{StaticResource BrandTextSubtle}" />
+                        <TextBlock Text="Советы по новым функциям находятся в FAQ"
+                                   FontSize="12"
+                                   Foreground="{StaticResource BrandTextSubtle}"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
 
+                    <Button Grid.Column="1"
+                            Content="Понятно"
+                            Command="{Binding CloseCommand}"
+                            CommandParameter="{Binding $parent[Window]}" />
+                </Grid>
             </Border>
-
-            <Button Grid.Row="2"
-                    HorizontalAlignment="Right"
-                    Width="82"
-                    Content="Понятно"
-                    Command="{Binding CloseCommand}"
-                    CommandParameter="{Binding $parent[Window]}"
-                    Margin="20" />
-
         </Grid>
     </Border>
-
 </Window>

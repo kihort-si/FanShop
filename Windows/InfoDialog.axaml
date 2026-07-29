@@ -38,7 +38,6 @@
 
             <Button Grid.Row="2"
                     Content="ОК"
-                    Width="90"
                     HorizontalAlignment="Right"
                     Margin="20"
                     Command="{Binding CloseCommand}"
