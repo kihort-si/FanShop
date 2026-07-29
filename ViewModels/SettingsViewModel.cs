@@ -143,6 +143,7 @@ public partial class SettingsViewModel : BaseViewModel
         }
 
         context.SaveChanges();
+        WorkplaceCatalogNotifier.NotifyChanged();
     }
     
     [RelayCommand]
@@ -166,6 +167,7 @@ public partial class SettingsViewModel : BaseViewModel
             ShopName = shop.ShopName,
             IsDefault = shop.IsDefault
         });
+        WorkplaceCatalogNotifier.NotifyChanged();
     }
 
     [RelayCommand]
@@ -181,6 +183,7 @@ public partial class SettingsViewModel : BaseViewModel
 
         foreach (var shop in Shops)
             shop.IsDefault = shop.ShopID == selectedShop.ShopID;
+        WorkplaceCatalogNotifier.NotifyChanged();
     }
 
     [RelayCommand]
@@ -197,6 +200,7 @@ public partial class SettingsViewModel : BaseViewModel
 
         foreach (var position in selectedPosition.Shop.Positions)
             position.IsDefault = position.PositionID == selectedPosition.PositionID;
+        WorkplaceCatalogNotifier.NotifyChanged();
     }
     
     [RelayCommand]
@@ -283,6 +287,7 @@ public partial class SettingsViewModel : BaseViewModel
         context.SaveChanges();
 
         positionVm.PositionName = vm.Name;
+        WorkplaceCatalogNotifier.NotifyChanged();
     }
     
     [RelayCommand]
@@ -339,6 +344,7 @@ public partial class SettingsViewModel : BaseViewModel
             .FirstOrDefault(s => s.Positions.Contains(positionVm));
 
         shop?.Positions.Remove(positionVm);
+        WorkplaceCatalogNotifier.NotifyChanged();
     }
     
     [RelayCommand]
@@ -381,6 +387,7 @@ public partial class SettingsViewModel : BaseViewModel
         context.SaveChanges();
 
         shopVm.ShopName = vm.Name;
+        WorkplaceCatalogNotifier.NotifyChanged();
     }
     
     [RelayCommand]
@@ -439,6 +446,7 @@ public partial class SettingsViewModel : BaseViewModel
         context.SaveChanges();
 
         Shops.Remove(shopVm);
+        WorkplaceCatalogNotifier.NotifyChanged();
     }
     
     private static Window? GetMainWindow()

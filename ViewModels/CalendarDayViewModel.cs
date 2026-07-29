@@ -316,6 +316,20 @@ public partial class CalendarDayViewModel : BaseViewModel
         OnPropertyChanged(nameof(DisplayedEmployees));
     }
 
+    public void RefreshWorkplaceCatalog()
+    {
+        if (_employees == null)
+            return;
+
+        using var context = new AppDbContext();
+        var shops = LoadWorkplaceShops(context);
+        foreach (var employee in _employees)
+            employee.InitializeWorkplace(shops, employee.PositionID);
+
+        OnPropertyChanged(nameof(EmployeeGroups));
+        OnPropertyChanged(nameof(DisplayedEmployees));
+    }
+
     private static IBrush GetShopChipBackground(Shop? shop)
     {
         if (shop?.IsDefault != false)

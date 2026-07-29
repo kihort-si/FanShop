@@ -54,6 +54,7 @@ public partial class ShopViewModel : ObservableObject
             IsDefault = position.IsDefault,
             Shop = this
         });
+        WorkplaceCatalogNotifier.NotifyChanged();
     }
 
     [RelayCommand]
@@ -74,5 +75,6 @@ public partial class ShopViewModel : ObservableObject
         context.SaveChanges();
 
         Positions.Remove(positionVm);
+        WorkplaceCatalogNotifier.NotifyChanged();
     }
 }

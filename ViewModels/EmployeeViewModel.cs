@@ -10,7 +10,7 @@ using FanShop.Windows;
 
 namespace FanShop.ViewModels;
 
-public partial class EmployeeViewModel : BaseViewModel
+public partial class EmployeeViewModel : BaseViewModel, IWorkplaceCatalogObserver
 {
     private readonly MainWindowViewModel? _mainWindowViewModel;
     private static readonly EmployeeNameComparer NameComparer = new();
@@ -19,6 +19,7 @@ public partial class EmployeeViewModel : BaseViewModel
     {
         LoadShops();
         RefreshEmployees();
+        WorkplaceCatalogNotifier.Register(this);
     }
 
     [ObservableProperty]
@@ -42,6 +43,9 @@ public partial class EmployeeViewModel : BaseViewModel
     [ObservableProperty]
     private ObservableCollection<Position> _availablePositions = new();
 
+    [ObservableProperty] 
+    private bool _canSelectShop;
+
     [ObservableProperty]
     private bool _canSelectPosition;
 
@@ -50,9 +54,17 @@ public partial class EmployeeViewModel : BaseViewModel
         _mainWindowViewModel = mainWindowViewModel;
         LoadShops();
         RefreshEmployees();
+        WorkplaceCatalogNotifier.Register(this);
     }
-    
-    private void LoadShops()
+
+    public void RefreshWorkplaceCatalog()
+    {
+        var shopId = SelectedShop?.ShopID;
+        var positionId = SelectedPosition?.PositionID;
+        LoadShops(shopId, positionId);
+    }
+
+    private void LoadShops(int? preferredShopId = null, int? preferredPositionId = null)
     {
         using var context = new AppDbContext();
 
@@ -63,7 +75,14 @@ public partial class EmployeeViewModel : BaseViewModel
             Shops.Add(shop);
         }
 
-        SelectedShop = Shops.FirstOrDefault();
+        SelectedShop = Shops.FirstOrDefault(shop => shop.ShopID == preferredShopId)
+                       ?? Shops.FirstOrDefault(shop => shop.IsDefault)
+                       ?? Shops.FirstOrDefault();
+        CanSelectShop = Shops.Count > 1;
+
+        if (preferredPositionId != null)
+            SelectedPosition = AvailablePositions.FirstOrDefault(position => position.PositionID == preferredPositionId)
+                               ?? SelectedPosition;
     }
     
     partial void OnSelectedEmployeeChanged(Employee? value)
@@ -77,7 +96,11 @@ public partial class EmployeeViewModel : BaseViewModel
         AvailablePositions.Clear();
 
         if (value == null)
+        {
+            SelectedPosition = null;
+            CanSelectPosition = false;
             return;
+        }
 
         using var context = new AppDbContext();
 

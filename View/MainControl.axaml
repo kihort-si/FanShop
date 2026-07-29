@@ -89,7 +89,7 @@
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Width="40" Height="36" Margin="5,0"
-                            IsVisible="{Binding IsEmployeeView}"
+                            IsVisible="{Binding HasMultipleShops}"
                             ToolTip.Tip="Фильтр по магазинам">
                         <avalonia:MaterialIcon Kind="FilterVariant"/>
                         <Button.Flyout>

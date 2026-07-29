@@ -56,7 +56,8 @@
                                FontWeight="Bold" />
 
                     <ComboBox ItemsSource="{Binding Shops}"
-                              SelectedItem="{Binding SelectedShop}">
+                              SelectedItem="{Binding SelectedShop}"
+                              IsEnabled="{Binding CanSelectShop}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding ShopName}" />

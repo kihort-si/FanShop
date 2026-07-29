@@ -17,7 +17,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FanShop.ViewModels;
 
-public partial class MainViewModel : BaseViewModel
+public partial class MainViewModel : BaseViewModel, IWorkplaceCatalogObserver
 {
     public int _currentYear;
     public int _currentMonth;
@@ -50,6 +50,9 @@ public partial class MainViewModel : BaseViewModel
     [ObservableProperty]
     private ShopFilterOption? _selectedEmployeeShopFilter;
 
+    [ObservableProperty]
+    private bool _hasMultipleShops;
+    
     public string CurrentMonthName => new DateTime(_currentYear, _currentMonth, 1)
         .ToString("MMMM yyyy", new CultureInfo("ru-RU")).ToUpper();
 
@@ -102,19 +105,32 @@ public partial class MainViewModel : BaseViewModel
         _pickerYear = _currentYear;
         _selectedCalendarMonth = new DateTimeOffset(new DateTime(_currentYear, _currentMonth, 1));
         LoadEmployeeShopFilters();
+        WorkplaceCatalogNotifier.Register(this);
 
         _ = GenerateCalendar(_currentYear, _currentMonth);
         _lastCalendarUpdateDate = DateTime.Today;
     }
 
-    private void LoadEmployeeShopFilters()
+    private void LoadEmployeeShopFilters(int? preferredShopId = null)
     {
         using var context = new AppDbContext();
         EmployeeShopFilters.Clear();
         EmployeeShopFilters.Add(new ShopFilterOption(null, "Все магазины"));
         foreach (var shop in context.Shops.OrderByDescending(shop => shop.IsDefault).ThenBy(shop => shop.ShopName))
             EmployeeShopFilters.Add(new ShopFilterOption(shop.ShopID, shop.ShopName));
-        SelectedEmployeeShopFilter = EmployeeShopFilters[0];
+        SelectedEmployeeShopFilter = EmployeeShopFilters
+                                         .FirstOrDefault(option => option.ShopID == preferredShopId)
+                                     ?? EmployeeShopFilters[0];
+        HasMultipleShops = EmployeeShopFilters.Count > 2 && IsEmployeeView;
+    }
+
+    public void RefreshWorkplaceCatalog()
+    {
+        var selectedShopId = SelectedEmployeeShopFilter?.ShopID;
+        LoadEmployeeShopFilters(selectedShopId);
+
+        foreach (var day in CalendarDays)
+            day.RefreshWorkplaceCatalog();
     }
 
     partial void OnSelectedEmployeeShopFilterChanged(ShopFilterOption? value)
@@ -361,6 +377,7 @@ public partial class MainViewModel : BaseViewModel
     private async Task ToggleCalendarViewMode()
     {
         IsEmployeeView = !IsEmployeeView;
+        LoadEmployeeShopFilters();
         await GenerateCalendar(_currentYear, _currentMonth);
     }
 
@@ -403,7 +420,6 @@ public partial class MainViewModel : BaseViewModel
             }
             else
             {
-                // Log error - notification will be handled by the view
                 Console.WriteLine($"Error loading matches: {e.Message}");
             }
         }
