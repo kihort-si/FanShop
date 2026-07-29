@@ -68,6 +68,11 @@ jobs:
             Write-Host "Release $env:RELEASE_TAG does not exist and will be created."
           }
 
+          # gh returns 1 when a release does not exist. That result is expected
+          # here, so do not propagate its exit code to the GitHub Actions step.
+          $global:LASTEXITCODE = 0
+          exit 0
+
       - name: Restore dependencies
         if: steps.existing_release.outputs.exists != 'true'
         run: dotnet restore FanShop.csproj --runtime win-x64
