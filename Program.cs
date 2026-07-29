@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using System.Threading.Tasks;
 using Avalonia;
 
 namespace FanShop;
@@ -7,6 +10,8 @@ internal static class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        WriteStartupLog();
+
         RegisterGlobalExceptionHandlers();
 
         try
@@ -17,7 +22,8 @@ internal static class Program
         catch (Exception ex)
         {
             WriteCrashLog("Fatal startup exception", ex);
-            throw;
+
+            Console.Error.WriteLine(ex);
         }
     }
 
@@ -33,51 +39,163 @@ internal static class Program
             }
             else
             {
-                WriteCrashLog(
-                    $"Unhandled non-Exception object. IsTerminating: {eventArgs.IsTerminating}",
+                WriteTextLog(
+                    $"Unhandled object. IsTerminating: {eventArgs.IsTerminating}",
                     eventArgs.ExceptionObject?.ToString() ?? "null");
             }
         };
 
         TaskScheduler.UnobservedTaskException += (_, eventArgs) =>
         {
-            WriteCrashLog("Unobserved task exception", eventArgs.Exception);
+            WriteCrashLog(
+                "Unobserved task exception",
+                eventArgs.Exception);
+
             eventArgs.SetObserved();
         };
     }
 
-    private static void WriteCrashLog(string source, Exception exception)
-    {
-        WriteCrashLog(source, exception.ToString());
-    }
-
-    private static void WriteCrashLog(string source, string details)
+    private static void WriteStartupLog()
     {
         try
         {
-            var logDirectory = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "FanShop",
-                "Logs");
+            var text = $"""
+                        ==================================================
+                        Date: {DateTime.Now:yyyy-MM-dd HH:mm:ss}
+                        Application started
+                        Version: {GetAppVersion()}
+                        Process path: {Environment.ProcessPath}
+                        Base directory: {AppContext.BaseDirectory}
+                        Current directory: {Environment.CurrentDirectory}
+                        AppData: {GetAppDataDirectory()}
+                        OS: {Environment.OSVersion}
+                        64-bit process: {Environment.Is64BitProcess}
 
-            Directory.CreateDirectory(logDirectory);
+                        """;
 
-            var logPath = Path.Combine(logDirectory, "crash.log");
+            WriteToLogFile("startup.log", text);
+        }
+        catch (Exception ex)
+        {
+            WriteFallbackLog("Startup log error", ex);
+        }
+    }
 
-            var message = $"""
-                           
-                           ==================================================
-                           Date: {DateTime.Now:yyyy-MM-dd HH:mm:ss}
-                           Source: {source}
-                           App version: {GetAppVersion()}
-                           OS: {Environment.OSVersion}
-                           64-bit process: {Environment.Is64BitProcess}
-                           
-                           {details}
-                           
-                           """;
+    private static void WriteCrashLog(
+        string source,
+        Exception exception)
+    {
+        var text = $"""
+                    ==================================================
+                    Date: {DateTime.Now:yyyy-MM-dd HH:mm:ss}
+                    Source: {source}
+                    Version: {GetAppVersion()}
+                    Process path: {Environment.ProcessPath}
+                    Base directory: {AppContext.BaseDirectory}
+                    Current directory: {Environment.CurrentDirectory}
+                    AppData: {GetAppDataDirectory()}
+                    OS: {Environment.OSVersion}
+                    64-bit process: {Environment.Is64BitProcess}
 
-            File.AppendAllText(logPath, message);
+                    {exception}
+
+                    """;
+
+        try
+        {
+            WriteToLogFile("crash.log", text);
+        }
+        catch
+        {
+            WriteFallbackLog(source, exception);
+        }
+    }
+
+    private static void WriteTextLog(
+        string source,
+        string details)
+    {
+        var text = $"""
+                    ==================================================
+                    Date: {DateTime.Now:yyyy-MM-dd HH:mm:ss}
+                    Source: {source}
+
+                    {details}
+
+                    """;
+
+        try
+        {
+            WriteToLogFile("crash.log", text);
+        }
+        catch
+        {
+            try
+            {
+                var fallbackPath = Path.Combine(
+                    Path.GetTempPath(),
+                    "FanShop-crash.log");
+
+                File.AppendAllText(fallbackPath, text);
+            }
+            catch
+            {
+            }
+        }
+    }
+
+    private static void WriteToLogFile(
+        string fileName,
+        string content)
+    {
+        var logDirectory = GetLogDirectory();
+
+        Directory.CreateDirectory(logDirectory);
+
+        var logPath = Path.Combine(
+            logDirectory,
+            fileName);
+
+        File.AppendAllText(logPath, content);
+    }
+
+    private static string GetLogDirectory()
+    {
+        return Path.Combine(
+            GetAppDataDirectory(),
+            "FanShop",
+            "Logs");
+    }
+
+    private static string GetAppDataDirectory()
+    {
+        return Environment.GetFolderPath(
+            Environment.SpecialFolder.ApplicationData);
+    }
+
+    private static void WriteFallbackLog(
+        string source,
+        Exception exception)
+    {
+        try
+        {
+            var fallbackPath = Path.Combine(
+                Path.GetTempPath(),
+                "FanShop-crash.log");
+
+            var text = $"""
+                        ==================================================
+                        Date: {DateTime.Now:yyyy-MM-dd HH:mm:ss}
+                        Source: {source}
+                        Process path: {Environment.ProcessPath}
+                        Base directory: {AppContext.BaseDirectory}
+                        AppData: {GetAppDataDirectory()}
+
+                        {exception}
+
+                        """;
+
+            File.AppendAllText(fallbackPath, text);
         }
         catch
         {
@@ -86,7 +204,8 @@ internal static class Program
 
     private static string GetAppVersion()
     {
-        return typeof(Program).Assembly
+        return typeof(Program)
+                   .Assembly
                    .GetName()
                    .Version?
                    .ToString()
@@ -95,7 +214,8 @@ internal static class Program
 
     public static AppBuilder BuildAvaloniaApp()
     {
-        return AppBuilder.Configure<App>()
+        return AppBuilder
+            .Configure<App>()
             .UsePlatformDetect()
             .LogToTrace();
     }
