@@ -171,6 +171,21 @@ public partial class MainWindowViewModel : BaseViewModel
     }
 
     [RelayCommand]
+    private async Task OpenPriceTagsTab()
+    {
+        try
+        {
+            OpenTab(new FanTabItem
+            {
+                Title = "Ценники 1С",
+                Content = new PriceTagsControl { DataContext = FanShop.Services.PriceTags.PriceTagModule.ViewModel },
+                IsClosable = true
+            });
+        }
+        catch (Exception ex) { await DialogService.ShowInfo($"Не удалось открыть раздел ценников. {ex.Message}"); }
+    }
+
+    [RelayCommand]
     private void OpenEmployeeTab()
     {
         var employeeWindowTab = new EmployeeControl

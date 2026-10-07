@@ -59,7 +59,7 @@ namespace FanShop.Services
                 if (latestRelease == null || latestRelease.Assets.Length == 0)
                     return false;
 
-                string downloadUrl = null;
+                string? downloadUrl = null;
                 foreach (var asset in latestRelease.Assets)
                 {
                     if (asset.Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
@@ -72,7 +72,7 @@ namespace FanShop.Services
                 if (string.IsNullOrEmpty(downloadUrl))
                     return false;
 
-                var appPath = Process.GetCurrentProcess().MainModule.FileName;
+                var appPath = Environment.ProcessPath ?? throw new IOException("Не удалось определить путь приложения.");
                 var tempZipPath = Path.Combine(Path.GetTempPath(), "FanShopUpdate.zip");
                 var tempExtractPath = Path.Combine(Path.GetTempPath(), "FanShopUpdate");
 
@@ -112,7 +112,7 @@ namespace FanShop.Services
                 return;
 
             string updaterPath = Path.Combine(
-                Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName),
+                AppContext.BaseDirectory,
                 "updater.bat");
 
             if (File.Exists(updaterPath))
@@ -137,7 +137,7 @@ namespace FanShop.Services
             return Assembly.GetExecutingAssembly().GetName().Version ?? new Version(1, 0, 0);
         }
 
-        private async Task<ReleaseInfo> GetLatestReleaseInfoAsync()
+        private async Task<ReleaseInfo?> GetLatestReleaseInfoAsync()
         {
             try
             {
@@ -166,12 +166,13 @@ namespace FanShop.Services
 
         private void CreateUpdateScript(string tempExtractPath, string appPath)
         {
-            string currentDir = Path.GetDirectoryName(appPath);
+            string currentDir = Path.GetDirectoryName(appPath) ?? throw new IOException("Не удалось определить папку приложения.");
             string appExeName = Path.GetFileName(appPath);
             string batPath = Path.Combine(Path.GetTempPath(), "update_fanshop.bat");
             var filesToDelete = Directory
                 .GetFiles(tempExtractPath, "*", SearchOption.TopDirectoryOnly)
                 .Select(Path.GetFileName)
+                .OfType<string>()
                 .Where(f => !string.IsNullOrWhiteSpace(f))
                 .ToList();
             var deleteCommands = string.Join(

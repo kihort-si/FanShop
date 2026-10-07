@@ -511,10 +511,10 @@ public class StatisticItem
 public class PieChartData
 {
     public double Value { get; set; }
-    public LabelVisual? Label { get; set; }
+    public DrawnLabelVisual? Label { get; set; }
     public SolidColorPaint? Fill { get; set; }
 
-    public PieChartData(double value, LabelVisual? label, SolidColorPaint? fill)
+    public PieChartData(double value, DrawnLabelVisual? label, SolidColorPaint? fill)
     {
         Value = value;
         Label = label;

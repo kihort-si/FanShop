@@ -45,7 +45,9 @@ public partial class App : Application
         {
             _splashScreen?.ViewModel.UpdateProgress(5);
             var updateService = new UpdateService();
-            bool updateAvailable = await updateService.CheckForUpdatesAsync();
+            var priceTagsStartup = Environment.GetCommandLineArgs().Contains("--price-tags")
+                || await FanShop.Services.PriceTags.PriceTagModule.HasSavedWorkAsync();
+            bool updateAvailable = !priceTagsStartup && await updateService.CheckForUpdatesAsync();
 
             if (updateAvailable)
             {
@@ -127,7 +129,7 @@ public partial class App : Application
             _splashScreen?.ViewModel.UpdateProgress(30);
             await Task.Delay(100);
 
-            await _mainWindowViewModel.LoadMatchesFromFirebase();
+            if (!priceTagsStartup) await _mainWindowViewModel.LoadMatchesFromFirebase();
             _splashScreen?.ViewModel.UpdateProgress(60);
             await Task.Delay(100);
 
@@ -138,12 +140,13 @@ public partial class App : Application
                 _splashScreen?.ViewModel.UpdateProgress(80);
                 await Task.Delay(100);
 
-                await mainViewModel.CheckAndUpdateCalendarAsync();
+                if (!priceTagsStartup) await mainViewModel.CheckAndUpdateCalendarAsync();
                 _splashScreen?.ViewModel.UpdateProgress(95);
                 await Task.Delay(100);
             }
 
             _mainWindowViewModel.RefreshStatistics();
+            if (priceTagsStartup) _mainWindowViewModel.OpenPriceTagsTabCommand.Execute(null);
 
             _splashScreen?.ViewModel.UpdateProgress(100);
             await Task.Delay(100);
@@ -152,7 +155,7 @@ public partial class App : Application
 
             await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
             {
-                _mainWindow = new MainWindow { DataContext = _mainWindowViewModel };
+                _mainWindow = new MainWindow { DataContext = _mainWindowViewModel, SkipWelcome = priceTagsStartup };
 
                 if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
                 {

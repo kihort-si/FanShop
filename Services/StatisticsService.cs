@@ -107,8 +107,8 @@ namespace FanShop.Services
 
     public class EmployeeStatistic
     {
-        public string EmployeeName { get; set; }
+        public string EmployeeName { get; set; } = string.Empty;
         public int WorkDaysCount { get; set; }
-        public string TotalSalary { get; set; }
+        public string TotalSalary { get; set; } = string.Empty;
     }
 }

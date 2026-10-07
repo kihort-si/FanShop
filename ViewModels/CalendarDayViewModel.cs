@@ -227,7 +227,7 @@ public partial class CalendarDayViewModel : BaseViewModel
     private bool CanPrintPass => Employees.Count > 0;
 
     [RelayCommand]
-    private async void DailySchedule()
+    private async Task DailySchedule()
     {
         var dayTasksWindow = new DayTasksWindow
         {

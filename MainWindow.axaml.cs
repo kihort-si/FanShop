@@ -9,7 +9,10 @@ namespace FanShop;
 
 public partial class MainWindow : Window
 {
+    internal bool SkipWelcome { get; init; }
     private MainWindowViewModel? _mainWindowViewModel;
+    private bool _priceTagsShutdownComplete;
+    private bool _priceTagsShutdownStarted;
 
     public MainWindow()
     {
@@ -24,7 +27,7 @@ public partial class MainWindow : Window
     {
         _mainWindowViewModel = DataContext as MainWindowViewModel;
 
-        if (DataContext is MainWindowViewModel vm)
+        if (!SkipWelcome && !Environment.GetCommandLineArgs().Contains("--price-tags") && DataContext is MainWindowViewModel vm)
         {
             await vm.CheckWhatsNew();
         }
@@ -32,7 +35,7 @@ public partial class MainWindow : Window
 
     private async void OnWindowActivated(object? sender, EventArgs e)
     {
-        if (_mainWindowViewModel?.GetMainViewModel() is MainViewModel mainViewModel)
+        if (!SkipWelcome && !Environment.GetCommandLineArgs().Contains("--price-tags") && _mainWindowViewModel?.GetMainViewModel() is MainViewModel mainViewModel)
         {
             await mainViewModel.CheckAndUpdateCalendarAsync();
         }
@@ -51,6 +54,21 @@ public partial class MainWindow : Window
     private void CloseButton_Click(object? sender, RoutedEventArgs e)
     {
         Close();
+    }
+
+    protected override async void OnClosing(WindowClosingEventArgs e)
+    {
+        if (!_priceTagsShutdownComplete)
+        {
+            e.Cancel = true;
+            base.OnClosing(e);
+            if (_priceTagsShutdownStarted) return;
+            _priceTagsShutdownStarted = true;
+            try { await FanShop.Services.PriceTags.PriceTagModule.ShutdownAsync(); }
+            finally { _priceTagsShutdownComplete = true; Close(); }
+            return;
+        }
+        base.OnClosing(e);
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)

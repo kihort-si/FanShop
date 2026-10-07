@@ -137,6 +137,12 @@
                                     <TextBlock Text="Загрузить матчи и обновить календарь" FontSize="12" Foreground="{StaticResource BrandTextSubtle}" />
                                 </StackPanel>
                             </Button>
+                            <Button Classes="menu-item" Command="{Binding OpenPriceTagsTabCommand}">
+                                <StackPanel>
+                                    <TextBlock Text="Ценники 1С" FontWeight="SemiBold" />
+                                    <TextBlock Text="Сканирование и передача в 1С" FontSize="12" Foreground="{StaticResource BrandTextSubtle}" />
+                                </StackPanel>
+                            </Button>
                             <Button Classes="menu-item" Command="{Binding OpenTaskCategoriesTabCommand}">
                                 <StackPanel>
                                     <TextBlock Text="Тайминг" FontWeight="SemiBold" />

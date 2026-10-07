@@ -13,7 +13,7 @@ namespace FanShop.Services
     {
         public static bool CreateWordPass(DateTime date, ObservableCollection<EmployeeWorkInfo> employees)
         {
-            return CreateWordPass(date.ToString("dd MMMM yyyy"), date, employees);
+            return CreateWordPass(date.ToString("dd MMMM yyyy"), IsDayWeekend(date), date, employees);
         }
 
         public static bool CreateWordPassForDates(
@@ -38,11 +38,13 @@ namespace FanShop.Services
                 ? firstDate.ToString("d MMMM", culture)
                 : $"с {firstDate.ToString("d MMMM", culture)} по {lastDate.ToString("d MMMM", culture)}";
             
-            return CreateWordPass(dateText, orderedDates[0], employees);
+            return firstDate == lastDate ? CreateWordPass(dateText, IsDayWeekend(firstDate), orderedDates[0], employees) :
+                    CreateWordPass(dateText, false, orderedDates[0], employees);
         }
 
         private static bool CreateWordPass(
             string dateText,
+            bool isWeekend,
             DateTime fileDate,
             ObservableCollection<EmployeeWorkInfo> employees)
         {
@@ -65,12 +67,15 @@ namespace FanShop.Services
 
                     ReplaceText(wordDoc, "{DATE}", dateText);
                     ReplaceText(wordDoc, "{HEAD}", settings.Head);
+                    ReplaceText(wordDoc, "{WEEKEND}", isWeekend ? " в выходной день" : "");
                     ReplaceText(wordDoc, "{RESPONSIBLE_POSITION}", settings.ResponsiblePosition);
                     ReplaceText(wordDoc, "{RESPONSIBLE_PERSON}", settings.ResponsiblePerson);
                     ReplaceText(wordDoc, "{PHONE_NUMBER}", settings.ResponsiblePhoneNumber);
                     ReplaceText(wordDoc, "{GOAL}", settings.VisitGoal);
 
-                    var table = wordDoc.MainDocumentPart.Document.Body.Elements<Table>()
+                    var body = wordDoc.MainDocumentPart?.Document.Body
+                        ?? throw new InvalidDataException("В шаблоне пропуска отсутствует основная часть документа. Выберите корректный DOCX-шаблон.");
+                    var table = body.Elements<Table>()
                         .FirstOrDefault(t => t.Elements<TableRow>()
                             .FirstOrDefault()?.Elements<TableCell>()
                             .Any(c => c.InnerText.Contains("№ п/п")) != null);
@@ -148,7 +153,7 @@ namespace FanShop.Services
                 outputPath = Path.Combine(Path.GetTempPath(), $"пропуск_{fileDate:yyyyMMdd}_{Guid.NewGuid():N}.docx");
                 File.Copy(templatePath, outputPath, true);
 
-                return CreateWordPass(dateText, fileDate, employees);
+                return CreateWordPass(dateText, isWeekend, fileDate, employees);
             }
             catch (Exception)
             {
@@ -160,6 +165,12 @@ namespace FanShop.Services
                 catch { }
                 return false;
             }
+        }
+
+        private static bool IsDayWeekend(DateTime date)
+        {
+            return date.DayOfWeek == DayOfWeek.Saturday ||
+                   date.DayOfWeek == DayOfWeek.Sunday;
         }
         
         private static TableRow CreateRow(string[] cellTexts, float minHeightInCm)
@@ -191,13 +202,90 @@ namespace FanShop.Services
 
         private static void ReplaceText(WordprocessingDocument wordDoc, string searchText, string replaceText)
         {
-            var body = wordDoc.MainDocumentPart.Document.Body;
-            var texts = body.Descendants<Text>().Where(t => t.Text.Contains(searchText)).ToList();
+            var mainPart = wordDoc.MainDocumentPart;
+            if (mainPart?.Document == null)
+                return;
 
-            foreach (var text in texts)
+            ReplaceTextInElement(mainPart.Document, searchText, replaceText);
+
+            foreach (var headerPart in mainPart.HeaderParts)
             {
-                text.Text = text.Text.Replace(searchText, replaceText);
+                if (headerPart.Header != null)
+                    ReplaceTextInElement(headerPart.Header, searchText, replaceText);
             }
+
+            foreach (var footerPart in mainPart.FooterParts)
+            {
+                if (footerPart.Footer != null)
+                    ReplaceTextInElement(footerPart.Footer, searchText, replaceText);
+            }
+        }
+
+        private static void ReplaceTextInElement(
+            DocumentFormat.OpenXml.OpenXmlElement root,
+            string searchText,
+            string replaceText)
+        {
+            foreach (var paragraph in root.Descendants<Paragraph>())
+            {
+                while (ReplaceFirstOccurrence(paragraph, searchText, replaceText))
+                {
+                }
+            }
+        }
+
+        private static bool ReplaceFirstOccurrence(
+            Paragraph paragraph,
+            string searchText,
+            string replaceText)
+        {
+            var textNodes = paragraph.Descendants<Text>().ToList();
+            if (textNodes.Count == 0)
+                return false;
+
+            var paragraphText = string.Concat(textNodes.Select(x => x.Text));
+            var matchIndex = paragraphText.IndexOf(searchText, StringComparison.Ordinal);
+            if (matchIndex < 0)
+                return false;
+
+            var matchEndIndex = matchIndex + searchText.Length;
+            var currentIndex = 0;
+            Text? firstMatchedNode = null;
+
+            foreach (var textNode in textNodes)
+            {
+                var nodeStart = currentIndex;
+                var nodeEnd = nodeStart + textNode.Text.Length;
+
+                if (firstMatchedNode == null &&
+                    matchIndex >= nodeStart &&
+                    matchIndex < nodeEnd)
+                {
+                    firstMatchedNode = textNode;
+                }
+
+                if (firstMatchedNode != null &&
+                    nodeStart < matchEndIndex &&
+                    nodeEnd > matchIndex)
+                {
+                    var removeStart = Math.Max(matchIndex, nodeStart) - nodeStart;
+                    var removeEnd = Math.Min(matchEndIndex, nodeEnd) - nodeStart;
+                    var prefix = textNode.Text[..removeStart];
+                    var suffix = textNode.Text[removeEnd..];
+
+                    textNode.Text = textNode == firstMatchedNode
+                        ? prefix + replaceText + suffix
+                        : suffix;
+
+                    textNode.Space = textNode.Text.StartsWith(' ') || textNode.Text.EndsWith(' ')
+                        ? DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve
+                        : null;
+                }
+
+                currentIndex = nodeEnd;
+            }
+
+            return firstMatchedNode != null;
         }
 
         private static TableCell CreateCell(string text, bool centerAlign = false)

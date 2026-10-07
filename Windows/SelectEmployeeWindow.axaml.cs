@@ -48,7 +48,7 @@ public partial class SelectEmployeeWindow : Window
 
         if (selectedPosition == null)
         {
-            DialogService.ShowInfo(
+            _ = DialogService.ShowInfo(
                 "Не выбрана должность.");
             return;
         }
