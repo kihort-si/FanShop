@@ -44,61 +44,21 @@ public partial class App : Application
         try
         {
             _splashScreen?.ViewModel.UpdateProgress(5);
-            var updateService = new UpdateService();
-            var priceTagsStartup = Environment.GetCommandLineArgs().Contains("--price-tags")
+            using var updateService = new UpdateService();
+            var adjustmentStartup = Environment.GetCommandLineArgs().Contains("--report-adjustment");
+            var priceTagsStartup = adjustmentStartup || Environment.GetCommandLineArgs().Contains("--price-tags")
                 || await FanShop.Services.PriceTags.PriceTagModule.HasSavedWorkAsync();
-            bool updateAvailable = !priceTagsStartup && await updateService.CheckForUpdatesAsync();
+            var skipOnlineInitialization = priceTagsStartup || FanShop.Services.Updates.UpdateBootstrap.IsHealthCheck;
+            bool updateAvailable = await updateService.CheckForUpdatesAsync();
 
-            if (updateAvailable)
+            var updateProgress = new Progress<int>(p => _splashScreen?.ViewModel.UpdateProgress(8 + p * 87 / 100));
+            if (updateAvailable && await updateService.UpdateAsync(updateProgress))
             {
-                _splashScreen?.ViewModel.UpdateProgress(8);
-
-                bool updated = await updateService.UpdateAsync();
-                if (updated)
-                {
-                    var messageBox = new Window
-                    {
-                        Title = "Обновление FanShop",
-                        Width = 400,
-                        Height = 150,
-                        CanResize = false,
-                        WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                        Content = new StackPanel
-                        {
-                            Margin = new Thickness(20),
-                            Spacing = 15,
-                            Children =
-                            {
-                                new TextBlock
-                                {
-                                    Text = "Доступно обновление приложения. После нажатия OK, программа будет перезапущена.",
-                                    TextWrapping = TextWrapping.Wrap
-                                },
-                                new Button
-                                {
-                                    Content = "OK",
-                                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center
-                                }
-                            }
-                        }
-                    };
-
-                    ((Button)((StackPanel)messageBox.Content).Children[1]).Click += (s, e) =>
-                    {
-                        messageBox.Close();
-                        updateService.ExecuteUpdate();
-                    };
-
-                    if (_splashScreen != null)
-                    {
-                        await messageBox.ShowDialog(_splashScreen);
-                    }
-                    else
-                    {
-                        messageBox.Show();
-                    }
-                    return;
-                }
+                await FanShop.Services.ReportAdjustment.ReportAdjustmentModule.ShutdownAsync();
+                await FanShop.Services.PriceTags.PriceTagModule.ShutdownAsync();
+                if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime updatingDesktop)
+                    updatingDesktop.Shutdown(0);
+                return;
             }
 
             _splashScreen?.ViewModel.UpdateProgress(10);
@@ -111,10 +71,9 @@ public partial class App : Application
                 {
                     await db.Employees.AnyAsync();
                 }
-                catch (Microsoft.Data.Sqlite.SqliteException)
+                catch (Microsoft.Data.Sqlite.SqliteException ex)
                 {
-                    await db.Database.EnsureDeletedAsync();
-                    await db.Database.EnsureCreatedAsync();
+                    throw new InvalidOperationException("Не удалось прочитать базу данных FanShop. База сохранена; проверьте её схему и резервную копию.", ex);
                 }
 
                 await EnsureColumnAsync(db, "WorkDayEmployee", "IncludeInPass", "INTEGER NOT NULL DEFAULT 1");
@@ -129,7 +88,7 @@ public partial class App : Application
             _splashScreen?.ViewModel.UpdateProgress(30);
             await Task.Delay(100);
 
-            if (!priceTagsStartup) await _mainWindowViewModel.LoadMatchesFromFirebase();
+            if (!skipOnlineInitialization) await _mainWindowViewModel.LoadMatchesFromFirebase();
             _splashScreen?.ViewModel.UpdateProgress(60);
             await Task.Delay(100);
 
@@ -140,13 +99,14 @@ public partial class App : Application
                 _splashScreen?.ViewModel.UpdateProgress(80);
                 await Task.Delay(100);
 
-                if (!priceTagsStartup) await mainViewModel.CheckAndUpdateCalendarAsync();
+                if (!skipOnlineInitialization) await mainViewModel.CheckAndUpdateCalendarAsync();
                 _splashScreen?.ViewModel.UpdateProgress(95);
                 await Task.Delay(100);
             }
 
             _mainWindowViewModel.RefreshStatistics();
-            if (priceTagsStartup) _mainWindowViewModel.OpenPriceTagsTabCommand.Execute(null);
+            if (adjustmentStartup) _mainWindowViewModel.OpenReportAdjustmentTabCommand.Execute(null);
+            else if (priceTagsStartup) _mainWindowViewModel.OpenPriceTagsTabCommand.Execute(null);
 
             _splashScreen?.ViewModel.UpdateProgress(100);
             await Task.Delay(100);
@@ -155,7 +115,7 @@ public partial class App : Application
 
             await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
             {
-                _mainWindow = new MainWindow { DataContext = _mainWindowViewModel, SkipWelcome = priceTagsStartup };
+                _mainWindow = new MainWindow { DataContext = _mainWindowViewModel, SkipWelcome = skipOnlineInitialization };
 
                 if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
                 {
@@ -163,8 +123,19 @@ public partial class App : Application
                 }
 
                 _mainWindow.Show();
+                FanShop.Services.Updates.UpdateBootstrap.ConfirmHealthy();
                 _splashScreen?.Close();
             });
+            await FanShop.Services.Updates.UpdateBootstrap.CleanLegacyFilesAsync();
+            if (FanShop.Services.Updates.UpdateBootstrap.IsHealthCheck)
+            {
+                _ = _mainWindowViewModel.CheckWhatsNew();
+                if (!priceTagsStartup)
+                {
+                    if (_mainWindow is not null) _mainWindow.SkipWelcome = false;
+                    _ = RefreshAfterUpdateAsync(_mainWindowViewModel);
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -217,6 +188,16 @@ public partial class App : Application
         {
             _splashScreen?.Close();
         }
+    }
+
+    private static async Task RefreshAfterUpdateAsync(MainWindowViewModel viewModel)
+    {
+        try
+        {
+            await viewModel.LoadMatchesFromFirebase();
+            if (viewModel.GetMainViewModel() is { } mainViewModel) await mainViewModel.CheckAndUpdateCalendarAsync();
+        }
+        catch (Exception ex) { FanShop.Services.Updates.UpdateState.Log("Не обновлено расписание после успешного запуска; приложение продолжает работу.", ex); }
     }
 
     private static async Task EnsureColumnAsync(AppDbContext db, string table, string column, string columnDef)

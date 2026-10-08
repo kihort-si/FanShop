@@ -1,234 +1,159 @@
-﻿using System.Diagnostics;
-using System.IO;
-using System.IO.Compression;
-using System.Net.Http;
+using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text.Json;
-using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
+using FanShop.Services.Updates;
+using FanShop.Updates;
 
-namespace FanShop.Services
+namespace FanShop.Services;
+
+public sealed class UpdateService : IDisposable
 {
-    public class UpdateService
+    private const string ReleaseUrl = "https://api.github.com/repos/kihort-si/FanShop/releases/latest";
+    private readonly HttpClient _client;
+    private ReleaseInfo? _release;
+    public UpdateService() : this(new HttpClient()) { }
+    public UpdateService(HttpClient client)
     {
-        private const string GITHUB_API_URL = "https://api.github.com/repos/kihort-si/FanShop/releases/latest";
-        private readonly HttpClient _httpClient;
-
-        public UpdateService()
+        _client = client; _client.Timeout = TimeSpan.FromMinutes(15);
+        _client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("FanShop", GetAppVersion()));
+        _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
+    }
+    public async Task<bool> CheckForUpdatesAsync()
+    {
+        if (!OperatingSystem.IsWindows() || UpdateBootstrap.IsHealthCheck) return false;
+        try
         {
-            _httpClient = new HttpClient();
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            _httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("FanShop", "1.0"));
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            var json = await _client.GetStringAsync(ReleaseUrl, timeout.Token);
+            _release = JsonSerializer.Deserialize<ReleaseInfo>(json, UpdateManifest.JsonOptions);
+            if (_release is null || _release.Draft || _release.Prerelease) return false;
+            var version = _release.Tag_Name.TrimStart('v', 'V');
+            return Version.TryParse(version, out var latest) && latest > Assembly.GetExecutingAssembly().GetName().Version
+                && !UpdateState.IsCoolingDown(version) && SelectPackage(_release, version) is not null;
         }
-
-        public async Task<bool> CheckForUpdatesAsync()
+        catch (Exception ex) { UpdateState.Log("Проверка обновлений не завершена; приложение продолжит работу.", ex); return false; }
+    }
+    public static (ReleaseAsset Zip, ReleaseAsset Checksum)? SelectPackage(ReleaseInfo release, string version)
+    {
+        var name = "FanShop" + version + ".zip";
+        var zip = release.Assets.SingleOrDefault(a => a.Name == name);
+        var checksum = release.Assets.SingleOrDefault(a => a.Name == name + ".sha256");
+        return zip is null || checksum is null ? null : (zip, checksum);
+    }
+    public async Task<bool> UpdateAsync(IProgress<int>? progress = null)
+    {
+        if (!OperatingSystem.IsWindows() || _release is null) return false;
+        string? work = null;
+        try
         {
+            var version = _release.Tag_Name.TrimStart('v', 'V');
+            var assets = SelectPackage(_release, version) ?? throw new InvalidDataException("Не найдены ZIP и его контрольная сумма.");
+            Directory.CreateDirectory(UpdateState.Root);
+            work = Path.Combine(UpdateState.Root, Guid.NewGuid().ToString("N")); Directory.CreateDirectory(work);
+            using var timeout = new CancellationTokenSource(TimeSpan.FromMinutes(10));
+            var checksumText = await _client.GetStringAsync(ValidateDownloadUrl(assets.Checksum.Browser_Download_Url), timeout.Token);
+            var checksum = checksumText.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+            if (checksum is null || checksum.Length != 64 || !checksum.All(Uri.IsHexDigit)) throw new InvalidDataException("Некорректная контрольная сумма ZIP.");
+            var archive = Path.Combine(work, "package.zip");
+            await DownloadAsync(ValidateDownloadUrl(assets.Zip.Browser_Download_Url), archive, progress, timeout.Token);
+            var payload = Path.Combine(work, "payload");
+            await Task.Run(() => UpdatePackage.Extract(archive, payload, version, checksum), timeout.Token);
+            progress?.Report(95);
+            var install = Path.GetFullPath(AppContext.BaseDirectory);
+            var target = Path.Combine(install, ".fanshop-write-probe-" + Guid.NewGuid().ToString("N"));
+            var needsElevation = false;
+            try { using (File.Create(target)) { } File.Delete(target); }
+            catch (UnauthorizedAccessException) { needsElevation = true; }
+            using var parent = Process.GetCurrentProcess();
+            var request = new UpdateRequest(install, payload, version, parent.Id, parent.StartTime.ToUniversalTime().Ticks,
+                UpdateState.UserArguments(Environment.GetCommandLineArgs().Skip(1).ToArray()), Convert.ToHexString(RandomNumberGenerator.GetBytes(32)),
+                System.Security.Principal.WindowsIdentity.GetCurrent().User?.Value);
+            var requestPath = Path.Combine(work, "request.json"); AtomicFiles.WriteJson(requestPath, request);
+            var start = new ProcessStartInfo(Path.Combine(payload, "FanShop.exe"))
+            { UseShellExecute = needsElevation, WorkingDirectory = payload, CreateNoWindow = true };
+            if (needsElevation) start.Verb = "runas";
+            start.ArgumentList.Add("--apply-update"); start.ArgumentList.Add(requestPath);
+            using var installer = Process.Start(start) ?? throw new IOException("Не удалось запустить установщик.");
+            var readyPath = Path.Combine(work, "ready.json");
+            var deadline = DateTimeOffset.UtcNow.AddSeconds(15);
+            var ready = false;
             try
             {
-                var currentVersion = GetCurrentVersion();
-                var latestRelease = await GetLatestReleaseInfoAsync();
-
-                if (latestRelease == null)
-                    return false;
-
-                var latestVersionString = latestRelease.Tag_Name.StartsWith("v")
-                    ? latestRelease.Tag_Name.Substring(1)
-                    : latestRelease.Tag_Name;
-
-                if (!Version.TryParse(latestVersionString, out var latestVersion))
-                    return false;
-
-                return latestVersion > currentVersion;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Ошибка при проверке обновлений: {ex.Message}");
-                return false;
-            }
-        }
-
-        public async Task<bool> UpdateAsync()
-        {
-            if (!OperatingSystem.IsWindows())
-                return false;
-
-            try
-            {
-                var latestRelease = await GetLatestReleaseInfoAsync();
-                if (latestRelease == null || latestRelease.Assets.Length == 0)
-                    return false;
-
-                string? downloadUrl = null;
-                foreach (var asset in latestRelease.Assets)
+                while (!installer.HasExited && DateTimeOffset.UtcNow < deadline)
                 {
-                    if (asset.Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+                    if (File.Exists(readyPath))
                     {
-                        downloadUrl = asset.Browser_Download_Url;
-                        break;
+                        var signal = JsonSerializer.Deserialize<HealthAcknowledgment>(File.ReadAllText(readyPath), UpdateManifest.JsonOptions);
+                        if (signal?.Token == request.HealthToken && signal.ProcessId == installer.Id && signal.Version == version) { ready = true; break; }
                     }
-                }
-
-                if (string.IsNullOrEmpty(downloadUrl))
-                    return false;
-
-                var appPath = Environment.ProcessPath ?? throw new IOException("Не удалось определить путь приложения.");
-                var tempZipPath = Path.Combine(Path.GetTempPath(), "FanShopUpdate.zip");
-                var tempExtractPath = Path.Combine(Path.GetTempPath(), "FanShopUpdate");
-
-                await DownloadFileAsync(downloadUrl, tempZipPath);
-
-                if (Directory.Exists(tempExtractPath))
-                    Directory.Delete(tempExtractPath, true);
-
-                ZipFile.ExtractToDirectory(tempZipPath, tempExtractPath);
-                File.Delete(tempZipPath);
-
-                CreateUpdateScript(tempExtractPath, appPath);
-
-                string batPath = Path.Combine(Path.GetTempPath(), "update_fanshop.bat");
-
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = batPath,
-                    CreateNoWindow = false,
-                    UseShellExecute = true,
-                    WindowStyle = ProcessWindowStyle.Normal
-                });
-
-                Environment.Exit(0);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Ошибка при обновлении: {ex.Message}");
-                return false;
-            }
-        }
-
-        public void ExecuteUpdate()
-        {
-            if (!OperatingSystem.IsWindows())
-                return;
-
-            string updaterPath = Path.Combine(
-                AppContext.BaseDirectory,
-                "updater.bat");
-
-            if (File.Exists(updaterPath))
-            {
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = updaterPath,
-                    CreateNoWindow = true,
-                    UseShellExecute = true,
-                    WindowStyle = ProcessWindowStyle.Hidden
-                });
-
-                if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-                {
-                    desktop.Shutdown();
+                    await Task.Delay(100, timeout.Token);
                 }
             }
-        }
-
-        private Version GetCurrentVersion()
-        {
-            return Assembly.GetExecutingAssembly().GetName().Version ?? new Version(1, 0, 0);
-        }
-
-        private async Task<ReleaseInfo?> GetLatestReleaseInfoAsync()
-        {
-            try
+            finally
             {
-                var response = await _httpClient.GetStringAsync(GITHUB_API_URL);
-                var options = new JsonSerializerOptions
+                if (!ready)
                 {
-                    PropertyNameCaseInsensitive = true
-                };
-                return JsonSerializer.Deserialize<ReleaseInfo>(response, options);
+                    if (!installer.HasExited) { installer.Kill(true); await installer.WaitForExitAsync(); }
+                    WindowsUpdateHost.ClearRecoveryIfOwned(install, payload);
+                }
             }
-            catch (Exception ex)
+            if (!ready) throw new IOException("Установщик не подтвердил готовность. Приложение продолжит работу.");
+            UpdateState.Log($"Пакет {version} проверен; установщик {installer.Id} ожидает штатного завершения процесса {parent.Id}.");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            UpdateState.Log("Обновление не запущено; установленная версия и данные сохранены.", ex);
+            if (work is not null)
+                try { Directory.Delete(work, true); } catch (Exception cleanup) when (cleanup is IOException or UnauthorizedAccessException) { UpdateState.Log("Временная загрузка не удалена.", cleanup); }
+            return false;
+        }
+    }
+    private static Uri ValidateDownloadUrl(string value)
+    {
+        if (!Uri.TryCreate(value, UriKind.Absolute, out var uri) || uri.Scheme != "https"
+            || uri.Host != "github.com" || !uri.AbsolutePath.StartsWith("/kihort-si/FanShop/releases/download/", StringComparison.OrdinalIgnoreCase))
+            throw new InvalidDataException("Адрес пакета не относится к релизам FanShop.");
+        return uri;
+    }
+    private async Task DownloadAsync(Uri url, string destination, IProgress<int>? progress, CancellationToken token)
+    {
+        using var response = await _client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, token);
+        response.EnsureSuccessStatusCode();
+        const long max = 512 * 1024 * 1024;
+        if (response.Content.Headers.ContentLength > max) throw new IOException("ZIP обновления слишком велик.");
+        await using var input = await response.Content.ReadAsStreamAsync(token);
+        await using var output = new FileStream(destination, FileMode.CreateNew, FileAccess.Write, FileShare.None);
+        var buffer = new byte[81920]; long total = 0; int read; var previousProgress = -1;
+        while ((read = await input.ReadAsync(buffer, token)) > 0)
+        {
+            total += read; if (total > max) throw new IOException("ZIP обновления слишком велик."); await output.WriteAsync(buffer.AsMemory(0, read), token);
+            if (response.Content.Headers.ContentLength is > 0)
             {
-                Debug.WriteLine($"Ошибка при получении информации о релизе: {ex.Message}");
-                return null;
+                var percent = (int)(total * 90 / response.Content.Headers.ContentLength.Value);
+                if (percent != previousProgress) { previousProgress = percent; progress?.Report(percent); }
             }
         }
-
-        private async Task DownloadFileAsync(string url, string destinationPath)
-        {
-            using var response = await _httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
-            response.EnsureSuccessStatusCode();
-
-            using var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write, FileShare.None);
-            await response.Content.CopyToAsync(fileStream);
-        }
-
-        private void CreateUpdateScript(string tempExtractPath, string appPath)
-        {
-            string currentDir = Path.GetDirectoryName(appPath) ?? throw new IOException("Не удалось определить папку приложения.");
-            string appExeName = Path.GetFileName(appPath);
-            string batPath = Path.Combine(Path.GetTempPath(), "update_fanshop.bat");
-            var filesToDelete = Directory
-                .GetFiles(tempExtractPath, "*", SearchOption.TopDirectoryOnly)
-                .Select(Path.GetFileName)
-                .OfType<string>()
-                .Where(f => !string.IsNullOrWhiteSpace(f))
-                .ToList();
-            var deleteCommands = string.Join(
-                Environment.NewLine,
-                filesToDelete.Select(f =>
-                    $@"del /Q ""{Path.Combine(currentDir, f)}"" >nul 2>&1"));
-
-            string script = $@"
-                @echo off
-                echo Обновление FanShop...
-
-                timeout /t 3 /nobreak > nul
-
-                taskkill /f /im ""{appExeName}"" /t >nul 2>&1
-
-                timeout /t 2 /nobreak > nul
-
-                REM Удаляем старые файлы версии
-                {deleteCommands}
-
-                REM Копируем файлы обновления
-                xcopy /E /Y /I ""{tempExtractPath}\*"" ""{currentDir}\""
-
-                REM Удаляем временную папку
-                rmdir /S /Q ""{tempExtractPath}""
-
-                REM Запускаем обновленное приложение
-                start """" ""{Path.Combine(currentDir, appExeName)}""
-
-                timeout /t 1 /nobreak > nul
-                del ""%~f0""
-                ";
-
-            File.WriteAllText(batPath, script);
-        }
-        
-        public static string GetAppVersion()
-        {
-            var version = Assembly
-                .GetExecutingAssembly()
-                .GetName()
-                .Version;
-
-            return $"{version?.Major}.{version?.Minor}.{version?.Build}";
-        }
+        await output.FlushAsync(token);
     }
-
-    public class ReleaseInfo
+    public static string GetAppVersion()
     {
-        public string Tag_Name { get; set; } = string.Empty;
-        public ReleaseAsset[] Assets { get; set; } = [];
+        var version = Assembly.GetExecutingAssembly().GetName().Version ?? new Version(1, 0, 0);
+        return $"{version.Major}.{version.Minor}.{version.Build}";
     }
-
-    public class ReleaseAsset
-    {
-        public string Name { get; set; } = string.Empty;
-        public string Browser_Download_Url { get; set; } = string.Empty;
-    }
+    public void Dispose() => _client.Dispose();
+}
+public sealed class ReleaseInfo
+{
+    public string Tag_Name { get; set; } = "";
+    public ReleaseAsset[] Assets { get; set; } = [];
+    public bool Draft { get; set; }
+    public bool Prerelease { get; set; }
+}
+public sealed class ReleaseAsset
+{
+    public string Name { get; set; } = "";
+    public string Browser_Download_Url { get; set; } = "";
 }
