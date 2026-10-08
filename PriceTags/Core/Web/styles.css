@@ -1,1 +1,117 @@
-:root{font-family:Segoe UI,Arial,sans-serif;color:#16324f;background:#f4f8fb}*{box-sizing:border-box}body{margin:0}main{max-width:840px;margin:40px auto;padding:28px;background:white;border:1px solid #e2ecf5;border-radius:18px}header{display:flex;justify-content:space-between;gap:12px;color:#0a6dae;font-weight:700;font-size:14px}h1{font-size:34px;margin-bottom:8px}p{line-height:1.5}label{display:block;margin:24px 0 8px}input{width:100%;padding:16px;font-size:28px;border:2px solid #0a6dae;border-radius:10px}button{background:#0a6dae;color:white;border:0;border-radius:8px;padding:12px 20px;margin-top:12px;font-size:16px;cursor:pointer}section{margin-top:20px;padding:20px;border:2px solid #e2ecf5;border-radius:12px}section.ok{background:#ecfdf3;border-color:#15803d}section.error{background:#fff1f2;border-color:#dc2626}dl{display:grid;grid-template-columns:150px 1fr;gap:12px}dd{margin:0;font-weight:600;overflow-wrap:anywhere}dt{color:#6e7e8f}#last{font-size:22px;overflow-wrap:anywhere}@media(max-width:600px){main{margin:8px;padding:20px}header{flex-direction:column}h1{font-size:26px}}
+:root {
+    font-family: Segoe UI, Arial, sans-serif;
+    color: #16324f;
+    background: #f4f8fb
+}
+
+* {
+    box-sizing: border-box
+}
+
+body {
+    margin: 0
+}
+
+main {
+    max-width: 840px;
+    margin: 40px auto;
+    padding: 28px;
+    background: white;
+    border: 1px solid #e2ecf5;
+    border-radius: 18px
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    color: #0a6dae;
+    font-weight: 700;
+    font-size: 14px
+}
+
+h1 {
+    font-size: 34px;
+    margin-bottom: 8px
+}
+
+p {
+    line-height: 1.5
+}
+
+label {
+    display: block;
+    margin: 24px 0 8px
+}
+
+input {
+    width: 100%;
+    padding: 16px;
+    font-size: 28px;
+    border: 2px solid #0a6dae;
+    border-radius: 10px
+}
+
+button {
+    background: #0a6dae;
+    color: white;
+    border: 0;
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin-top: 12px;
+    font-size: 16px;
+    cursor: pointer
+}
+
+section {
+    margin-top: 20px;
+    padding: 20px;
+    border: 2px solid #e2ecf5;
+    border-radius: 12px
+}
+
+section.ok {
+    background: #ecfdf3;
+    border-color: #15803d
+}
+
+section.error {
+    background: #fff1f2;
+    border-color: #dc2626
+}
+
+dl {
+    display: grid;
+    grid-template-columns:150px 1fr;
+    gap: 12px
+}
+
+dd {
+    margin: 0;
+    font-weight: 600;
+    overflow-wrap: anywhere
+}
+
+dt {
+    color: #6e7e8f
+}
+
+#last {
+    font-size: 22px;
+    overflow-wrap: anywhere
+}
+
+@media (max-width: 600px) {
+    main {
+        margin: 8px;
+        padding: 20px
+    }
+
+    header {
+        flex-direction: column
+    }
+
+    h1 {
+        font-size: 26px
+    }
+}

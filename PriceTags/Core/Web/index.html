@@ -1,2 +1,35 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FanShop • Сканирование ценников</title><link rel="stylesheet" href="/styles.css"><script src="/app.js" defer></script></head>
-<body><main><header><span>FANSHOP / ЦЕННИКИ</span><span id="connection">Проверка соединения…</span></header><h1>Готов к сканированию</h1><p>Сканируйте штрихкод. Сканер отправляет его клавишей Enter.</p><form id="form"><label for="barcode">Штрихкод</label><input id="barcode" autocomplete="off" autofocus maxlength="256" spellcheck="false"><button type="submit">Отправить</button></form><p>Принято в этой web-сессии: <strong id="count">0</strong> · Ожидает: <strong id="pending">0</strong></p><section id="result" aria-live="polite"><h2 id="message">Ожидание первого сканирования</h2><p id="last"></p><dl><dt>Номенклатура</dt><dd id="name">—</dd><dt>Артикул</dt><dd id="article">—</dd><dt>Характеристика</dt><dd id="size">—</dd></dl></section><p id="help">Поле ввода автоматически получает фокус.</p><button id="retry" type="button">Повторить отправку ожидающих</button></main></body></html>
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>FanShop • Сканирование ценников</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/app.js" defer></script>
+</head>
+<body>
+<main>
+    <header><span>FANSHOP / ЦЕННИКИ</span><span id="connection">Проверка соединения…</span></header>
+    <h1>Готов к сканированию</h1>
+    <p>Сканируйте штрихкод. Сканер отправляет его клавишей Enter.</p>
+    <form id="form"><label for="barcode">Штрихкод</label><input id="barcode" autocomplete="off" autofocus
+                                                                maxlength="256" spellcheck="false">
+        <button type="submit">Отправить</button>
+    </form>
+    <p>Принято в этой web-сессии: <strong id="count">0</strong> · Ожидает: <strong id="pending">0</strong></p>
+    <section id="result" aria-live="polite"><h2 id="message">Ожидание первого сканирования</h2>
+        <p id="last"></p>
+        <dl>
+            <dt>Номенклатура</dt>
+            <dd id="name">—</dd>
+            <dt>Артикул</dt>
+            <dd id="article">—</dd>
+            <dt>Характеристика</dt>
+            <dd id="size">—</dd>
+        </dl>
+    </section>
+    <p id="help">Поле ввода автоматически получает фокус.</p>
+    <button id="retry" type="button">Повторить отправку ожидающих</button>
+</main>
+</body>
+</html>
