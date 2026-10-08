@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings></PropertyGroup>
+  <ItemGroup><PackageReference Include="ClosedXML" Version="0.105.0" /><FrameworkReference Include="Microsoft.AspNetCore.App" /><EmbeddedResource Include="Web/*" /></ItemGroup>
+</Project>
