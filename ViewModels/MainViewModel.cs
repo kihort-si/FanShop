@@ -524,7 +524,7 @@ public partial class MainViewModel : BaseViewModel, IWorkplaceCatalogObserver
             var calendarDay = new CalendarDayViewModel
             {
                 Date = date,
-                IsCurrentMonth = date.Month == _currentMonth && date.Year == _currentYear,
+                IsCurrentMonth = date.Month == month && date.Year == year,
                 IsEmployeeView = IsEmployeeView,
                 MainViewModel = this
             };

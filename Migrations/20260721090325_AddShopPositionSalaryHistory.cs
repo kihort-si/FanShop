@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FanShop.Migrations
 {
     /// <inheritdoc />
-    public partial class AddShopPositionSalaryHistory : Migration
+    public partial class AddShopPositionSalaryHistoryRevision : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

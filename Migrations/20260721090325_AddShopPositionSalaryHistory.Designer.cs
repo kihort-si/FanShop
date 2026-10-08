@@ -12,7 +12,7 @@ namespace FanShop.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20260721090325_AddShopPositionSalaryHistory")]
-    partial class AddShopPositionSalaryHistory
+    partial class AddShopPositionSalaryHistoryRevision
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -9,7 +9,7 @@ namespace FanShop;
 
 public partial class MainWindow : Window
 {
-    internal bool SkipWelcome { get; init; }
+    internal bool SkipWelcome { get; set; }
     private MainWindowViewModel? _mainWindowViewModel;
     private bool _priceTagsShutdownComplete;
     private bool _priceTagsShutdownStarted;
@@ -64,7 +64,11 @@ public partial class MainWindow : Window
             base.OnClosing(e);
             if (_priceTagsShutdownStarted) return;
             _priceTagsShutdownStarted = true;
-            try { await FanShop.Services.PriceTags.PriceTagModule.ShutdownAsync(); }
+            try
+            {
+                await FanShop.Services.ReportAdjustment.ReportAdjustmentModule.ShutdownAsync();
+                await FanShop.Services.PriceTags.PriceTagModule.ShutdownAsync();
+            }
             finally { _priceTagsShutdownComplete = true; Close(); }
             return;
         }

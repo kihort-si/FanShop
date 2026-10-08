@@ -82,7 +82,7 @@
                                    FontWeight="Bold"
                                    Foreground="White" />
 
-                        <TextBlock Text="Больше порядка в сменах, быстрее работа с календарём и подробнее аналитика"
+                        <TextBlock Text="Помощь по работе с ценниками"
                                    MaxWidth="520"
                                    FontSize="14"
                                    LineHeight="20"

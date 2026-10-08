@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
@@ -13,7 +14,17 @@ namespace FanShop.ViewModels;
 
 public partial class CalendarDayViewModel : BaseViewModel
 {
-    public DateTime Date { get; set; }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DayLabel))]
+    [NotifyPropertyChangedFor(nameof(DateTooltip))]
+    private DateTime _date;
+
+    public string DayLabel => IsCurrentMonth
+        ? Date.Day.ToString(CultureInfo.GetCultureInfo("ru-RU"))
+        : Date.ToString("d MMM", CultureInfo.GetCultureInfo("ru-RU"));
+
+    public string DateTooltip => Date.ToString("d MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))
+        + (IsCurrentMonth ? "" : " — другой месяц");
 
     private ObservableCollection<EmployeeWorkInfo>? _employees;
 
@@ -85,7 +96,10 @@ public partial class CalendarDayViewModel : BaseViewModel
 
     public bool ShowChangeNotice => HasMatch && Match != null && Match.CanChange;
 
-    [ObservableProperty] private bool _isCurrentMonth;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DayLabel))]
+    [NotifyPropertyChangedFor(nameof(DateTooltip))]
+    private bool _isCurrentMonth;
 
     [ObservableProperty] private bool _isBlackoutMode;
 
