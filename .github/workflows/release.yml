@@ -73,11 +73,21 @@ jobs:
             }
             $previous = (Resolve-Path artifacts/previous).Path
           }
-          $tagCommit = git rev-parse --verify "v$version^{commit}" 2>$null
-          if ($LASTEXITCODE -eq 0 -and $tagCommit -ne $env:GITHUB_SHA) { throw 'This version tag already points to another commit. Increase AssemblyVersion; published tags are immutable.' }
+          $tagRef = "refs/tags/v${version}^{commit}"
+          $tagCommit = git rev-parse --verify --quiet $tagRef
+          $tagExit = $LASTEXITCODE
+          if ($tagExit -eq 0) {
+            if ($tagCommit -ne $env:GITHUB_SHA) { throw 'This version tag already points to another commit. Increase AssemblyVersion; published tags are immutable.' }
+          } elseif ($tagExit -eq 1) {
+            Write-Host "Tag v$version does not exist yet; it will be created when the release is published."
+          } else {
+            throw "Cannot inspect tag v$version (git exit code $tagExit)."
+          }
           "publish=true" >> $env:GITHUB_OUTPUT
           "version=$version" >> $env:GITHUB_OUTPUT
           "previous=$previous" >> $env:GITHUB_OUTPUT
+          # The Actions pwsh wrapper propagates LASTEXITCODE; an absent tag is an expected git result.
+          exit 0
 
       - uses: actions/setup-dotnet@v5
         if: steps.version.outputs.publish == 'true'
