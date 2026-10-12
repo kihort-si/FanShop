@@ -122,8 +122,14 @@ jobs:
           if ((Invoke-FanShopCommand './artifacts/release/FanShop.exe' @('--verify-update-archive', (Resolve-Path "artifacts/$name").Path)) -ne 0) { throw 'Final ZIP verification failed' }
           "name=$name" >> $env:GITHUB_OUTPUT
 
+      - name: Build and verify Windows EXE installer
+        if: steps.version.outputs.publish == 'true'
+        run: |
+          ./scripts/Build-WindowsInstaller.ps1 -PackageDirectory artifacts/release -Version '${{ steps.version.outputs.version }}' -OutputDirectory artifacts
+          ./scripts/Test-WindowsInstaller.ps1 -Installer 'artifacts/FanShopSetup-${{ steps.version.outputs.version }}.exe' -PackageDirectory artifacts/release
+
       - name: Publish release for this exact commit
         if: steps.version.outputs.publish == 'true'
         run: |
-          gh release create 'v${{ steps.version.outputs.version }}' 'artifacts/${{ steps.archive.outputs.name }}' 'artifacts/${{ steps.archive.outputs.name }}.sha256' --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title 'FanShop ${{ steps.version.outputs.version }}' --generate-notes --latest
+          gh release create 'v${{ steps.version.outputs.version }}' 'artifacts/${{ steps.archive.outputs.name }}' 'artifacts/${{ steps.archive.outputs.name }}.sha256' 'artifacts/FanShopSetup-${{ steps.version.outputs.version }}.exe' 'artifacts/FanShopSetup-${{ steps.version.outputs.version }}.exe.sha256' --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title 'FanShop ${{ steps.version.outputs.version }}' --generate-notes --latest
           if ($LASTEXITCODE -ne 0) { throw 'Release publication failed' }
