@@ -1,201 +1,178 @@
-# FanShop
+# FanShop — Avalonia Application for Matchday and Shop Management
 
-FanShop — существующее desktop-приложение на C# и Avalonia для календаря матчей, сотрудников, смен, зарплаты, пропусков и аналитики. В него интегрирован раздел **«Ценники 1С»**: Excel-справочник, получение штрихкодов из браузера кассы или TXT и автоматический ввод в существующую форму печати ценников 1С. Отдельного исполняемого приложения для ценников нет.
+**FanShop Calendar** is a desktop application built with **C#/.NET 10 and Avalonia** for managing the day-to-day operations of the **Zenit Football Club's FanShop**. It provides tools for scheduling matches, assigning employee shifts, calculating payroll, printing access passes and price tags, and analyzing sales report adjustments.
 
-## Требования и сборка
+---
 
-- .NET 10 SDK для сборки; .NET 10 и ASP.NET Core 10 Runtime для запуска framework-dependent сборки. Self-contained публикация включает runtime.
-- Основная ОС: Windows 10/11. На macOS/Linux доступны каталог, TXT, HTTP и интерфейс; клавиатурная автоматизация 1С отключена.
-- Локально установленная 1С 8, процесс `1cv8.exe` или `1cv8c.exe`. Автоматизация окна внутри RDP/RemoteApp не поддерживается: активным процессом там будет клиент удалённого рабочего стола.
-- На кассе достаточно современного Chrome/Edge и HID-сканера с завершающей клавишей Enter.
+## Features
 
-В корне репозитория:
+- 📅 **Matchday Calendar**
+  - Displays upcoming Zenit FC matches, employee shifts, and tasks
+  - Supports month/year navigation and filtering employees by shop
+  - Clearly distinguishes neighboring-month days, including their matches, employees, and tasks
 
-```shell
-dotnet restore FanShop.sln
-dotnet build FanShop.sln -c Release
+- 👥 **Employee Shift Management**
+  - Manages employees, shops, positions, and full-day or half-day shifts
+  - Assigns one employee to several dates in a single operation
+  - Supports default shops and positions, with editable shift details
+
+- 💵 **Payroll Calculation**
+  - Calculates salaries using shift assignments and position salary history
+  - Lets individual shifts be included in or excluded from payroll
+  - Provides employee, shop, and position breakdowns with Excel export
+
+- 🖨️ **Pass Printing**
+  - Generates Word (DOCX) access passes for selected employees
+  - Creates a combined pass for multiple selected dates
+  - Supports a customizable document template and per-shift inclusion settings
+
+- 🏷️ **1C Price Tags**
+  - Imports an XLSX product catalog with barcodes, articles, names, and characteristics
+  - Receives scans from a browser on another computer or imports TXT files
+  - Groups repeated scans, identifies unknown barcodes, and supports undo
+  - Transfers verified positions to a local 1C price-tag form on Windows
+  - Supports pause, stop, adjustable delays, and recovery of unfinished sessions
+
+- 🧮 **Sales Report Adjustment**
+  - Imports XLSX sales reports and accepts an adjustment amount or several corrective positions
+  - Finds permitted discount changes that preserve the control total exactly to the kopeck
+  - Accounts for quantities, rounding rules, existing discounts, services, and MISC items
+  - Supports protected rows, explicitly permitted exclusions, ranked solutions, and cancellation
+  - Shows before/after previews and copies instructions for manual processing in 1C
+  - Reads the original report without editing it or automating 1C actions
+
+- ⚙️ **Flexible Settings**
+  - Configures shops, positions, salary rates, and document templates
+  - Saves price-tag connection settings and transfer delays
+  - Configures allowed discounts, their priorities, service names, and report rounding rules
+
+- 📊 **Analytics and Reporting**
+  - Shows shift counts, payroll totals, and task timing statistics
+  - Provides breakdowns by employee, match, shop, and position
+  - Exports reports to Excel and includes in-app FAQ and release notes
+
+- 🔄 **Automatic Updates and EXE Installer**
+  - Publishes a versioned Windows EXE installer and an auto-update ZIP through GitHub Actions
+  - Includes the .NET and ASP.NET Core runtime in Windows releases
+  - Verifies update checksums, backs up affected files, and confirms the new application starts
+  - Restores the previous version after a failed update and supports interrupted-update recovery
+  - Removes known obsolete components while preserving user data and unknown or modified files
+
+---
+
+## UI Preview
+
+The screenshots below show the main application sections. Newer releases also include price tags, sales report adjustment, and updated calendar styling.
+
+![Calendar view](.github/images/MainWindow.png)
+
+![Employee adding](.github/images/EmployeeAdding.png)
+
+![Menu view](.github/images/Menu.png)
+
+![Analytics view](.github/images/Analytics.png)
+
+![Category adding](.github/images/CategoryAdding.png)
+
+---
+
+## Installation
+
+### Windows Installer
+
+1. Open the [GitHub Releases](https://github.com/kihort-si/FanShop/releases) page.
+2. Download `FanShopSetup-<version>.exe` from the desired release's **Assets**.
+3. Run the installer, select the installation directory and shortcuts, and finish the wizard.
+4. Launch FanShop from the Start menu or desktop shortcut.
+
+The default installation directory is `%LOCALAPPDATA%\Programs\FanShop`. The installer includes the runtime, so installing the .NET SDK separately is not required. Versioned EXE installers are generated for new releases by CI; older releases may only provide a ZIP.
+
+Windows x64 is the primary deployment target. Keyboard transfer to 1C requires a locally installed Windows 1C client. The interface and local analysis tools can also be built on macOS/Linux; 1C keyboard automation is Windows-only.
+
+### Build from Source
+
+1. Install the [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) compatible with `global.json`.
+2. Clone the repository:
+
+   ```bash
+   git clone https://github.com/kihort-si/FanShop.git
+   cd FanShop
+   ```
+
+3. Restore dependencies, build, and run:
+
+   ```bash
+   dotnet restore FanShop.sln
+   dotnet build FanShop.sln -c Release
+   dotnet run --project FanShop.csproj
+   ```
+
+4. Open `FanShop.sln` in JetBrains Rider or another IDE with .NET 10 and Avalonia support.
+
+Run the test suite with:
+
+```bash
 dotnet test FanShop.sln -c Release
-dotnet run --project FanShop.csproj
 ```
 
-Раздел находится в меню → **Ценники 1С**. Для запуска сразу на этой вкладке без проверки интернет-обновлений и загрузки матчей:
+To open a module directly:
 
-```shell
+```bash
 dotnet run --project FanShop.csproj -- --price-tags
+dotnet run --project FanShop.csproj -- --report-adjustment
 ```
 
-Для установленной сборки: `FanShop.exe --price-tags`. Остальные разделы приложения остаются доступны. Режим ценников полностью локальный; интернет нужен только разработчику для первоначального восстановления NuGet. Обычный запуск сохраняет существующее сетевое поведение календаря и проверки обновлений.
+## Dependencies
 
-Публикация автономной Windows x64 сборки:
+- **.NET 10** — application platform
+- **Avalonia** — desktop UI, Fluent theme, and data grids
+- **CommunityToolkit.Mvvm** — view models, observable properties, and commands
+- **Entity Framework Core and SQLite** — local employee, shift, and task data
+- **OpenXML SDK** — Word document generation
+- **ClosedXML and EPPlus** — Excel import and reporting
+- **Firebase REST API** — match schedule synchronization
+- **LiveCharts2 and SkiaSharp** — charts and graphics
+- **ASP.NET Core/Kestrel** — local barcode scanning endpoint
+- **xUnit and Avalonia.Headless** — business logic, HTTP, and UI tests
+- **Inno Setup** — Windows EXE installer generation in CI
 
-```shell
-dotnet publish FanShop.csproj -c Release -r win-x64 --self-contained true -o artifacts/win-x64
+## Project Structure
+
+```plaintext
+FanShop/
+├── Models/                  # Employees, shifts, matches, settings, and tasks
+├── ViewModels/              # MVVM state, commands, and module workflows
+├── View/                    # Avalonia controls and AXAML views
+├── Windows/                 # Windows and dialogs
+├── Converters/              # Data-binding converters
+├── Services/                # Documents, statistics, module DI, and updates
+├── PriceTags/
+│   ├── Core/                # Price tags, report adjustment, and update logic
+│   ├── Tests/               # Unit, HTTP, update, and headless UI tests
+│   └── Samples/             # Example XLSX catalogs/reports and TXT scans
+├── Resources/               # Icons, fonts, and application assets
+├── installer/               # Inno Setup installer definition
+├── scripts/                 # Windows packaging and installation checks
+├── docs/                    # Deployment and auto-update documentation
+├── .github/workflows/       # CI and release publication
+├── FanShop.csproj           # Main Avalonia application project
+├── FanShop.sln              # Application, core library, and test solution
+├── MainWindow.axaml         # Main application window
+└── App.axaml                # Application resources and styles
 ```
 
-Готовая собранная версия также упакована в `artifacts/FanShop-win-x64.zip`. В публикацию вложены README и примеры в `Samples`.
+## License
 
-Перенесите **всю** папку `artifacts/win-x64` на ноутбук. Запустите `FanShop.exe --price-tags`. Не включайте trimming: Avalonia и существующие зависимости используют reflection.
+This project is licensed under the [MIT License](LICENSE).
 
-## Архитектура и пакеты
+## Acknowledgements
 
-В решении остаётся один GUI-проект `FanShop.csproj`. `PriceTags/Core/FanShop.PriceTags.Core.csproj` — библиотека, а не отдельное приложение; в ней нет зависимости от Avalonia. Сервисы раздела зарегистрированы как singleton через Microsoft.Extensions.DependencyInjection. Закрытие вкладки не уничтожает сессию и сервер; они завершаются при выходе из FanShop.
+- To Zenit FC for the inspiration
+- To the development team for their effort
+- To users for feedback and support
 
-```text
-FanShop.csproj                         существующее Avalonia-приложение (.NET 10)
-View/PriceTagsControl.axaml             встроенная вкладка, таблицы, история, настройки
-ViewModels/PriceTagsViewModel.cs        MVVM, команды, UI-dispatcher
-Services/PriceTags/PriceTagModule.cs    DI и жизненный цикл раздела
-PriceTags/Core/Models/                  товары, сканы, очередь, настройки
-PriceTags/Core/Services/                Excel, сессия, TXT, HTTP, persistence, Windows input
-PriceTags/Core/Web/                     HTML/CSS/JS, встроенные ресурсы без CDN
-PriceTags/Tests/                        unit, настоящий HTTP, Avalonia headless
-PriceTags/Samples/                      готовые примеры Excel и TXT
-```
+## Feedback & Issues
 
-Пакеты для нового функционала: **ClosedXML 0.105.0**, существующие **Avalonia 11.3.0** (Desktop, Fluent, DataGrid), **CommunityToolkit.Mvvm 8.2.2**. Kestrel, DI и Microsoft.Extensions.Logging берутся из framework reference `Microsoft.AspNetCore.App`. Тесты: xUnit 2.9.3, xunit.runner.visualstudio 3.1.4, Microsoft.NET.Test.Sdk 17.14.1 и Avalonia.Headless.XUnit 11.3.0.
+Found a bug? Have an idea? Open an [issue](https://github.com/kihort-si/FanShop/issues) or submit a pull request. See the [contributing guidelines](CONTRIBUTING.md) for details.
 
-Существующие EF Core, EPPlus, OpenXML, Material Icons и прочие функции сохранены. Неиспользуемый Firebase.Database удалён (реальный FirebaseService уже использует HttpClient); транзитивные SQLite/D-Bus обновлены, версия LiveCharts зафиксирована.
-
-## Справочник Excel
-
-Нажмите **«Загрузить Excel»** и выберите выгрузку `.xlsx` из 1С. Можно перетащить XLSX на вкладку. Автоматически распознаются четыре заголовка в первых 50 непустых строках каждого листа:
-
-| Штрихкод | Артикул | Номенклатура | Характеристика |
-|---|---|---|---|
-| 1111111111111 | ЦБ-00008440 | Футболка Jogel | S |
-| 1111111111112 | ЦБ-00008440 | Футболка Jogel | M |
-| 1111111111113 | ЦБ-00008440 | Футболка Jogel | L |
-| 2222222222222 | ЦБ-00009123 | Кружка Зенит | MISC |
-
-Допускаются синонимы заголовков: «Штрих код», Barcode/EAN, «Наименование»/«Название», «Размер» и «Характеристика номенклатуры». Пустые строки игнорируются, пробелы с краёв удаляются, неполные/некорректные строки пропускаются с объяснениями в **«Пропущенные строки Excel»**. Совпадающие дубли разрешены. Противоречивые соответствия одного штрихкода разным товарам отменяют загрузку целиком; предыдущий каталог остаётся действующим.
-
-**Штрихкоды выгружайте как текст.** Текст `000123` сохраняет нули; числовая ячейка с маской `000000` также сохраняет отображаемые нули. Если Excel уже отбросил нули или округлил длинное число, восстановить исходное значение невозможно: программу нельзя использовать для угадывания. Числовые штрихкоды от 15 цифр и некорректные числа пропускаются с предложением выгрузить их заново как текст.
-
-Повторная загрузка каталога меняет поиск для **новых** сканирований. Старые записи сохраняют результат поиска на момент скана, включая неизвестные штрихкоды. Чтобы устранить неизвестный код, исправьте каталог, явно удалите соответствующую запись и отсканируйте товар заново.
-
-## Сетевой режим и касса
-
-1. Подключите кассу и ноутбук к разрешённой локальной сети.
-2. На ноутбуке откройте раздел «Ценники 1С» и загрузите Excel. HTTP-сервер запускается при открытии раздела, порт по умолчанию **8765**.
-3. В блоке сети выберите Ethernet или Wi-Fi и нажмите **«Скопировать адрес»**.
-4. На кассе откройте этот адрес в Chrome/Edge, например `http://192.168.1.47:8765`.
-5. Отсканируйте товар. Сканер вводит штрихкод и Enter. Поле очищается сразу, фокус возвращается автоматически, следующие сканы поступают без кликов и перезагрузки.
-
-Страница показывает соединение, счётчик принятых сканов этой вкладки браузера, ожидающие запросы, последний код, наименование, артикул, характеристику. Найденный товар отображается зелёным, неизвестный — красным. Неизвестный код тоже считается принятым сканированием и появляется в истории ноутбука.
-
-Запросы отправляются последовательно. При потере ответа запрос остаётся в локальной очереди страницы; после восстановления связи отправляется повторно с тем же UUID. Ноутбук сохраняет квитанции, поэтому повторный запрос не создаёт двойное количество, включая случай, когда скан отменён в GUI. Очередь страницы хранится в `sessionStorage` и переживает перезагрузку этой вкладки. **Не закрывайте вкладку с ожидающими запросами**: sessionStorage не обещает сохранение после закрытия браузера. При запрете browser storage страница предупреждает пользователя.
-
-Нажмите **«Повторить отправку ожидающих»**, если исправили проблему на ноутбуке. Во время восстановления сохранённой сессии или существования очереди 1С новые сканы временно не принимаются и остаются ждать в браузере. По завершении партии дождитесь нулевого количества ожидающих запросов на кассе перед очисткой сессии.
-
-IP не сохраняется и определяется заново. Ethernet предлагается первым; loopback, APIPA и распознаваемые виртуальные/VPN-интерфейсы исключаются. При нескольких подходящих интерфейсах выбирайте тот, который доступен кассе. После смены сети или DHCP нажмите **«Обновить адреса»** и откройте новый адрес на кассе. Порт можно изменить и применить кнопкой **«Перезапустить сервер»**. Сервер слушает IPv4.
-
-### Windows Firewall
-
-Не отключайте Firewall. Создайте входящее правило для **FanShop.exe** либо для TCP-порта 8765 в профилях **Private/Domain**. Ограничьте удалённые адреса IP кассы или LocalSubnet. Не разрешайте доступ в Public-профиле и не пробрасывайте порт на маршрутизаторе в интернет.
-
-Пример для PowerShell с правами администратора (замените пути и IP кассы на реальные):
-
-```powershell
-New-NetFirewallRule -DisplayName "FanShop ценники, касса" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8765 -Program "C:\FanShop\FanShop.exe" -Profile Private,Domain -RemoteAddress 192.168.1.20
-```
-
-Проверьте адрес и порт на кассе:
-
-```powershell
-Test-NetConnection 192.168.1.47 -Port 8765
-```
-
-Разные VLAN/подсети требуют разрешённой маршрутизации и сетевого ACL между кассой и ноутбуком. Правило Windows Firewall не исправляет запрет между VLAN. Попросите администратора разрешить нужный TCP-порт между этими двумя устройствами. Если это невозможно, используйте TXT. Изоляция Wi-Fi клиентов также может блокировать связь.
-
-## Резервный режим TXT
-
-На кассе откройте Блокнот, поставьте курсор в новый документ и сканируйте товары. Сканер с Enter создаёт по строке на скан. Сохраните как `scan.txt` в UTF-8 (UTF-16 с BOM также поддерживается). Перенесите файл на ноутбук и нажмите **«Импортировать TXT»** или перетащите его на вкладку.
-
-Каждая непустая строка проходит **тот же ProcessBarcode**, что и HTTP; источник будет `File`. Нули сохраняются. Некорректные строки пропускаются с сообщением, неизвестные коды добавляются в историю. При ошибке диска импорт останавливается и сообщает число уже принятых строк. Повторный импорт всего файла **повторяет сканирования**: это нормальное поведение файлового режима. Проверьте историю перед повторным импортом частично обработанного файла.
-
-## Сессия и исправления
-
-Каждая запись хранит UUID, строковый штрихкод, время с часовым поясом, источник и снимок найденного товара. Агрегация использует **артикул + характеристику + название**, поэтому L, M и MISC не смешиваются. Если одному артикулу/характеристике соответствуют разные названия, передача блокируется как неоднозначная.
-
-Показаны все сканирования, уникальные найденные позиции, найденные сканы и неизвестные сканы. Откройте **«История сканирований»**, включите **«Только неизвестные»**, выберите запись и удалите её. Есть **«Отменить последнее»** и **«Очистить сессию»** с подтверждением. Количества пересчитываются автоматически. Пока остался хотя бы один неизвестный код, формировать очередь передачи запрещено.
-
-Каталог, Undo, удаление и очистка блокируются на время жизни очереди передачи, чтобы её состав и текущие количества не расходились. Получение новых HTTP/TXT-сканов также блокируется.
-
-## Передача в 1С
-
-1. Загрузите справочник, соберите сессию, устраните неизвестные сканы.
-2. В 1С откройте обработку печати ценников и нажмите **«Добавить»**.
-3. Убедитесь, что курсор в **пустой ячейке «Номенклатура»**, а следующий цикл точно соответствует вашей форме.
-4. В FanShop нажмите **«Передать в 1С»**: формируется и сохраняется неизменяемая очередь, регистрируются глобальные клавиши. Ввод пока не начинается.
-5. Вернитесь в 1С, поставьте курсор в нужную ячейку и нажмите **F8**.
-
-Для каждой позиции программа вводит:
-
-```text
-Артикул → Enter → Характеристика → Enter → Количество → Enter
-```
-
-Количество — число сканирований соответствующей позиции. Программа не нажимает «Печать» и не изменяет конфигурацию 1С, не использует COM или координаты мыши.
-
-- **F8** — начать/продолжить. При активной передаче второй параллельный цикл не запускается.
-- **F9** — пауза **после полной текущей строки**, чтобы не оставлять половину позиции. Это не аварийный стоп.
-- **Esc** — аварийная остановка немедленно, включая задержки и посимвольный ввод.
-
-Клавиши обслуживаются отдельным Windows message-loop, независимо от Avalonia UI thread. Если хотя бы одна занята другой программой и не зарегистрировалась, передача запрещается. Клавиши действуют глобально, пока очередь включена; закройте очередь, чтобы вернуть обычное поведение Esc/F8/F9. После перезапуска сначала нажмите **«Включить F8/F9/Esc для продолжения»**, затем F8 в 1С.
-
-Активный процесс должен быть `1cv8`/`1cv8c`. Переход фокуса в другое окно, закрытие окна или зажатая Shift/Ctrl/Alt/Win останавливают ввод. Целевое окно проверяется перед каждой парой событий и каждые 25 мс в задержках. Клавиатурный ввод всё равно имеет небольшое неустранимое окно гонки со сменой фокуса: не переключайте окна и не вводите вручную во время передачи.
-
-Unicode/кириллица вводятся через Windows **SendInput + KEYEVENTF_UNICODE** по UTF-16 символам; раскладка не предполагается. Буфер обмена не изменяется. Между символами есть короткая проверяемая задержка. Механизм описан в [Microsoft KEYBDINPUT](https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-keybdinput). Windows [ограничивает SendInput уровнем прав UIPI](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-sendinput): обычно запускайте обе программы без повышения прав. Если 1С уже работает от администратора, права должны совпадать. Не повышайте права без необходимости.
-
-Состояния очереди: Pending → Sending → Completed либо Interrupted/Failed. **Completed означает завершение всей последовательности ввода и задержки**, а не подтверждение из базы 1С: API у формы нет. Программа не может доказать, что поиск в 1С выбрал ожидаемый товар; пользователь проверяет результат.
-
-При Esc, ошибке, потере фокуса или закрытии внутри строки её статус становится **«Проверить строку 1С»**. После аварийного завершения процесса сохранённый Sending восстанавливается как Interrupted. Продолжение заблокировано до выбора:
-
-- **«Строка введена полностью»** — вы вручную проверили артикул, характеристику и количество. Позиция считается завершённой, следующий ввод начнётся с оставшихся позиций.
-- **«Частичная строка удалена — повторить»** — удалите ошибочную строку в 1С, создайте пустую с курсором в «Номенклатура», подтвердите повтор. Повторяется только эта и оставшиеся позиции.
-
-После завершения проверьте форму 1С и печатайте из самой 1С. **Закрытие очереди не очищает сканирования.** Повторное создание очереди включает всю сессию и может привести к повторной печати: для следующей партии явно очистите сессию.
-
-### Настройки задержек
-
-В разделе передачи раскройте настройки. Все значения в миллисекундах, разрешено 100–10000:
-
-| После действия | По умолчанию |
-|---|---:|
-| Ввод артикула | 600 |
-| Enter артикула | 400 |
-| Ввод характеристики | 500 |
-| Enter характеристики | 350 |
-| Количество/Enter | 400 |
-
-Перед Enter количества дополнительно выдерживается 150 мс. Настройки сохраняются отдельно и применяются к следующему запуску/продолжению. Сначала проверьте 1–2 позиции; на медленной базе увеличьте задержки поиска. Настройки задержек можно менять при остановленной передаче, сохраняя ту же очередь и её Completed-позиции. Для изменения на безопасной границе нажмите F9, дождитесь завершения строки, затем Esc и измените задержки. Следующий F8 применит их к оставшимся позициям. Во время выполнения и активной паузы настройки блокируются.
-
-## Сохранение и логи
-
-Windows: `%LOCALAPPDATA%\FanShop\PriceTags` (точный путь виден внизу вкладки). На других ОС используется `Environment.SpecialFolder.LocalApplicationData`.
-
-- `session.json`: отдельные сканы и квитанции сетевых запросов, включая отменённые сканы для исключения повторного приёма.
-- `transfer.json`: immutable данные очереди и состояния каждой позиции.
-- `settings.json`: последний путь Excel, порт и задержки.
-- `Logs/price-tags-YYYY-MM-DD.log`: загрузка/ошибки Excel, TXT, неизвестные коды, запуск/остановка HTTP, передача и ошибки.
-
-JSON сохраняется через временный файл, flush на диск и атомарную замену. Каждое принятое сканирование сохраняется **до HTTP-подтверждения**. При следующем запуске с сохранёнными сканированиями или очередью FanShop автоматически открывает вкладку ценников без ожидания интернет-загрузок и предлагает восстановление либо удаление сохранённой сессии с подтверждением. Повреждённый JSON не перезаписывается автоматически; ошибка сообщает каталог файлов. Сохраните резервную копию и исправьте/уберите повреждённый файл при закрытой программе. Файл `instance.lock` блокирует одновременное открытие раздела в нескольких экземплярах FanShop, чтобы они не перезаписывали одну сессию.
-
-Пароли и учётные записи для раздела не нужны. Web-страница без авторизации рассчитана на разрешённую локальную сеть. Логи содержат рабочие штрихкоды и пути файлов.
-
-## Проверка без второго компьютера и без 1С
-
-1. Запустите FanShop с `--price-tags`, загрузите `PriceTags/Samples/catalog.xlsx`.
-2. Откройте `http://localhost:8765` на этом компьютере.
-3. Введите по очереди `1111111111113`, `1111111111113`, `1111111111112`, `2222222222222`, каждый раз Enter.
-4. В FanShop должны быть L × 2, M × 1, MISC × 1. Импорт `PriceTags/Samples/scan.txt` добавляет L × 3, M × 1, MISC × 2.
-5. Введите `9999999999999`: появляется неизвестный, кнопка передачи недоступна. Удалите его в истории; проверьте Undo.
-6. Закройте приложение, запустите вновь и восстановите сессию. Сверьте историю и количества.
-
-Тесты проверяют нормализацию/конфликты Excel, поиск, нули, группировку, повторения, неизвестные, Undo, TXT, потокобезопасность, сохранение, immutable очередь, точную последовательность клавиатуры через тестовый интерфейс, остановку/потерю фокуса, продолжение без повторения Completed, HTTP-ресурсы/запросы и загрузку GUI в Avalonia headless. Реальный ввод клавиш в 1С не выполняется тестами.
-
-## Что проверить в магазине
-
-На двух компьютерах: доступность выбранного IP/порта, Firewall/VLAN, HID Enter, серийные сканы без потерь, обрыв сети и возврат ожидающих запросов. В реальной форме 1С: ввод Unicode на русской и английской раскладках, выбор артикула/размера/MISC, реальные задержки поиска, автосоздание строки после количества, F8/F9/Esc при активной 1С, ручная проверка частично введённой строки и отсутствие повторного ввода Completed. Начните с короткой партии и сравните каждую строку. Без установленной Windows/1С эту финальную проверку достоверно выполнить нельзя.
-
-Лицензия исходного проекта — MIT; см. LICENSE. Предыдущие изображения основных разделов находятся в `.github/images`.
+⚽ Built with a love for football and clean desktop apps.
