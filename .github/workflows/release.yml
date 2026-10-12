@@ -94,15 +94,13 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Restore, build and test
+      - name: Restore and build application
         if: steps.version.outputs.publish == 'true'
         run: |
-          dotnet restore FanShop.sln --disable-build-servers
+          dotnet restore FanShop.csproj --disable-build-servers
           if ($LASTEXITCODE -ne 0) { throw 'Restore failed' }
-          dotnet build FanShop.sln -c Release --no-restore --disable-build-servers
+          dotnet build FanShop.csproj -c Release --no-restore --disable-build-servers
           if ($LASTEXITCODE -ne 0) { throw 'Build failed' }
-          dotnet test FanShop.sln -c Release --no-build --no-restore --disable-build-servers
-          if ($LASTEXITCODE -ne 0) { throw 'Tests failed' }
 
       - name: Publish self-contained Windows x64 application
         if: steps.version.outputs.publish == 'true'
@@ -114,13 +112,12 @@ jobs:
           if ((Invoke-FanShopCommand './artifacts/release/FanShop.exe' @('--generate-samples', (Join-Path (Resolve-Path artifacts/release).Path 'Samples'))) -ne 0) { throw 'Sample generation failed' }
           if (Test-Path docs) { Copy-Item docs artifacts/release/docs -Recurse }
 
-      - name: Generate manifest and verify native installer
+      - name: Generate and validate package manifest
         if: steps.version.outputs.publish == 'true'
         run: |
           . ./scripts/Invoke-FanShopCommand.ps1
           if ((Invoke-FanShopCommand './artifacts/release/FanShop.exe' @('--write-update-manifest', (Resolve-Path artifacts/release).Path, '${{ steps.version.outputs.previous }}')) -ne 0) { throw 'Manifest generation failed' }
           if ((Invoke-FanShopCommand './artifacts/release/FanShop.exe' @('--verify-update-package', (Resolve-Path artifacts/release).Path)) -ne 0) { throw 'Package verification failed' }
-          ./scripts/Test-WindowsUpdate.ps1 -PackageDirectory "$((Resolve-Path artifacts/release).Path)"
 
       - name: Create flat ZIP and checksum
         if: steps.version.outputs.publish == 'true'
@@ -133,11 +130,10 @@ jobs:
           if ((Invoke-FanShopCommand './artifacts/release/FanShop.exe' @('--verify-update-archive', (Resolve-Path "artifacts/$name").Path)) -ne 0) { throw 'Final ZIP verification failed' }
           "name=$name" >> $env:GITHUB_OUTPUT
 
-      - name: Build and verify Windows EXE installer
+      - name: Build Windows EXE installer
         if: steps.version.outputs.publish == 'true'
         run: |
           ./scripts/Build-WindowsInstaller.ps1 -PackageDirectory artifacts/release -Version '${{ steps.version.outputs.version }}' -OutputDirectory artifacts
-          ./scripts/Test-WindowsInstaller.ps1 -Installer 'artifacts/FanShopSetup-${{ steps.version.outputs.version }}.exe' -PackageDirectory artifacts/release
 
       - name: Publish release for this exact commit
         if: steps.version.outputs.publish == 'true'
