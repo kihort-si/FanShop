@@ -9,13 +9,13 @@ public class WorkDayEmployee
     public int WorkDayEmployeeID { get; set; }
     
     public int WorkDayID { get; set; }
-    public WorkDay WorkDay { get; set; }
+    public WorkDay WorkDay { get; set; } = null!;
     
     public int EmployeeID { get; set; }
-    public Employee Employee { get; set; }
+    public Employee Employee { get; set; } = null!;
     
     [Required]
-    public string WorkDuration { get; set; }
+    public string WorkDuration { get; set; } = string.Empty;
 
     public bool IncludeInPass { get; set; } = true;
     public bool IncludeInSalary { get; set; } = true;

@@ -9,13 +9,13 @@ public class TaskCategory
     
     [Required]
     [MaxLength(100)]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     
     [MaxLength(500)]
     public string? Description { get; set; }
     
     [MaxLength(7)]
-    public string Color { get; set; }
+    public string Color { get; set; } = "#0A6DAE";
     
     public string? DefaultTask { get; set; }
     

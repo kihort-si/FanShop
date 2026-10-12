@@ -44,59 +44,21 @@ public partial class App : Application
         try
         {
             _splashScreen?.ViewModel.UpdateProgress(5);
-            var updateService = new UpdateService();
+            using var updateService = new UpdateService();
+            var adjustmentStartup = Environment.GetCommandLineArgs().Contains("--report-adjustment");
+            var priceTagsStartup = adjustmentStartup || Environment.GetCommandLineArgs().Contains("--price-tags")
+                || await FanShop.Services.PriceTags.PriceTagModule.HasSavedWorkAsync();
+            var skipOnlineInitialization = priceTagsStartup || FanShop.Services.Updates.UpdateBootstrap.IsHealthCheck;
             bool updateAvailable = await updateService.CheckForUpdatesAsync();
 
-            if (updateAvailable)
+            var updateProgress = new Progress<int>(p => _splashScreen?.ViewModel.UpdateProgress(8 + p * 87 / 100));
+            if (updateAvailable && await updateService.UpdateAsync(updateProgress))
             {
-                _splashScreen?.ViewModel.UpdateProgress(8);
-
-                bool updated = await updateService.UpdateAsync();
-                if (updated)
-                {
-                    var messageBox = new Window
-                    {
-                        Title = "Обновление FanShop",
-                        Width = 400,
-                        Height = 150,
-                        CanResize = false,
-                        WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                        Content = new StackPanel
-                        {
-                            Margin = new Thickness(20),
-                            Spacing = 15,
-                            Children =
-                            {
-                                new TextBlock
-                                {
-                                    Text = "Доступно обновление приложения. После нажатия OK, программа будет перезапущена.",
-                                    TextWrapping = TextWrapping.Wrap
-                                },
-                                new Button
-                                {
-                                    Content = "OK",
-                                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center
-                                }
-                            }
-                        }
-                    };
-
-                    ((Button)((StackPanel)messageBox.Content).Children[1]).Click += (s, e) =>
-                    {
-                        messageBox.Close();
-                        updateService.ExecuteUpdate();
-                    };
-
-                    if (_splashScreen != null)
-                    {
-                        await messageBox.ShowDialog(_splashScreen);
-                    }
-                    else
-                    {
-                        messageBox.Show();
-                    }
-                    return;
-                }
+                await FanShop.Services.ReportAdjustment.ReportAdjustmentModule.ShutdownAsync();
+                await FanShop.Services.PriceTags.PriceTagModule.ShutdownAsync();
+                if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime updatingDesktop)
+                    updatingDesktop.Shutdown(0);
+                return;
             }
 
             _splashScreen?.ViewModel.UpdateProgress(10);
@@ -105,8 +67,19 @@ public partial class App : Application
             await using (var db = new AppDbContext())
             {
                 await db.Database.EnsureCreatedAsync();
-                await PrepareLegacyDatabaseForMigrationsAsync(db);
-                await db.Database.MigrateAsync();
+                try
+                {
+                    await db.Employees.AnyAsync();
+                }
+                catch (Microsoft.Data.Sqlite.SqliteException ex)
+                {
+                    throw new InvalidOperationException("Не удалось прочитать базу данных FanShop. База сохранена; проверьте её схему и резервную копию.", ex);
+                }
+
+                await EnsureColumnAsync(db, "WorkDayEmployee", "IncludeInPass", "INTEGER NOT NULL DEFAULT 1");
+                await EnsureColumnAsync(db, "WorkDayEmployee", "IncludeInSalary", "INTEGER NOT NULL DEFAULT 1");
+                await EnsureColumnAsync(db, "Shops", "IsDefault", "INTEGER NOT NULL DEFAULT 0");
+                await EnsureColumnAsync(db, "Positions", "IsDefault", "INTEGER NOT NULL DEFAULT 0");
             }
 
             _mainWindowViewModel = new MainWindowViewModel();
@@ -115,7 +88,7 @@ public partial class App : Application
             _splashScreen?.ViewModel.UpdateProgress(30);
             await Task.Delay(100);
 
-            await _mainWindowViewModel.LoadMatchesFromFirebase();
+            if (!skipOnlineInitialization) await _mainWindowViewModel.LoadMatchesFromFirebase();
             _splashScreen?.ViewModel.UpdateProgress(60);
             await Task.Delay(100);
 
@@ -126,12 +99,14 @@ public partial class App : Application
                 _splashScreen?.ViewModel.UpdateProgress(80);
                 await Task.Delay(100);
 
-                await mainViewModel.CheckAndUpdateCalendarAsync();
+                if (!skipOnlineInitialization) await mainViewModel.CheckAndUpdateCalendarAsync();
                 _splashScreen?.ViewModel.UpdateProgress(95);
                 await Task.Delay(100);
             }
 
             _mainWindowViewModel.RefreshStatistics();
+            if (adjustmentStartup) _mainWindowViewModel.OpenReportAdjustmentTabCommand.Execute(null);
+            else if (priceTagsStartup) _mainWindowViewModel.OpenPriceTagsTabCommand.Execute(null);
 
             _splashScreen?.ViewModel.UpdateProgress(100);
             await Task.Delay(100);
@@ -140,7 +115,7 @@ public partial class App : Application
 
             await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
             {
-                _mainWindow = new MainWindow { DataContext = _mainWindowViewModel };
+                _mainWindow = new MainWindow { DataContext = _mainWindowViewModel, SkipWelcome = skipOnlineInitialization };
 
                 if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
                 {
@@ -148,8 +123,19 @@ public partial class App : Application
                 }
 
                 _mainWindow.Show();
+                FanShop.Services.Updates.UpdateBootstrap.ConfirmHealthy();
                 _splashScreen?.Close();
             });
+            await FanShop.Services.Updates.UpdateBootstrap.CleanLegacyFilesAsync();
+            if (FanShop.Services.Updates.UpdateBootstrap.IsHealthCheck)
+            {
+                _ = _mainWindowViewModel.CheckWhatsNew();
+                if (!priceTagsStartup)
+                {
+                    if (_mainWindow is not null) _mainWindow.SkipWelcome = false;
+                    _ = RefreshAfterUpdateAsync(_mainWindowViewModel);
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -204,118 +190,34 @@ public partial class App : Application
         }
     }
 
-    private static readonly string[] LegacyMigrationIds =
-    [
-        "20250820142259_AddTaskCategory",
-        "20250820160455_AddTask",
-        "20250820181811_ChangeTask",
-        "20250820183424_ChangeTask2",
-        "20250824124029_AddTaskAdnTaskCategories",
-        "20260629221316_AddEmployeeAnalytics",
-        "20260630174547_RenameWorkDayEmployeesBack"
-    ];
-
-    private const string ShopMigrationId =
-        "20260721083755_AddShopPositionSalaryHistory";
-
-    private const string DefaultWorkplaceMigrationId =
-        "20260729214056_AddDefaultWorkplaceFlags";
-
-    private static async Task PrepareLegacyDatabaseForMigrationsAsync(AppDbContext db)
+    private static async Task RefreshAfterUpdateAsync(MainWindowViewModel viewModel)
     {
-        // Versions up to 2.0.1 created the database with EnsureCreated().
-        // Such a database already has the schema, but no EF migration history.
-        // Register the schema that is actually present before calling Migrate().
-        if (!await TableExistsAsync(db, "Employees"))
-            return;
-
-        await db.Database.ExecuteSqlRawAsync(
-            """
-            CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory" (
-                "MigrationId" TEXT NOT NULL CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY,
-                "ProductVersion" TEXT NOT NULL
-            );
-            """);
-
-        if (await TableExistsAsync(db, "WorkDayEmployee"))
+        try
         {
-            foreach (var migrationId in LegacyMigrationIds)
-                await RegisterMigrationAsync(db, migrationId);
+            await viewModel.LoadMatchesFromFirebase();
+            if (viewModel.GetMainViewModel() is { } mainViewModel) await mainViewModel.CheckAndUpdateCalendarAsync();
         }
-
-        var hasWorkplaceSchema =
-            await TableExistsAsync(db, "Shops") &&
-            await TableExistsAsync(db, "Positions") &&
-            await TableExistsAsync(db, "SalaryHistories") &&
-            await ColumnExistsAsync(db, "WorkDayEmployee", "PositionID") &&
-            await ColumnExistsAsync(db, "WorkDayEmployee", "SalaryAtMoment");
-
-        if (hasWorkplaceSchema)
-            await RegisterMigrationAsync(db, ShopMigrationId);
-
-        var hasDefaultWorkplaceFlags =
-            hasWorkplaceSchema &&
-            await ColumnExistsAsync(db, "Shops", "IsDefault") &&
-            await ColumnExistsAsync(db, "Positions", "IsDefault");
-
-        if (hasDefaultWorkplaceFlags)
-            await RegisterMigrationAsync(db, DefaultWorkplaceMigrationId);
+        catch (Exception ex) { FanShop.Services.Updates.UpdateState.Log("Не обновлено расписание после успешного запуска; приложение продолжает работу.", ex); }
     }
 
-    private static async Task RegisterMigrationAsync(
-        AppDbContext db,
-        string migrationId)
-    {
-        await db.Database.ExecuteSqlInterpolatedAsync(
-            $"""
-             INSERT OR IGNORE INTO "__EFMigrationsHistory"
-                 ("MigrationId", "ProductVersion")
-             VALUES ({migrationId}, {"8.0.2"});
-             """);
-    }
-
-    private static async Task<bool> TableExistsAsync(
-        AppDbContext db,
-        string table)
+    private static async Task EnsureColumnAsync(AppDbContext db, string table, string column, string columnDef)
     {
         var connection = db.Database.GetDbConnection();
         if (connection.State != System.Data.ConnectionState.Open)
             await connection.OpenAsync();
 
-        await using var command = connection.CreateCommand();
-        command.CommandText =
-            """
-            SELECT COUNT(*)
-            FROM sqlite_master
-            WHERE type = 'table' AND name = $name;
-            """;
-
-        var parameter = command.CreateParameter();
-        parameter.ParameterName = "$name";
-        parameter.Value = table;
-        command.Parameters.Add(parameter);
-
-        return Convert.ToInt32(await command.ExecuteScalarAsync()) > 0;
-    }
-
-    private static async Task<bool> ColumnExistsAsync(
-        AppDbContext db,
-        string table,
-        string column)
-    {
-        var connection = db.Database.GetDbConnection();
-        if (connection.State != System.Data.ConnectionState.Open)
-            await connection.OpenAsync();
-
-        await using var command = connection.CreateCommand();
-        command.CommandText = $"PRAGMA table_info(\"{table}\");";
-        await using var reader = await command.ExecuteReaderAsync();
+        await using var probe = connection.CreateCommand();
+        probe.CommandText = $"PRAGMA table_info(\"{table}\");";
+        await using var reader = await probe.ExecuteReaderAsync();
         while (await reader.ReadAsync())
         {
             if (string.Equals(reader.GetString(1), column, StringComparison.OrdinalIgnoreCase))
-                return true;
+                return;
         }
+        await reader.CloseAsync();
 
-        return false;
+        await using var alter = connection.CreateCommand();
+        alter.CommandText = $"ALTER TABLE \"{table}\" ADD COLUMN \"{column}\" {columnDef};";
+        await alter.ExecuteNonQueryAsync();
     }
 }

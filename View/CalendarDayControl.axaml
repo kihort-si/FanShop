@@ -1,24 +1,41 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="FanShop.View.CalendarDayControl">
+    <UserControl.Styles>
+        <Style Selector="Border.day-frame">
+            <Setter Property="Background" Value="{Binding HasMatch, Converter={StaticResource BoolToBackgroundConverter}}" />
+            <Setter Property="BorderBrush" Value="#E2ECF5" />
+        </Style>
+        <Style Selector="Border.day-frame.adjacent-month">
+            <Setter Property="Background" Value="#F0F3F6" />
+            <Setter Property="BorderBrush" Value="#D7DFE7" />
+        </Style>
+        <Style Selector="Border.adjacent-month StackPanel.day-details">
+            <Setter Property="Opacity" Value="0.58" />
+        </Style>
+        <Style Selector="Border.adjacent-month Border.day-change-notice">
+            <Setter Property="Opacity" Value="0.58" />
+        </Style>
+    </UserControl.Styles>
     <Button Classes="cell"
             Command="{Binding ShowDayDetailsCommand}"
+            ToolTip.Tip="{Binding DateTooltip}"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch">
         <Border Classes="day-frame"
-                BorderBrush="#E2ECF5"
+                Classes.adjacent-month="{Binding !IsCurrentMonth}"
                 BorderThickness="1"
                 CornerRadius="10"
                 Padding="8"
                 HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                Background="{Binding HasMatch, Converter={StaticResource BoolToBackgroundConverter}}">
+                VerticalAlignment="Stretch">
             <Grid RowDefinitions="Auto,*,Auto">
                 <Grid ColumnDefinitions="*,Auto">
-                    <TextBlock Text="{Binding Date.Day}"
+                    <TextBlock Text="{Binding DayLabel}"
                                FontWeight="Bold"
                                Foreground="{Binding ., Converter={StaticResource DateToTodayColorConverter}}" />
                     <Border Grid.Column="1"
+                            Classes="day-change-notice"
                             Width="18"
                             Height="18"
                             CornerRadius="9"
@@ -29,7 +46,7 @@
                     </Border>
                 </Grid>
 
-                <StackPanel Grid.Row="1" Spacing="3" IsVisible="{Binding IsEmployeeView}">
+                <StackPanel Classes="day-details" Grid.Row="1" Spacing="3" IsVisible="{Binding IsEmployeeView}">
                     <ItemsControl ItemsSource="{Binding DisplayedEmployees}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -46,7 +63,7 @@
                                IsVisible="{Binding IsAdditionalEmployeesTextVisible}" />
                 </StackPanel>
 
-                <StackPanel Grid.Row="1" Spacing="3" IsVisible="{Binding IsEmployeeView, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                <StackPanel Classes="day-details" Grid.Row="1" Spacing="3" IsVisible="{Binding IsEmployeeView, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                     <ItemsControl ItemsSource="{Binding DisplayedTasks}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -62,7 +79,7 @@
                                IsVisible="{Binding IsAdditionalTasksTextVisible}" />
                 </StackPanel>
 
-                <StackPanel Grid.Row="2" Spacing="2" HorizontalAlignment="Center" IsVisible="{Binding HasMatch}">
+                <StackPanel Classes="day-details" Grid.Row="2" Spacing="2" HorizontalAlignment="Center" IsVisible="{Binding HasMatch}">
                     <Image Source="{Binding Match.Logo}" Height="40" Stretch="Uniform" />
                     <TextBlock Text="{Binding Match.TeamName}" HorizontalAlignment="Center" FontWeight="SemiBold" FontSize="11" Foreground="MidnightBlue" />
                     <TextBlock Text="{Binding Match.SartTime}" HorizontalAlignment="Center" FontSize="11" Foreground="MidnightBlue" />

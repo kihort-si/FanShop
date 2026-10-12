@@ -1,171 +1,135 @@
-name: Release Workflow
+name: Release FanShop
 
 on:
   push:
-    branches:
-      - master
+    branches: [master, main]
   workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: fanshop-release
+  cancel-in-progress: false
+
 jobs:
   release:
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.x
-
-      - name: Read version from AssemblyInfo.cs
+      - name: Determine version and previous package
         id: version
-        shell: pwsh
         run: |
-          $assemblyInfo = Get-Content -Path "AssemblyInfo.cs" -Raw
-          $match = [regex]::Match(
-            $assemblyInfo,
-            '\[assembly:\s*AssemblyVersion\("(?<version>\d+\.\d+\.\d+(?:\.\d+)?)"\)\]'
-          )
-
-          if (-not $match.Success) {
-            throw "AssemblyVersion was not found in AssemblyInfo.cs."
-          }
-
-          $version = $match.Groups["version"].Value
-          $tag = "v$version"
-          $archiveName = "FanShop$version.zip"
-
-          "version=$version" >> $env:GITHUB_OUTPUT
-          "tag=$tag" >> $env:GITHUB_OUTPUT
-          "archive_name=$archiveName" >> $env:GITHUB_OUTPUT
-
-          Write-Host "Release version: $version"
-          Write-Host "Release tag: $tag"
-          Write-Host "Archive name: $archiveName"
-
-      - name: Check whether release already exists
-        id: existing_release
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ steps.version.outputs.tag }}
-        run: |
-          gh release view $env:RELEASE_TAG --repo "${{ github.repository }}" 2>$null
-
-          if ($LASTEXITCODE -eq 0) {
-            "exists=true" >> $env:GITHUB_OUTPUT
-            Write-Host "Release $env:RELEASE_TAG already exists. Nothing to publish."
-          }
-          else {
-            "exists=false" >> $env:GITHUB_OUTPUT
-            Write-Host "Release $env:RELEASE_TAG does not exist and will be created."
-          }
-
-          # gh returns 1 when a release does not exist. That result is expected
-          # here, so do not propagate its exit code to the GitHub Actions step.
-          $global:LASTEXITCODE = 0
-          exit 0
-
-      - name: Restore dependencies
-        if: steps.existing_release.outputs.exists != 'true'
-        run: dotnet restore FanShop.csproj --runtime win-x64
-
-      - name: Publish Windows application
-        if: steps.existing_release.outputs.exists != 'true'
-        shell: pwsh
-        run: |
-          dotnet publish FanShop.csproj `
-            --configuration Release `
-            --runtime win-x64 `
-            --self-contained false `
-            --no-restore `
-            --output artifacts/publish
-
-      - name: Add Resources and icon to release files
-        if: steps.existing_release.outputs.exists != 'true'
-        shell: pwsh
-        run: |
-          Copy-Item -Path "Resources" `
-            -Destination "artifacts/publish/Resources" `
-            -Recurse `
-            -Force
-
-          Copy-Item -Path "icon.ico" `
-            -Destination "artifacts/publish/icon.ico" `
-            -Force
-
-      - name: Verify published Windows application
-        if: steps.existing_release.outputs.exists != 'true'
-        shell: pwsh
-        run: |
-          $executable = Resolve-Path "artifacts/publish/FanShop.exe"
-          $process = Start-Process `
-            -FilePath $executable `
-            -WorkingDirectory "artifacts/publish" `
-            -PassThru
-
-          Start-Sleep -Seconds 10
-          $process.Refresh()
-
-          if ($process.HasExited) {
-            throw "FanShop.exe exited during the smoke test with code $($process.ExitCode)."
-          }
-
-          Stop-Process -Id $process.Id -Force
-          $process.WaitForExit()
-          Write-Host "FanShop.exe started successfully on Windows."
-
-      - name: Create release archive
-        if: steps.existing_release.outputs.exists != 'true'
-        shell: pwsh
-        env:
-          ARCHIVE_NAME: ${{ steps.version.outputs.archive_name }}
-        run: |
-          $archivePath = Join-Path "artifacts" $env:ARCHIVE_NAME
-
-          Compress-Archive `
-            -Path "artifacts/publish/*" `
-            -DestinationPath $archivePath `
-            -CompressionLevel Optimal
-
-          $entries = [System.IO.Compression.ZipFile]::OpenRead(
-            (Resolve-Path $archivePath)
-          )
-
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $false
+          $match = [regex]::Match((Get-Content AssemblyInfo.cs -Raw), '\[assembly: AssemblyVersion\("([^"]+)"\)\]')
+          if (-not $match.Success) { throw 'AssemblyVersion is missing' }
+          $version = $match.Groups[1].Value
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw 'Use a three-part AssemblyVersion, for example 2.2.0.' }
+          $parsed = [Version]$version
+          $latest = $null
           try {
-            $entryNames = $entries.Entries.FullName
-
-            if ("FanShop.exe" -notin $entryNames) {
-              throw "FanShop.exe is missing from the release archive."
-            }
-
-            if ("icon.ico" -notin $entryNames) {
-              throw "icon.ico is missing from the release archive."
-            }
-
-            if (-not ($entryNames | Where-Object { $_ -like "Resources/*" })) {
-              throw "Resources directory is missing from the release archive."
-            }
+            $latest = Invoke-RestMethod -Uri "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases/latest" -Headers @{ Authorization = "Bearer $env:GH_TOKEN"; 'User-Agent' = 'FanShop-CI'; Accept = 'application/vnd.github+json' } -TimeoutSec 30
+          } catch {
+            if ([int]$_.Exception.Response.StatusCode -ne 404) { throw }
           }
-          finally {
-            $entries.Dispose()
+          $previous = 'none'
+          if ($null -ne $latest) {
+            $latestVersion = $latest.tag_name -replace '^[vV]', ''
+            if ($parsed -le [Version]$latestVersion) {
+              "publish=false" >> $env:GITHUB_OUTPUT
+              Write-Host "Version $version is already released; nothing to publish."
+              exit 0
+            }
+            $oldZip = @($latest.assets | Where-Object { $_.name -eq "FanShop$latestVersion.zip" })
+            if ($oldZip.Count -ne 1) { throw 'Previous release must have exactly one FanShop version ZIP; cannot safely prepare legacy cleanup.' }
+            New-Item -ItemType Directory -Force artifacts/previous | Out-Null
+            gh release download $latest.tag_name --repo $env:GITHUB_REPOSITORY --pattern $oldZip[0].name --dir artifacts/previous
+            if ($LASTEXITCODE -ne 0) { throw 'Previous package download failed' }
+            # Include historical packages: legacy installers may have accumulated DLLs across skipped releases.
+            $historyJson = gh api "repos/$env:GITHUB_REPOSITORY/releases?per_page=100" --paginate --slurp
+            if ($LASTEXITCODE -ne 0) { throw 'Cannot read release history for legacy cleanup.' }
+            $history = @($historyJson | ConvertFrom-Json | ForEach-Object { $_ } | Where-Object { -not $_.draft -and -not $_.prerelease })
+            foreach ($release in $history) {
+              $oldVersion = $release.tag_name -replace '^[vV]', ''
+              if ($oldVersion -notmatch '^\d+\.\d+\.\d+(?:\.\d+)?$') { continue }
+              $asset = @($release.assets | Where-Object { $_.name -eq "FanShop$oldVersion.zip" })
+              if ($asset.Count -ne 1) { continue }
+              if (-not (Test-Path (Join-Path artifacts/previous $asset[0].name))) {
+                gh release download $release.tag_name --repo $env:GITHUB_REPOSITORY --pattern $asset[0].name --dir artifacts/previous
+                if ($LASTEXITCODE -ne 0) { throw "Historical package $oldVersion download failed" }
+              }
+            }
+            $previous = (Resolve-Path artifacts/previous).Path
           }
+          $tagCommit = git rev-parse --verify "v$version^{commit}" 2>$null
+          if ($LASTEXITCODE -eq 0 -and $tagCommit -ne $env:GITHUB_SHA) { throw 'This version tag already points to another commit. Increase AssemblyVersion; published tags are immutable.' }
+          "publish=true" >> $env:GITHUB_OUTPUT
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "previous=$previous" >> $env:GITHUB_OUTPUT
 
-          Write-Host "Archive created: $archivePath"
-
-      - name: Create GitHub release
-        if: steps.existing_release.outputs.exists != 'true'
-        uses: softprops/action-gh-release@v2
+      - uses: actions/setup-dotnet@v5
+        if: steps.version.outputs.publish == 'true'
         with:
-          tag_name: ${{ steps.version.outputs.tag }}
-          name: FanShop ${{ steps.version.outputs.version }}
-          target_commitish: ${{ github.sha }}
-          generate_release_notes: true
-          files: artifacts/${{ steps.version.outputs.archive_name }}
+          dotnet-version: '10.0.x'
+
+      - name: Restore, build and test
+        if: steps.version.outputs.publish == 'true'
+        run: |
+          dotnet restore FanShop.sln --disable-build-servers
+          if ($LASTEXITCODE -ne 0) { throw 'Restore failed' }
+          dotnet build FanShop.sln -c Release --no-restore --disable-build-servers
+          if ($LASTEXITCODE -ne 0) { throw 'Build failed' }
+          dotnet test FanShop.sln -c Release --no-build --no-restore --disable-build-servers
+          if ($LASTEXITCODE -ne 0) { throw 'Tests failed' }
+
+      - name: Publish self-contained Windows x64 application
+        if: steps.version.outputs.publish == 'true'
+        run: |
+          dotnet publish FanShop.csproj -c Release -r win-x64 --self-contained true -p:PublishTrimmed=false -p:PublishSingleFile=false --disable-build-servers -o artifacts/release
+          if ($LASTEXITCODE -ne 0) { throw 'Publish failed' }
+          Copy-Item README.md artifacts/release/README.md
+          Copy-Item PriceTags/Samples artifacts/release/Samples -Recurse
+          Copy-Item docs artifacts/release/docs -Recurse
+
+      - name: Generate manifest and verify native installer
+        if: steps.version.outputs.publish == 'true'
+        run: |
+          . ./scripts/Invoke-FanShopCommand.ps1
+          if ((Invoke-FanShopCommand './artifacts/release/FanShop.exe' @('--write-update-manifest', (Resolve-Path artifacts/release).Path, '${{ steps.version.outputs.previous }}')) -ne 0) { throw 'Manifest generation failed' }
+          if ((Invoke-FanShopCommand './artifacts/release/FanShop.exe' @('--verify-update-package', (Resolve-Path artifacts/release).Path)) -ne 0) { throw 'Package verification failed' }
+          ./scripts/Test-WindowsUpdate.ps1 -PackageDirectory "$((Resolve-Path artifacts/release).Path)"
+
+      - name: Create flat ZIP and checksum
+        if: steps.version.outputs.publish == 'true'
+        id: archive
+        run: |
+          $name = 'FanShop${{ steps.version.outputs.version }}.zip'
+          Compress-Archive -Path ./artifacts/release/* -DestinationPath "artifacts/$name"
+          "$((Get-FileHash "artifacts/$name" -Algorithm SHA256).Hash)  $name" | Set-Content "artifacts/$name.sha256" -Encoding utf8NoBOM
+          . ./scripts/Invoke-FanShopCommand.ps1
+          if ((Invoke-FanShopCommand './artifacts/release/FanShop.exe' @('--verify-update-archive', (Resolve-Path "artifacts/$name").Path)) -ne 0) { throw 'Final ZIP verification failed' }
+          "name=$name" >> $env:GITHUB_OUTPUT
+
+      - name: Build and verify Windows EXE installer
+        if: steps.version.outputs.publish == 'true'
+        run: |
+          ./scripts/Build-WindowsInstaller.ps1 -PackageDirectory artifacts/release -Version '${{ steps.version.outputs.version }}' -OutputDirectory artifacts
+          ./scripts/Test-WindowsInstaller.ps1 -Installer 'artifacts/FanShopSetup-${{ steps.version.outputs.version }}.exe' -PackageDirectory artifacts/release
+
+      - name: Publish release for this exact commit
+        if: steps.version.outputs.publish == 'true'
+        run: |
+          gh release create 'v${{ steps.version.outputs.version }}' 'artifacts/${{ steps.archive.outputs.name }}' 'artifacts/${{ steps.archive.outputs.name }}.sha256' 'artifacts/FanShopSetup-${{ steps.version.outputs.version }}.exe' 'artifacts/FanShopSetup-${{ steps.version.outputs.version }}.exe.sha256' --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title 'FanShop ${{ steps.version.outputs.version }}' --generate-notes --latest
+          if ($LASTEXITCODE -ne 0) { throw 'Release publication failed' }

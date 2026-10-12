@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <ApplicationIcon>icon.ico</ApplicationIcon>
@@ -13,11 +13,11 @@
 
     <ItemGroup>
         <!-- Avalonia -->
-        <PackageReference Include="Avalonia" Version="11.0.10" />
-        <PackageReference Include="Avalonia.Desktop" Version="11.0.10" />
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.10" />
-<!--        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.10" />-->
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.10" />
+        <PackageReference Include="Avalonia" Version="11.3.0" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.3.0" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.0" />
+<!--        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.0" />-->
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.0" />
         <PackageReference Include="Material.Icons.Avalonia" Version="2.4.0" />
 
         <!-- EF Core -->
@@ -28,13 +28,16 @@
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.2" />
 
+        <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.13" />
+
+        <PackageReference Include="Tmds.DBus.Protocol" Version="0.21.3" />
+
         <!-- Other dependencies -->
         <PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
         <PackageReference Include="EPPlus" Version="8.1.0" />
-        <PackageReference Include="Firebase.Database" Version="1.0.0" />
         <PackageReference Include="HtmlAgilityPack" Version="1.12.2" />
         <PackageReference Include="SkiaSharp" Version="2.88.9" />
-        <PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.*" />
+        <PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.5" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
     </ItemGroup>
 
@@ -71,4 +74,11 @@
       </Compile>
     </ItemGroup>
 
+    <ItemGroup>
+        <Compile Remove="PriceTags/**/*.cs" />
+        <EmbeddedResource Remove="PriceTags/**/*" />
+        <AvaloniaResource Remove="PriceTags/**/*" />
+        <ProjectReference Include="PriceTags/Core/FanShop.PriceTags.Core.csproj" />
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
 </Project>
