@@ -240,10 +240,10 @@ public class ReportAdjustmentTests
     }
     [Fact] public async Task SyntheticReportsAThroughGAreImportedAndVerified()
     {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(System.IO.Path.Combine(directory.FullName, "FanShop.csproj"))) directory = directory.Parent;
-        Assert.NotNull(directory);
-        var samples = System.IO.Path.Combine(directory!.FullName, "PriceTags", "Samples", "ReportAdjustment"); Directory.CreateDirectory(samples);
+        using var fixture = new ReportFixture();
+        var generated = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(fixture.Path)!, "Samples");
+        FanShop.PriceTags.SampleDataGenerator.Write(generated);
+        var samples = System.IO.Path.Combine(generated, "ReportAdjustment");
         var cases = new (string Name, SalesReportRow[] Rows, decimal Amount)[]
         {
             ("A_MISC.xlsx", [Row(1, 1000)], 30),
@@ -257,8 +257,9 @@ public class ReportAdjustmentTests
         var evidence = new List<string>();
         foreach (var test in cases)
         {
-            var path = System.IO.Path.Combine(samples, test.Name); ReportFixture.WriteFile(path, test.Rows);
+            var path = System.IO.Path.Combine(samples, test.Name);
             var report = Loader.Load(path, _default); var result = await Engine.SearchAsync(report.Rows, new(test.Amount), _default with { MaxSolutions = 3 });
+            Assert.Equal(test.Rows.Length, report.Rows.Count);
             if (test.Name.StartsWith('D')) Assert.Empty(result.Solutions);
             else { Assert.NotEmpty(result.Solutions); Assert.All(result.Solutions, s => Assert.Equal(s.ControlTotalBefore, s.ControlTotalAfter)); }
             if (test.Name.StartsWith('C')) Assert.Single(result.Solutions[0].Changes);

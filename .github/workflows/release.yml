@@ -110,8 +110,9 @@ jobs:
           dotnet publish FanShop.csproj -c Release -r win-x64 --self-contained true -p:PublishTrimmed=false -p:PublishSingleFile=false --disable-build-servers -o artifacts/release
           if ($LASTEXITCODE -ne 0) { throw 'Publish failed' }
           Copy-Item README.md artifacts/release/README.md
-          Copy-Item PriceTags/Samples artifacts/release/Samples -Recurse
-          Copy-Item docs artifacts/release/docs -Recurse
+          . ./scripts/Invoke-FanShopCommand.ps1
+          if ((Invoke-FanShopCommand './artifacts/release/FanShop.exe' @('--generate-samples', (Join-Path (Resolve-Path artifacts/release).Path 'Samples'))) -ne 0) { throw 'Sample generation failed' }
+          if (Test-Path docs) { Copy-Item docs artifacts/release/docs -Recurse }
 
       - name: Generate manifest and verify native installer
         if: steps.version.outputs.publish == 'true'

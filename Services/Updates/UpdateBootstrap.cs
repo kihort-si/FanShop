@@ -11,6 +11,11 @@ public static class UpdateBootstrap
     {
         try
         {
+            if (arguments.FirstOrDefault() == "--generate-samples")
+            {
+                if (arguments.Length != 2) throw new ArgumentException("--generate-samples <output-directory>");
+                FanShop.PriceTags.SampleDataGenerator.Write(arguments[1]); return 0;
+            }
             if (arguments.FirstOrDefault() == "--write-update-manifest")
             {
                 if (arguments.Length != 3) throw new ArgumentException("--write-update-manifest <publish-directory> <previous-zip-or-none>");

@@ -114,7 +114,8 @@ public sealed class WorkflowTests : IDisposable
     }
     [Fact] public async Task ShippedExamplesLoadAndMatchExpectedTotals()
     {
-        var directory=Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../Samples"));
+        var directory=Path.Combine(_root,"Samples");
+        FanShop.PriceTags.SampleDataGenerator.Write(directory);
         var loader=new ExcelCatalogLoader(NullLogger<ExcelCatalogLoader>.Instance);
         var catalog=await loader.LoadAsync(Path.Combine(directory,"catalog.xlsx")); Assert.Empty(catalog.Warnings); _catalog.Replace(catalog.Products);
         Assert.NotNull(_catalog.Find("000123"));
