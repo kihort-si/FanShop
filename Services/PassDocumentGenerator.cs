@@ -36,7 +36,7 @@ namespace FanShop.Services
 
             var dateText = firstDate == lastDate
                 ? firstDate.ToString("d MMMM", culture)
-                : $"с {firstDate.ToString("d MMMM", culture)} по {lastDate.ToString("d MMMM", culture)}";
+                : $"с {firstDate.ToString("d MMMM", culture)} по {lastDate.ToString("d MMMM yyyy", culture)}";
             
             return firstDate == lastDate ? CreateWordPass(dateText, IsDayWeekend(firstDate), orderedDates[0], employees) :
                     CreateWordPass(dateText, false, orderedDates[0], employees);
