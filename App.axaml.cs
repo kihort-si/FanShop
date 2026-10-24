@@ -139,6 +139,7 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
+            FanShop.Services.Updates.UpdateState.Log("Ошибка инициализации приложения.", ex);
             await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
             {
                 var errorWindow = new Window

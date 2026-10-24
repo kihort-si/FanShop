@@ -7,6 +7,27 @@ namespace FanShop.PriceTags.Tests;
 
 public class UpdateTests
 {
+    [Fact] public void StartupGuardDistinguishesActiveUpdateFromLeftoverLockFile()
+    {
+        using var f = new UpdateFixture();
+        Assert.False(InstallationTransaction.IsActive(f.Install));
+        using (var transaction = new InstallationTransaction(f.Install, Path.Combine(f.Root, "active")))
+            Assert.True(InstallationTransaction.IsActive(f.Install));
+        Assert.False(InstallationTransaction.IsActive(f.Install));
+        Assert.True(File.Exists(Path.Combine(f.Install, ".fanshop-update.lock")));
+    }
+    [Fact] public async Task CompetingUpdaterDoesNotRestartAppOrBlockTheReleaseForSixHours()
+    {
+        using var f = new UpdateFixture();
+        f.Package(f.Install, "2.2.0", "old"); f.Package(f.Payload, "2.3.0", "new");
+        using var active = new InstallationTransaction(f.Install, Path.Combine(f.Root, "active"));
+        var host = new FakeUpdateHost();
+        Assert.False(await new UpdateRunner(host).RunAsync(f.Request()));
+        Assert.False(host.Ready);
+        Assert.Equal(0, host.Restarts);
+        Assert.Null(host.FailedVersion);
+        Assert.Equal("old", File.ReadAllText(Path.Combine(f.Install, "FanShop.dll")));
+    }
     [Fact] public void ValidPackageHasVerifiedHashesAndExtractsFlat()
     {
         using var f = new UpdateFixture(); var manifest = f.Package(f.Payload, "2.3.0", "new");
@@ -218,7 +239,11 @@ internal sealed class FakeUpdateHost : IUpdateHost
     public void SignalReady(string requestPath, UpdateRequest request) => Ready = true;
     public void ClearRecovery(string installDirectory) => Cleared = true;
     public Task<bool> StartAndVerifyAsync(UpdateRequest request, string requestPath, CancellationToken cancellationToken) => Task.FromResult(Healthy);
-    public void RestartPrevious(UpdateRequest request) => Restarts++;
+    public void RestartPrevious(UpdateRequest request)
+    {
+        Assert.False(InstallationTransaction.IsActive(request.InstallDirectory));
+        Restarts++;
+    }
     public void RecordFailure(string version, string reason) => FailedVersion = version;
     public void Log(string message, Exception? exception = null) { }
 }

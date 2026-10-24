@@ -13,6 +13,19 @@ public sealed class InstallationTransaction : IDisposable
     private readonly FileStream _lock;
     private InstallationJournal? _journal;
     private string JournalPath => Path.Combine(_install, JournalName);
+    public static bool IsActive(string installDirectory)
+    {
+        try
+        {
+            using var probe = new FileStream(Path.Combine(installDirectory, ".fanshop-update.lock"),
+                FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            return false;
+        }
+        catch (FileNotFoundException) { return false; }
+        catch (DirectoryNotFoundException) { return false; }
+        catch (IOException ex) when ((ex.HResult & 0xFFFF) is 32 or 33
+            || (!OperatingSystem.IsWindows() && (ex.HResult & 0xFFFF) is 11 or 35)) { return true; }
+    }
     public InstallationTransaction(string installDirectory, string workDirectory)
     {
         _install = Path.GetFullPath(installDirectory); _work = Path.GetFullPath(workDirectory);

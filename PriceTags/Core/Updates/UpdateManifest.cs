@@ -182,6 +182,10 @@ public static class AtomicFiles
             { input.CopyTo(output); output.Flush(true); }
             FileAccessRetry.Run(() => File.Move(temp, destination, true));
         }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            throw new IOException($"Не удалось скопировать файл обновления '{source}' в '{destination}'.", ex);
+        }
         finally { if (File.Exists(temp)) File.Delete(temp); }
     }
 }
@@ -194,6 +198,8 @@ public static class FileAccessRetry
         {
             try { action(); return; }
             catch (IOException ex) when (OperatingSystem.IsWindows() && attempt < 20 && (ex.HResult & 0xFFFF) is 5 or 32 or 33)
+            { Thread.Sleep(250); }
+            catch (UnauthorizedAccessException ex) when (OperatingSystem.IsWindows() && attempt < 20 && (ex.HResult & 0xFFFF) == 5)
             { Thread.Sleep(250); }
         }
     }

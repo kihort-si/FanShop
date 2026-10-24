@@ -79,6 +79,13 @@ public static class UpdateBootstrap
                     Thread.Sleep(100);
                 return 0;
             }
+            // A second normal startup must not load installed DLLs or start recovery while
+            // the active helper is replacing them. The helper's health-check launch is allowed.
+            if (!IsHealthCheck && OperatingSystem.IsWindows() && InstallationTransaction.IsActive(AppContext.BaseDirectory))
+            {
+                UpdateState.Log("Повторный запуск пропущен: обновление этой установки уже выполняется.");
+                return 0;
+            }
             if (!IsHealthCheck && OperatingSystem.IsWindows() && File.Exists(Path.Combine(AppContext.BaseDirectory, InstallationTransaction.JournalName)))
             {
                 var journal = System.Text.Json.JsonSerializer.Deserialize<InstallationJournal>(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, InstallationTransaction.JournalName)), UpdateManifest.JsonOptions)

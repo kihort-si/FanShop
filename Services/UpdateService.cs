@@ -25,6 +25,11 @@ public sealed class UpdateService : IDisposable
         if (!OperatingSystem.IsWindows() || UpdateBootstrap.IsHealthCheck) return false;
         try
         {
+            if (InstallationTransaction.IsActive(AppContext.BaseDirectory))
+            {
+                UpdateState.Log("Проверка обновлений пропущена: установщик уже работает.");
+                return false;
+            }
             using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
             var json = await _client.GetStringAsync(ReleaseUrl, timeout.Token);
             _release = JsonSerializer.Deserialize<ReleaseInfo>(json, UpdateManifest.JsonOptions);

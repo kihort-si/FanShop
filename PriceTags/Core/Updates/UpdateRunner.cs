@@ -45,7 +45,9 @@ public sealed class UpdateRunner(IUpdateHost host)
                 await host.WaitForParentAsync(request, cancellationToken); parentExited = true;
                 host.EnsureNoOtherInstances(request.InstallDirectory);
                 if (File.Exists(Path.Combine(request.InstallDirectory, InstallationTransaction.JournalName))) transaction.Rollback();
-                host.ClearRecovery(request.InstallDirectory); host.RestartPrevious(request); return true;
+                host.ClearRecovery(request.InstallDirectory);
+                transaction.Dispose(); // Release the startup guard before reopening the restored application.
+                host.RestartPrevious(request); return true;
             }
             var manifest = UpdateManifest.Read(request.PayloadDirectory);
             if (!System.Version.Parse(manifest.Version).Equals(System.Version.Parse(request.Version))) throw new InvalidDataException("Версия запроса и пакета не совпадает.");
@@ -72,7 +74,8 @@ public sealed class UpdateRunner(IUpdateHost host)
         catch (Exception ex)
         {
             host.Log("Обновление не завершено.", ex);
-            try { host.RecordFailure(request.Version, ex.Message); } catch (Exception stateError) { host.Log("Не сохранено состояние неудачного обновления.", stateError); }
+            if (parentExited)
+                try { host.RecordFailure(request.Version, ex.Message); } catch (Exception stateError) { host.Log("Не сохранено состояние неудачного обновления.", stateError); }
             if (!File.Exists(Path.Combine(request.InstallDirectory, InstallationTransaction.JournalName)))
             {
                 try
@@ -81,7 +84,12 @@ public sealed class UpdateRunner(IUpdateHost host)
                     using var check = new InstallationTransaction(request.InstallDirectory, work);
                     host.ClearRecovery(request.InstallDirectory);
                     AtomicFiles.WriteJson(Path.Combine(work, "completed.json"), new { Success = false, Version = request.Version, Time = DateTimeOffset.UtcNow });
-                    if (parentExited) { host.EnsureNoOtherInstances(request.InstallDirectory); host.RestartPrevious(request); }
+                    if (parentExited)
+                    {
+                        host.EnsureNoOtherInstances(request.InstallDirectory);
+                        check.Dispose();
+                        host.RestartPrevious(request);
+                    }
                 }
                 catch (Exception restartError) { host.Log("Повторный запуск отложен; проверьте журнал обновлений.", restartError); }
             }
