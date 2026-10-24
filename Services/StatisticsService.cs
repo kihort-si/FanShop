@@ -53,10 +53,7 @@ namespace FanShop.Services
                 .Where(wde => wde.IncludeInSalary)
                 .ToList();
 
-            var total = workDayEmployees.Sum(wde =>
-                wde.WorkDuration == "Целый день"
-                    ? wde.SalaryAtMoment
-                    : wde.SalaryAtMoment / 2m);
+            var total = workDayEmployees.Sum(wde => wde.SalaryAtMoment);
 
             return $"{total:N0}₽";
         }
@@ -80,10 +77,7 @@ namespace FanShop.Services
                 {
                     EmployeeName = $"{g.Key.FirstName} {g.Key.Surname}",
                     WorkDaysCount = g.Count(),
-                    SalaryAmount = g.Sum(wde =>
-                        wde.WorkDuration == "Целый день"
-                            ? wde.SalaryAtMoment
-                            : wde.SalaryAtMoment / 2m)
+                    SalaryAmount = g.Sum(wde => wde.SalaryAtMoment)
                 })
                 .OrderByDescending(x => x.SalaryAmount)
                 .Select(x => new EmployeeStatistic

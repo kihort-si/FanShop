@@ -314,9 +314,7 @@ public partial class EmployeeCostAnalyticsViewModel : BaseViewModel
             var matchDay = windows.FirstOrDefault(candidate => candidate.Match.Date == date);
             var salaryAmount =
                 item.IncludeInSalary
-                    ? (item.WorkDuration == "Целый день"
-                        ? item.SalaryAtMoment
-                        : item.SalaryAtMoment / 2m)
+                    ? item.SalaryAtMoment
                     : 0m;
 
             return new WorkDayCostExplanation
