@@ -82,7 +82,7 @@
                                    FontWeight="Bold"
                                    Foreground="White" />
 
-                        <TextBlock Text="Помощь по работе с ценниками"
+                        <TextBlock Text="Исправление ошибок"
                                    MaxWidth="520"
                                    FontSize="14"
                                    LineHeight="20"
