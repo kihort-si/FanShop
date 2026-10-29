@@ -6,6 +6,9 @@ namespace FanShop.Services;
 
 public class AppDbContext : DbContext
 {
+    public AppDbContext() { }
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
     public DbSet<Employee> Employees { get; set; }
     public DbSet<WorkDay> WorkDays { get; set; }
     public DbSet<WorkDayEmployee> WorkDayEmployee { get; set; }
@@ -18,6 +21,7 @@ public class AppDbContext : DbContext
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        if (optionsBuilder.IsConfigured) return;
         var appDataPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "FanShop");

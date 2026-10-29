@@ -15,16 +15,18 @@
             Background="White"
             CornerRadius="16"
             BoxShadow="0 0 34 0 #40000000">
-    <Grid RowDefinitions="Auto,*,Auto">
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
         <StackPanel Margin="0,0,0,12">
             <TextBlock Text="Добавление сотрудника" FontSize="24" FontWeight="Bold" />
-            <TextBlock Text="Выберите сотрудника и тип занятости" Foreground="#6E7E8F" />
+            <TextBlock Text="Сотрудники по активности за 30 дней. Добавляйте по одному, затем нажмите «Готово»." Foreground="#6E7E8F" />
         </StackPanel>
 
-        <Grid Grid.Row="1" ColumnDefinitions="*,220">
+        <TextBox Grid.Row="1" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                 Watermark="Поиск по фамилии, имени или отчеству" Margin="0,0,0,12" />
+        <Grid Grid.Row="2" ColumnDefinitions="*,220">
             <Border Background="#F9FBFD" BorderBrush="{StaticResource BrandBorder}" BorderThickness="1" CornerRadius="12" Padding="12">
                 <DataGrid x:Name="EmployeesGrid"
-                          ItemsSource="{Binding Employees}"
+                          ItemsSource="{Binding EmployeesWithStats}"
                           SelectedItem="{Binding SelectedEmployee}"
                           AutoGenerateColumns="False"
                           CanUserSortColumns="False"
@@ -82,9 +84,11 @@
             </Border>
         </Grid>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" Margin="0,12,0,0">
-            <Button Content="Выбрать" Click="SelectButton_Click" />
-            <Button Classes="ghost" Content="Отмена" Click="CancelButton_Click" />
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <TextBlock x:Name="AddedCountText" VerticalAlignment="Center" Margin="0,0,12,0" Text="Добавлено: 0" />
+            <Button x:Name="AddSelectedButton" Content="Добавить" Click="SelectButton_Click" />
+            <Button Content="Готово" Click="DoneButton_Click" />
+            <Button x:Name="CancelButton" Classes="ghost" Content="Отмена" Click="CancelButton_Click" />
         </StackPanel>
     </Grid>
     </Border>

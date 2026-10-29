@@ -7,6 +7,7 @@ public static class UpdateBootstrap
 {
     private static string? _healthRequest;
     public static bool IsHealthCheck => _healthRequest is not null;
+    public static (string RequestPath, bool Recover)? InstallerCommand { get; private set; }
     public static int? RunCommand(string[] arguments)
     {
         try
@@ -46,6 +47,12 @@ public static class UpdateBootstrap
                         Path.GetFullPath(request.PayloadDirectory).TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase))
                     throw new IOException("Установщик должен запускаться из проверенного пакета.");
                 if (arguments[0] == "--apply-update" && request.Version != UpdateService.GetAppVersion()) throw new IOException("Версия установщика не совпадает с запросом.");
+                // Native diagnostic probes keep their console-only execution path.
+                if (!request.OriginalArguments.Any(a => a is "--update-health-probe" or "--update-probe-fail" or "--update-probe-hang"))
+                {
+                    InstallerCommand = (requestPath, arguments[0] == "--recover-update");
+                    return null;
+                }
                 var success = new UpdateRunner(new WindowsUpdateHost()).RunAsync(requestPath, arguments[0] == "--recover-update").GetAwaiter().GetResult();
                 return success ? 0 : 1;
             }

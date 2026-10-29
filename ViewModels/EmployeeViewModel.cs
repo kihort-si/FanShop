@@ -14,9 +14,43 @@ public partial class EmployeeViewModel : BaseViewModel, IWorkplaceCatalogObserve
 {
     private readonly MainWindowViewModel? _mainWindowViewModel;
     private static readonly EmployeeNameComparer NameComparer = new();
+    private List<Employee> _allEmployees = new();
+    private List<Employee> _rankedEmployees = new();
+    private readonly HashSet<int> _excludedEmployeeIds = new();
 
-    public EmployeeViewModel()
+    [ObservableProperty] private string _searchText = string.Empty;
+    partial void OnSearchTextChanged(string value) => ApplyEmployeeFilter();
+
+    public void ExcludeEmployees(IEnumerable<int> employeeIds)
     {
+        _excludedEmployeeIds.UnionWith(employeeIds);
+        ApplyEmployeeFilter();
+    }
+
+    public static bool MatchesSearch(Employee employee, string? search)
+    {
+        static string Normalize(string value) => value.Trim().ToUpperInvariant().Replace('Ё', 'Е');
+        var name = Normalize($"{employee.Surname} {employee.FirstName} {employee.LastName}");
+        return Normalize(search ?? string.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .All(name.Contains);
+    }
+
+    private void ApplyEmployeeFilter()
+    {
+        var selectedId = SelectedEmployee?.EmployeeID;
+        bool Matches(Employee employee) => !_excludedEmployeeIds.Contains(employee.EmployeeID) && MatchesSearch(employee, SearchText);
+        Employees = new ObservableCollection<Employee>(_allEmployees.Where(Matches));
+        EmployeesWithStats = new ObservableCollection<Employee>(_rankedEmployees.Where(Matches));
+        SelectedEmployee = Employees.FirstOrDefault(e => e.EmployeeID == selectedId);
+    }
+
+    private readonly Func<AppDbContext> _createContext;
+
+    public EmployeeViewModel() : this(() => new AppDbContext()) { }
+
+    public EmployeeViewModel(Func<AppDbContext> createContext)
+    {
+        _createContext = createContext;
         LoadShops();
         RefreshEmployees();
         WorkplaceCatalogNotifier.Register(this);
@@ -49,12 +83,9 @@ public partial class EmployeeViewModel : BaseViewModel, IWorkplaceCatalogObserve
     [ObservableProperty]
     private bool _canSelectPosition;
 
-    public EmployeeViewModel(MainWindowViewModel mainWindowViewModel)
+    public EmployeeViewModel(MainWindowViewModel mainWindowViewModel) : this()
     {
         _mainWindowViewModel = mainWindowViewModel;
-        LoadShops();
-        RefreshEmployees();
-        WorkplaceCatalogNotifier.Register(this);
     }
 
     public void RefreshWorkplaceCatalog()
@@ -66,7 +97,7 @@ public partial class EmployeeViewModel : BaseViewModel, IWorkplaceCatalogObserve
 
     private void LoadShops(int? preferredShopId = null, int? preferredPositionId = null)
     {
-        using var context = new AppDbContext();
+        using var context = _createContext();
 
         Shops.Clear();
 
@@ -87,6 +118,13 @@ public partial class EmployeeViewModel : BaseViewModel, IWorkplaceCatalogObserve
     
     partial void OnSelectedEmployeeChanged(Employee? value)
     {
+        if (value is not null)
+        {
+            SelectedShop = Shops.FirstOrDefault(s => s.ShopID == value.DefaultShopID)
+                ?? Shops.FirstOrDefault(s => s.IsDefault) ?? Shops.FirstOrDefault();
+            SelectedPosition = AvailablePositions.FirstOrDefault(p => p.PositionID == value.DefaultPositionID)
+                ?? AvailablePositions.FirstOrDefault(p => p.IsDefault) ?? AvailablePositions.FirstOrDefault();
+        }
         RemoveEmployeeCommand.NotifyCanExecuteChanged();
         EditEmployeeCommand.NotifyCanExecuteChanged();
     }
@@ -102,7 +140,7 @@ public partial class EmployeeViewModel : BaseViewModel, IWorkplaceCatalogObserve
             return;
         }
 
-        using var context = new AppDbContext();
+        using var context = _createContext();
 
         var positions = context.Positions
             .Where(x => x.ShopID == value.ShopID)
@@ -187,7 +225,7 @@ public partial class EmployeeViewModel : BaseViewModel, IWorkplaceCatalogObserve
         if (!confirmed)
             return;
 
-        using var context = new AppDbContext();
+        using var context = _createContext();
 
         var employee = context.Employees.Find(SelectedEmployee.EmployeeID);
 
@@ -195,7 +233,7 @@ public partial class EmployeeViewModel : BaseViewModel, IWorkplaceCatalogObserve
         {
             context.Employees.Remove(employee);
             context.SaveChanges();
-            Employees.Remove(SelectedEmployee);
+            RefreshEmployees();
         }
     }
 
@@ -231,7 +269,7 @@ public partial class EmployeeViewModel : BaseViewModel, IWorkplaceCatalogObserve
 
     public (List<Employee> employeesSorted, List<Employee> employeesWithStats) RefreshEmployees()
     {
-        using var context = new AppDbContext();
+        using var context = _createContext();
         List<Employee> allEmployees = context.Employees.ToList();
 
         List<Employee> employeesSorted = allEmployees
@@ -248,8 +286,9 @@ public partial class EmployeeViewModel : BaseViewModel, IWorkplaceCatalogObserve
             .Select(x => x.Employee)
             .ToList();
 
-        Employees = new ObservableCollection<Employee>(employeesSorted);
-        EmployeesWithStats = new ObservableCollection<Employee>(employeesWithStats);
+        _allEmployees = employeesSorted;
+        _rankedEmployees = employeesWithStats;
+        ApplyEmployeeFilter();
 
         return (employeesSorted, employeesWithStats);
     }

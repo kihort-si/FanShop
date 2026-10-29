@@ -6,6 +6,7 @@ namespace FanShop.Models;
 public class Settings
 {
     public string Head { get; set; } = "";
+    public string HeadPosition { get; set; } = "";
     public string ResponsiblePerson { get; set; } = "";
     public string ResponsiblePhoneNumber { get; set; } = "";
     public string ResponsiblePosition { get; set; } = "Управляющий магазином Фаншоп";
@@ -14,13 +15,14 @@ public class Settings
     
     private static readonly string SettingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FanShop", "settings.json");
     
-    public static Settings Load()
+    public static Settings Load(string? path = null)
     {
+        path ??= SettingsPath;
         try
         {
-            if (File.Exists(SettingsPath))
+            if (File.Exists(path))
             {
-                var json = File.ReadAllText(SettingsPath);
+                var json = File.ReadAllText(path);
                 return JsonSerializer.Deserialize<Settings>(json) ?? new Settings();
             }
         }
@@ -28,14 +30,30 @@ public class Settings
         return new Settings();
     }
     
-    public void Save()
+    public void Save() => TrySave(out _);
+
+    public bool TrySave(out string? error, string? path = null)
     {
+        error = null;
+        path = Path.GetFullPath(path ?? SettingsPath);
+        var temporary = path + ".tmp-" + Guid.NewGuid().ToString("N");
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(SettingsPath)!);
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             var json = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(SettingsPath, json);
+            File.WriteAllText(temporary, json);
+            File.Move(temporary, path, true);
+            return true;
         }
-        catch { }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            return false;
+        }
+        finally
+        {
+            try { if (File.Exists(temporary)) File.Delete(temporary); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
+        }
     }
 }

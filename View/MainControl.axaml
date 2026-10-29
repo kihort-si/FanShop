@@ -72,7 +72,7 @@
                         </Button.Flyout>
                     </Button>
                     <Button Width="40" Height="36" Margin="3,0" Command="{Binding StartMultiShiftModeCommand}"
-                            ToolTip.Tip="Повторное нажатие завершает множественное добавление">
+                            ToolTip.Tip="Выберите сотрудников и дни; повторное нажатие создаёт пропуска">
                         <Grid>
                             <avalonia:MaterialIcon Kind="AccountMultiplePlus"
                                                    IsVisible="{Binding IsMultiShiftMode, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>

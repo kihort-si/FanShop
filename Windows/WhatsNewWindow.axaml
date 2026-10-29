@@ -82,7 +82,7 @@
                                    FontWeight="Bold"
                                    Foreground="White" />
 
-                        <TextBlock Text="Исправление ошибок"
+                        <TextBlock Text="Постоянные пропуска и не только"
                                    MaxWidth="520"
                                    FontSize="14"
                                    LineHeight="20"

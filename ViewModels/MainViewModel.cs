@@ -33,10 +33,8 @@ public partial class MainViewModel : BaseViewModel, IWorkplaceCatalogObserver
     public ObservableCollection<ShopFilterOption> EmployeeShopFilters { get; } = new();
 
     private DateTime _lastCalendarUpdateDate;
-    private Employee? _multiShiftEmployee;
-    private string _multiShiftWorkDuration = "Целый день";
-    private Position? _multiShiftPosition;
-    private readonly Dictionary<DateTime, int> _multiShiftAssignments = new();
+    private readonly List<EmployeeShiftSelection> _multiShiftEmployees = new();
+    private readonly Dictionary<DateTime, List<int>> _multiShiftAssignments = new();
 
     [ObservableProperty]
     private bool _isMultiShiftMode;
@@ -204,24 +202,22 @@ public partial class MainViewModel : BaseViewModel, IWorkplaceCatalogObserver
             SelectionOnly = true
         };
 
-        if (!await window.ShowDialog<bool>(owner) ||
-            window.SelectedEmployee == null ||
-            window.SelectedPosition == null)
+        if (!await window.ShowDialog<bool>(owner) || window.Selections.Count == 0)
             return;
 
-        _multiShiftEmployee = window.SelectedEmployee;
-        _multiShiftWorkDuration = window.SelectedWorkDuration;
-        _multiShiftPosition = window.SelectedPosition;
+        _multiShiftEmployees.Clear();
+        _multiShiftEmployees.AddRange(window.Selections);
         _multiShiftAssignments.Clear();
         IsMultiShiftMode = true;
     }
 
     public bool TryAddMultiShift(CalendarDayViewModel day)
     {
-        if (!IsMultiShiftMode || _multiShiftEmployee == null || _multiShiftPosition == null)
+        if (!IsMultiShiftMode || _multiShiftEmployees.Count == 0)
             return false;
 
         using var context = new AppDbContext();
+        using var transaction = context.Database.BeginTransaction();
         var date = day.Date.Date;
         var workDay = context.WorkDays
             .Include(x => x.WorkDayEmployee)
@@ -234,45 +230,33 @@ public partial class MainViewModel : BaseViewModel, IWorkplaceCatalogObserver
             context.SaveChanges();
         }
 
-        var assignment = workDay.WorkDayEmployee
-            .FirstOrDefault(x => x.EmployeeID == _multiShiftEmployee.EmployeeID);
         var salaryService = new SalaryService(context);
-
-        if (assignment == null)
+        var selectedAssignments = new List<(Employee Employee, WorkDayEmployee Assignment, string PositionName)>();
+        foreach (var selection in _multiShiftEmployees)
         {
-            assignment = new WorkDayEmployee
+            var assignment = workDay.WorkDayEmployee.FirstOrDefault(x => x.EmployeeID == selection.Employee.EmployeeID);
+            if (assignment == null)
             {
-                WorkDayID = workDay.WorkDayID,
-                EmployeeID = _multiShiftEmployee.EmployeeID,
-                IncludeInPass = true
-            };
-            context.WorkDayEmployee.Add(assignment);
+                assignment = EmployeeShiftDefaults.Create(selection.Employee, workDay.WorkDayID, date,
+                    selection.Position, selection.WorkDuration, salaryService);
+                context.WorkDayEmployee.Add(assignment);
+            }
+            // Existing shifts retain their individual flags, workplace and duration.
+            selectedAssignments.Add((selection.Employee, assignment,
+                context.Positions.Find(assignment.PositionID)?.PositionName ?? string.Empty));
         }
-
-        assignment.WorkDuration = _multiShiftWorkDuration;
-        assignment.PositionID = _multiShiftPosition.PositionID;
-        assignment.IncludeInPass = true;
-        assignment.SalaryAtMoment = salaryService.GetSalaryForShift(
-            _multiShiftPosition.PositionID, date, _multiShiftWorkDuration);
         context.SaveChanges();
-
-        _multiShiftAssignments[date] = assignment.WorkDayEmployeeID;
-        day.AddEmployeeToDay(
-            _multiShiftEmployee,
-            _multiShiftWorkDuration,
-            assignment.WorkDayEmployeeID,
-            _multiShiftPosition.PositionID,
-            _multiShiftPosition.PositionName);
-        var displayedAssignment = day.Employees
-            .FirstOrDefault(x => x.Employee.EmployeeID == _multiShiftEmployee.EmployeeID);
-        if (displayedAssignment != null && !displayedAssignment.IncludeInPass)
-            displayedAssignment.IncludeInPass = true;
+        transaction.Commit();
+        foreach (var item in selectedAssignments)
+            day.AddEmployeeToDay(item.Employee, item.Assignment.WorkDuration, item.Assignment.WorkDayEmployeeID,
+                item.Assignment.PositionID, item.PositionName);
+        _multiShiftAssignments[date] = selectedAssignments.Select(x => x.Assignment.WorkDayEmployeeID).ToList();
         return true;
     }
 
     private async Task FinishMultiShiftModeAsync()
     {
-        if (_multiShiftEmployee == null || _multiShiftAssignments.Count == 0)
+        if (_multiShiftEmployees.Count == 0 || _multiShiftAssignments.Count == 0)
         {
             ResetMultiShiftMode();
             return;
@@ -284,34 +268,38 @@ public partial class MainViewModel : BaseViewModel, IWorkplaceCatalogObserver
             DataContext = new AgreeDialogViewModel
             {
                 Title = "Напечатать пропуск сразу?",
-                Message = $"Смены добавлены на {_multiShiftAssignments.Count} дн. Хотите распечатать пропуск на все дни эти?"
+                Message = $"Выбрано сотрудников: {_multiShiftEmployees.Count}, дней: {_multiShiftAssignments.Count}. Сформировать пропуска для смен с отметкой «Пропуск»?"
             }
         };
         var shouldPrint = owner != null && await dialog.ShowDialog<bool>(owner);
 
         if (shouldPrint && owner != null && await PassTemplateService.EnsureTemplateAsync(owner))
         {
-            var employee = new EmployeeWorkInfo { Employee = _multiShiftEmployee, IncludeInPass = true };
-            var created = PassDocumentGenerator.CreateWordPassForDates(
-                _multiShiftAssignments.Keys.ToList(),
-                new ObservableCollection<EmployeeWorkInfo> { employee });
-
-            if (created)
+            using var context = new AppDbContext();
+            var ids = _multiShiftAssignments.Values.SelectMany(x => x).Distinct().ToList();
+            var assignments = context.WorkDayEmployee.Include(x => x.Employee).Include(x => x.WorkDay)
+                .Where(x => ids.Contains(x.WorkDayEmployeeID) && x.IncludeInPass).ToList();
+            if (assignments.Count == 0)
+                await DialogService.ShowInfo("Нет смен с отметкой «Пропуск». При необходимости включите её в деталях нужного дня.");
+            var plans = PassDocumentGenerator.PlanAssignmentPasses(assignments);
+            var printedIds = new HashSet<int>();
+            foreach (var plan in plans)
             {
-                using var context = new AppDbContext();
-                var ids = _multiShiftAssignments.Values.ToList();
-                var assignments = context.WorkDayEmployee.Where(x => ids.Contains(x.WorkDayEmployeeID)).ToList();
-                foreach (var assignment in assignments)
-                    assignment.IncludeInPass = false;
-                context.SaveChanges();
-
-                foreach (var day in CalendarDays.Where(x => _multiShiftAssignments.ContainsKey(x.Date.Date)))
+                if (!PassDocumentGenerator.CreateWordPass(plan, out var error))
                 {
-                    var item = day.Employees.FirstOrDefault(x => x.Employee.EmployeeID == _multiShiftEmployee.EmployeeID);
-                    if (item != null)
-                        item.IncludeInPass = false;
+                    await DialogService.ShowInfo($"Не удалось сформировать или открыть пропуск: {error}\n\nОтметки для этого документа сохранены.");
+                    continue;
+                }
+                foreach (var assignment in assignments.Where(a => plan.AssignmentIds.Contains(a.WorkDayEmployeeID)))
+                {
+                    assignment.IncludeInPass = false;
+                    printedIds.Add(assignment.WorkDayEmployeeID);
                 }
             }
+            context.SaveChanges();
+            foreach (var day in CalendarDays.Where(x => _multiShiftAssignments.ContainsKey(x.Date.Date)))
+                foreach (var item in day.Employees.Where(x => printedIds.Contains(x.WorkDayEmployeeID)))
+                    item.IncludeInPass = false;
         }
 
         ResetMultiShiftMode();
@@ -320,8 +308,7 @@ public partial class MainViewModel : BaseViewModel, IWorkplaceCatalogObserver
     private void ResetMultiShiftMode()
     {
         IsMultiShiftMode = false;
-        _multiShiftEmployee = null;
-        _multiShiftPosition = null;
+        _multiShiftEmployees.Clear();
         _multiShiftAssignments.Clear();
         RefreshStatistics();
     }

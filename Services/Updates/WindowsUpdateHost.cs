@@ -5,10 +5,11 @@ using Microsoft.Win32;
 
 namespace FanShop.Services.Updates;
 
-public sealed class WindowsUpdateHost : IUpdateHost
+public sealed class WindowsUpdateHost(Action<string>? reportStatus = null) : IUpdateHost
 {
     public async Task WaitForParentAsync(UpdateRequest request, CancellationToken cancellationToken)
     {
+        reportStatus?.Invoke("Завершаем предыдущую версию…");
         try
         {
             using var parent = Process.GetProcessById(request.ParentProcessId);
@@ -16,6 +17,7 @@ public sealed class WindowsUpdateHost : IUpdateHost
             await parent.WaitForExitAsync(cancellationToken).WaitAsync(TimeSpan.FromSeconds(60), cancellationToken);
         }
         catch (ArgumentException) { } // The parent already exited; never kill a process by image name.
+        reportStatus?.Invoke("Устанавливаем обновление…");
     }
     public void EnsureNoOtherInstances(string installDirectory)
     {
@@ -62,6 +64,7 @@ public sealed class WindowsUpdateHost : IUpdateHost
         Path.Combine(Path.GetDirectoryName(requestPath)!, "ready.json"), new HealthAcknowledgment(request.HealthToken, request.Version, Environment.ProcessId));
     public async Task<bool> StartAndVerifyAsync(UpdateRequest request, string requestPath, CancellationToken cancellationToken)
     {
+        reportStatus?.Invoke("Запускаем новую версию…");
         var health = Path.Combine(Path.GetDirectoryName(requestPath)!, "healthy.json");
         if (File.Exists(health)) File.Delete(health);
         using var process = Start(request, requestPath);

@@ -11,6 +11,31 @@ public partial class SplashScreenViewModel : BaseViewModel
     [ObservableProperty]
     private string _loadingText = "Загрузка...";
 
+    [ObservableProperty]
+    private string _statusDetails = string.Empty;
+
+    [ObservableProperty]
+    private bool _isUpdating;
+
+    [ObservableProperty]
+    private bool _isUpdateIndeterminate;
+
+    public void ShowUpdateStatus(string text, string details, bool indeterminate = true)
+    {
+        IsUpdating = true;
+        IsUpdateIndeterminate = indeterminate;
+        LoadingText = text;
+        StatusDetails = details;
+    }
+
+    public void ResumeLoading()
+    {
+        IsUpdating = false;
+        IsUpdateIndeterminate = false;
+        StatusDetails = string.Empty;
+        LoadingText = PickNewLoadingText();
+    }
+
     private readonly string[] _loadingTexts = new string[]
     {
         "Делаем довесы...",
@@ -54,6 +79,7 @@ public partial class SplashScreenViewModel : BaseViewModel
             {
                 percent = Math.Max(0, Math.Min(100, percent));
                 ProgressWidth = 360 * percent / 100;
+                if (IsUpdating) return;
                 if (percent == 30 || percent == 60)
                 {
                     LoadingText = PickNewLoadingText();

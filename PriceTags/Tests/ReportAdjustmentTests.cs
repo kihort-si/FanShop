@@ -86,8 +86,6 @@ public class ReportAdjustmentTests
     {
         var settings = _default with { AllowedDiscounts = [3, 7], DiscountPriorities = [3, 7], AllowDiscountDecrease = true };
         var rows = new[] { Row(1, 2199, discount: 7), Row(2, 1000) };
-        // -88 from 7→3 plus +30 from 0→3: target would be negative (unsupported).
-        // +88 from 3→7 plus -40 from 7→3 on another row produces +48.
         rows = [Row(1, 2199, discount: 3), Row(2, 1000, discount: 7)];
         var result = await Search(rows, 48, settings); Assert.NotEmpty(result.Solutions);
         Assert.Contains(result.Solutions[0].Changes, c => c.OriginalDiscount == 7 && c.NewDiscount == 3);

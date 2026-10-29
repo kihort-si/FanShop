@@ -9,7 +9,7 @@ public sealed class ScanSessionService(ProductCatalogService catalog, LocalStora
 {
     private readonly object _gate = new();
     private List<ScanRecord> _records = [];
-    private readonly Dictionary<Guid, ScanRecord> _receipts = []; // retain acknowledgements even after Undo
+    private readonly Dictionary<Guid, ScanRecord> _receipts = [];
     private ScanRecord[] _savedReceipts = [];
     private bool _frozen;
     private bool _recoveryPending;

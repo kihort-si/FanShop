@@ -41,7 +41,7 @@ public sealed class SolutionValidator(DiscountCalculationService calculator)
                 Money.ToMinor(change.NewTotal);
                 after += change.NewTotal - row.CurrentTotal;
             }
-            after += required; // Explicit corrective positions or the separately authorized amount, never a fabricated product.
+            after += required; 
             if (solution.Changes.Sum(c => c.Delta) != required) errors.Add("Компенсация не равна требуемой сумме.");
             if (before != after || solution.ControlTotalBefore != before || solution.ControlTotalAfter != after || solution.RequiredAmount != required)
                 errors.Add("Контрольная сумма не сохраняется.");

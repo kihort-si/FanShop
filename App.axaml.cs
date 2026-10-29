@@ -31,12 +31,40 @@ public partial class App : Application
             desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
 
             _splashScreen = new SplashScreenWindow();
+            if (FanShop.Services.Updates.UpdateBootstrap.InstallerCommand is { } installer)
+            {
+                desktop.MainWindow = _splashScreen;
+                _splashScreen.Title = "Обновление FanShop";
+                _splashScreen.ViewModel.ShowUpdateStatus(
+                    installer.Recover ? "Восстанавливаем приложение…" : "Устанавливаем обновление…",
+                    "Пожалуйста, подождите. FanShop откроется автоматически.");
+                _splashScreen.Show();
+                _ = RunInstallerAsync(installer.RequestPath, installer.Recover, desktop);
+                base.OnFrameworkInitializationCompleted();
+                return;
+            }
+            if (FanShop.Services.Updates.UpdateBootstrap.IsHealthCheck)
+                _splashScreen.ViewModel.ShowUpdateStatus("Запускаем обновлённый FanShop…", "Проверяем запуск новой версии. Пожалуйста, подождите.");
             _splashScreen.Show();
 
             _ = InitializeAppAsync();
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private async Task RunInstallerAsync(string requestPath, bool recover, IClassicDesktopStyleApplicationLifetime desktop)
+    {
+        var success = false;
+        try
+        {
+            var host = new FanShop.Services.Updates.WindowsUpdateHost(status =>
+                Avalonia.Threading.Dispatcher.UIThread.Post(() => _splashScreen?.ViewModel.ShowUpdateStatus(
+                    status, "Пожалуйста, подождите. FanShop откроется автоматически.")));
+            success = await Task.Run(() => new FanShop.Updates.UpdateRunner(host).RunAsync(requestPath, recover));
+        }
+        catch (Exception ex) { FanShop.Services.Updates.UpdateState.Log("Ошибка окна установки обновления.", ex); }
+        finally { desktop.Shutdown(success ? 0 : 1); }
     }
 
     private async Task InitializeAppAsync()
@@ -51,14 +79,32 @@ public partial class App : Application
             var skipOnlineInitialization = priceTagsStartup || FanShop.Services.Updates.UpdateBootstrap.IsHealthCheck;
             bool updateAvailable = await updateService.CheckForUpdatesAsync();
 
-            var updateProgress = new Progress<int>(p => _splashScreen?.ViewModel.UpdateProgress(8 + p * 87 / 100));
+            var updateProgress = new Progress<int>(p =>
+            {
+                _splashScreen?.ViewModel.ShowUpdateStatus(
+                    p < 90 ? $"Скачиваем FanShop {updateService.AvailableVersion} — {p * 100 / 90}%" : "Проверяем пакет обновления…",
+                    "Обновление установится автоматически, затем приложение перезапустится.", indeterminate: p >= 90);
+                _splashScreen?.ViewModel.UpdateProgress(8 + p * 87 / 100);
+            });
+            if (updateAvailable)
+            {
+                _splashScreen!.Title = "Обновление FanShop";
+                _splashScreen.ViewModel.ShowUpdateStatus($"Доступна новая версия FanShop {updateService.AvailableVersion}",
+                    "Скачиваем обновление. После установки приложение откроется автоматически.");
+            }
             if (updateAvailable && await updateService.UpdateAsync(updateProgress))
             {
+                _splashScreen?.ViewModel.ShowUpdateStatus("Передаём управление установщику…", "FanShop откроется автоматически после установки обновления.");
                 await FanShop.Services.ReportAdjustment.ReportAdjustmentModule.ShutdownAsync();
                 await FanShop.Services.PriceTags.PriceTagModule.ShutdownAsync();
                 if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime updatingDesktop)
                     updatingDesktop.Shutdown(0);
                 return;
+            }
+            if (updateAvailable)
+            {
+                _splashScreen!.Title = "Загрузка приложения";
+                _splashScreen.ViewModel.ResumeLoading();
             }
 
             _splashScreen?.ViewModel.UpdateProgress(10);
@@ -80,6 +126,7 @@ public partial class App : Application
                 await EnsureColumnAsync(db, "WorkDayEmployee", "IncludeInSalary", "INTEGER NOT NULL DEFAULT 1");
                 await EnsureColumnAsync(db, "Shops", "IsDefault", "INTEGER NOT NULL DEFAULT 0");
                 await EnsureColumnAsync(db, "Positions", "IsDefault", "INTEGER NOT NULL DEFAULT 0");
+                await EmployeeDefaultsSchema.EnsureAsync(db);
             }
 
             _mainWindowViewModel = new MainWindowViewModel();

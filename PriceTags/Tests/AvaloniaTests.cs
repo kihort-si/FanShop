@@ -19,11 +19,37 @@ public static class TestAppBuilder
 public class AvaloniaTests
 {
     [AvaloniaFact]
+    public async Task PriceTagCellsCopyArticleAndSizeWithoutOtherColumns()
+    {
+        var products = new[]
+        {
+            new { Article = "000123", Name = "Футболка", Characteristic = "XL", Quantity = 2 },
+            new { Article = "000456", Name = "Кофта", Characteristic = "M", Quantity = 1 }
+        };
+        var view = new PriceTagsControl { DataContext = new { Products = products } };
+        var window = new Window { Content = view, Width = 1280, Height = 1400 };
+        window.Show(); window.UpdateLayout();
+        var grid = view.FindControl<DataGrid>("ProductsGrid")!;
+        grid.SelectedItem = products[0]; grid.CurrentColumn = grid.Columns[0]; grid.Focus();
+        window.KeyPressQwerty(Avalonia.Input.PhysicalKey.C, Avalonia.Input.RawInputModifiers.Control);
+        window.KeyReleaseQwerty(Avalonia.Input.PhysicalKey.C, Avalonia.Input.RawInputModifiers.Control);
+        Assert.Equal("000123", (await window.Clipboard!.GetTextAsync())?.TrimEnd('\r', '\n'));
+        grid.CurrentColumn = grid.Columns[2];
+        window.KeyPressQwerty(Avalonia.Input.PhysicalKey.C, Avalonia.Input.RawInputModifiers.Control);
+        window.KeyReleaseQwerty(Avalonia.Input.PhysicalKey.C, Avalonia.Input.RawInputModifiers.Control);
+        Assert.Equal("XL", (await window.Clipboard.GetTextAsync())?.TrimEnd('\r', '\n'));
+        grid.SelectedItems.Add(products[1]);
+        window.KeyPressQwerty(Avalonia.Input.PhysicalKey.C, Avalonia.Input.RawInputModifiers.Control);
+        window.KeyReleaseQwerty(Avalonia.Input.PhysicalKey.C, Avalonia.Input.RawInputModifiers.Control);
+        Assert.Equal("XL" + Environment.NewLine + "M", await window.Clipboard.GetTextAsync());
+        window.Close();
+    }
+
+    [AvaloniaFact]
     public void IntegratedViewLoadsAndLaysOutWithinExistingWindow()
     {
         var view=new PriceTagsControl();
         var window=new MainWindow { DataContext = null, Content=view, WindowState=WindowState.Normal, Width=1280, Height=820 };
-        // Do not attach a production view model: this test must not touch real user files or start a production server.
         window.Show(); window.UpdateLayout();
         Assert.True(view.Bounds.Width>900); Assert.NotEmpty(view.GetVisualDescendants().OfType<DataGrid>());
         Assert.Contains(view.GetVisualDescendants().OfType<Button>(), b=>Equals(b.Content,"Передать в 1С"));
@@ -56,7 +82,6 @@ public class AvaloniaTests
         portEditor.Value=port+1; Assert.Equal(port+1,vm.Port);
         window.CaptureRenderedFrame()?.Save(Path.Combine(Path.GetTempPath(), "fanshop-price-tags-ui.png"));
         window.Close();
-        // BarcodeWebServer is IAsyncDisposable; dispose asynchronously to avoid blocking the UI thread.
         await vm.ShutdownAsync();
         await provider.DisposeAsync();
         Directory.Delete(root,true);

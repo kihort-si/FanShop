@@ -37,16 +37,22 @@
             </StackPanel>
             <StackPanel Grid.Row="2">
                 <TextBlock Text="{Binding LoadingText}"
+                           TextWrapping="Wrap"
                            FontSize="12"
                            FontWeight="SemiBold"
                            Foreground="#666666"
                            Margin="0, 0, 0, 8"/>
-                <Border Background="#D9D9D9" Height="5" MaxWidth="360">
-                    <Rectangle Fill="#003D75"
-                               Width="{Binding ProgressWidth}"
-                               HorizontalAlignment="Left"
-                               Height="5"/>
-                </Border>
+                <TextBlock Text="{Binding StatusDetails}"
+                           IsVisible="{Binding IsUpdating}"
+                           TextWrapping="Wrap"
+                           FontSize="12"
+                           Foreground="#666666"
+                           Margin="0, 0, 0, 12"/>
+                <ProgressBar Background="#D9D9D9" Foreground="#003D75"
+                             Height="5" MaxWidth="360"
+                             Minimum="0" Maximum="360"
+                             Value="{Binding ProgressWidth}"
+                             IsIndeterminate="{Binding IsUpdateIndeterminate}"/>
             </StackPanel>
         </Grid>
         <Image Grid.Column="1" Source="/Resources/zenit_arena.png" Stretch="UniformToFill" Height="248" Margin="0, 14, 0, 0"/>

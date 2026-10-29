@@ -18,6 +18,10 @@ public class Employee
     public string PlaceOfBirth { get; set; } = string.Empty;
     [Required]
     public string Passport { get; set; } = string.Empty;
+    public bool HasPermanentPass { get; set; }
+    public bool ExcludeFromSalaryByDefault { get; set; }
+    public int? DefaultShopID { get; set; }
+    public int? DefaultPositionID { get; set; }
     
     public ICollection<WorkDayEmployee> WorkDayEmployee { get; set; } = new List<WorkDayEmployee>();
 }

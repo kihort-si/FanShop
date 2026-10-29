@@ -1,18 +1,20 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="FanShop.View.EmployeeControl">
-    <Grid RowDefinitions="Auto,*" Margin="20">
+    <Grid RowDefinitions="Auto,Auto,*" Margin="20">
         <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,16">
             <Button Content="Добавить" Command="{Binding AddEmployeeCommand}" />
             <Button Content="Изменить" Command="{Binding EditEmployeeCommand}" />
             <Button Classes="danger" Content="Удалить" Command="{Binding RemoveEmployeeCommand}" />
         </StackPanel>
 
-        <Grid Grid.Row="1" ColumnDefinitions="*,*">
+        <TextBox Grid.Row="1" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                 Watermark="Поиск по фамилии, имени или отчеству" Margin="0,0,0,12" />
+        <Grid Grid.Row="2" ColumnDefinitions="*,*">
             <Border Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="12" Padding="12" Margin="0,0,8,0">
-                <StackPanel Spacing="8">
-                    <TextBlock Text="Все сотрудники" FontSize="18" FontWeight="Bold" />
-                    <DataGrid ItemsSource="{Binding Employees}"
+                <Grid RowDefinitions="Auto,*">
+                    <TextBlock Margin="0,0,0,8" Text="Все сотрудники" FontSize="18" FontWeight="Bold" />
+                    <DataGrid Grid.Row="1" ScrollViewer.VerticalScrollBarVisibility="Auto" ItemsSource="{Binding Employees}"
                               SelectedItem="{Binding SelectedEmployee}"
                               AutoGenerateColumns="False"
                               CanUserSortColumns="False"
@@ -24,13 +26,13 @@
                             <DataGridTextColumn Header="Дата рождения" Binding="{Binding DateOfBirth}" Width="*" />
                         </DataGrid.Columns>
                     </DataGrid>
-                </StackPanel>
+                </Grid>
             </Border>
 
             <Border Grid.Column="1" Background="#F9FBFD" BorderBrush="#D7E4EF" BorderThickness="1" CornerRadius="12" Padding="12" Margin="8,0,0,0">
-                <StackPanel Spacing="8">
-                    <TextBlock Text="По активности за 30 дней" FontSize="18" FontWeight="Bold" />
-                    <DataGrid ItemsSource="{Binding EmployeesWithStats}"
+                <Grid RowDefinitions="Auto,*">
+                    <TextBlock Margin="0,0,0,8" Text="По активности за 30 дней" FontSize="18" FontWeight="Bold" />
+                    <DataGrid Grid.Row="1" ScrollViewer.VerticalScrollBarVisibility="Auto" ItemsSource="{Binding EmployeesWithStats}"
                               AutoGenerateColumns="False"
                               CanUserSortColumns="False"
                               IsReadOnly="True">
@@ -40,7 +42,7 @@
                             <DataGridTextColumn Header="Отчество" Binding="{Binding LastName}" Width="*" />
                         </DataGrid.Columns>
                     </DataGrid>
-                </StackPanel>
+                </Grid>
             </Border>
         </Grid>
     </Grid>

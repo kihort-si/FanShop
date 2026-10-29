@@ -161,11 +161,7 @@ public partial class CalendarDayViewModel : BaseViewModel
         using var context = new AppDbContext();
         var employeeWindowViewModel = new EmployeeViewModel();
 
-        var availableEmployees = employeeWindowViewModel.EmployeesWithStats
-            .Where(e => !Employees.Any(existing => existing.Employee.EmployeeID == e.EmployeeID))
-            .ToList();
-
-        employeeWindowViewModel.Employees = new ObservableCollection<Employee>(availableEmployees);
+        employeeWindowViewModel.ExcludeEmployees(Employees.Select(e => e.Employee.EmployeeID));
 
         var selectEmployeeWindow = new SelectEmployeeWindow
         {
@@ -235,7 +231,8 @@ public partial class CalendarDayViewModel : BaseViewModel
             return;
         }
 
-        PassDocumentGenerator.CreateWordPass(Date, Employees);
+        if (!PassDocumentGenerator.CreateWordPassForDates(new[] { Date }, Employees, out var error))
+            await DialogService.ShowInfo($"Не удалось сформировать или открыть пропуск: {error}");
     }
 
     private bool CanPrintPass => Employees.Count > 0;
@@ -463,9 +460,12 @@ public partial class CalendarDayViewModel : BaseViewModel
             return;
 
         using var context = new AppDbContext();
+        var assignment = context.WorkDayEmployee.Find(workDayEmployeeId);
         var info = new EmployeeWorkInfo
         {
             Employee = employee,
+            IncludeInPass = assignment?.IncludeInPass ?? EmployeeShiftDefaults.RequiresPass(employee, Date),
+            IncludeInSalary = assignment?.IncludeInSalary ?? !employee.ExcludeFromSalaryByDefault,
             WorkDuration = workDuration,
             WorkDayEmployeeID = workDayEmployeeId,
             PositionID = positionId,

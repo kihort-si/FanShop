@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using FanShop.Models;
 using FanShop.Services;
 using System.Globalization;
+using System.Collections.ObjectModel;
+using Microsoft.EntityFrameworkCore;
 
 namespace FanShop.ViewModels;
 
@@ -46,6 +48,48 @@ public partial class EditEmployeeViewModel : BaseViewModel
     [ObservableProperty]
     private Employee? _selectedEmployee;
 
+    [ObservableProperty] private bool _hasPermanentPass;
+    [ObservableProperty] private bool _excludeFromSalaryByDefault;
+    [ObservableProperty] private Shop? _selectedDefaultShop;
+    [ObservableProperty] private Position? _selectedDefaultPosition;
+    public ObservableCollection<Shop> DefaultShops { get; } = new();
+    public ObservableCollection<Position> DefaultPositions { get; } = new();
+    private List<Position> _positions = new();
+
+    private void LoadEmployeeDefaults()
+    {
+        using var context = new AppDbContext();
+        foreach (var shop in context.Shops.OrderBy(s => s.ShopName)) DefaultShops.Add(shop);
+        _positions = context.Positions.OrderBy(p => p.PositionName).ToList();
+        HasPermanentPass = SelectedEmployee?.HasPermanentPass ?? false;
+        ExcludeFromSalaryByDefault = SelectedEmployee?.ExcludeFromSalaryByDefault ?? false;
+        SelectedDefaultShop = DefaultShops.FirstOrDefault(s => s.ShopID == SelectedEmployee?.DefaultShopID);
+        SelectedDefaultPosition = DefaultPositions.FirstOrDefault(p => p.PositionID == SelectedEmployee?.DefaultPositionID);
+    }
+
+    partial void OnSelectedDefaultShopChanged(Shop? value)
+    {
+        DefaultPositions.Clear();
+        foreach (var position in _positions.Where(p => p.ShopID == value?.ShopID)) DefaultPositions.Add(position);
+        SelectedDefaultPosition = null;
+    }
+
+    [RelayCommand]
+    private void ClearDefaultWorkplace()
+    {
+        SelectedDefaultShop = null;
+        SelectedDefaultPosition = null;
+    }
+
+    private void ApplyDefaults(Employee employee)
+    {
+        employee.HasPermanentPass = HasPermanentPass;
+        employee.ExcludeFromSalaryByDefault = ExcludeFromSalaryByDefault;
+        employee.DefaultShopID = SelectedDefaultShop?.ShopID;
+        employee.DefaultPositionID = SelectedDefaultPosition?.ShopID == SelectedDefaultShop?.ShopID
+            ? SelectedDefaultPosition?.PositionID : null;
+    }
+
     public bool CanSaveEmployee =>
         !string.IsNullOrWhiteSpace(Surname) &&
         !string.IsNullOrWhiteSpace(FirstName) &&
@@ -65,6 +109,7 @@ public partial class EditEmployeeViewModel : BaseViewModel
         EditEmployee();
         _mainWindowViewModel = mainWindowViewModel;
         _employeeViewModel = employeeViewModel;
+        LoadEmployeeDefaults();
     }
 
     public EditEmployeeViewModel(MainWindowViewModel mainWindowViewModel,
@@ -73,6 +118,7 @@ public partial class EditEmployeeViewModel : BaseViewModel
         AddEmployee();
         _mainWindowViewModel = mainWindowViewModel;
         _employeeViewModel = employeeViewModel;
+        LoadEmployeeDefaults();
     }
 
     partial void OnDateOfBirthPickerChanged(DateTime? value)
@@ -146,6 +192,7 @@ public partial class EditEmployeeViewModel : BaseViewModel
                     EditableEmployee.PlaceOfBirth = PlaceOfBirth;
                     EditableEmployee.Passport = Passport;
 
+                    ApplyDefaults(EditableEmployee);
                     context.Employees.Add(EditableEmployee);
                 }
                 else
@@ -159,6 +206,7 @@ public partial class EditEmployeeViewModel : BaseViewModel
                         employee.DateOfBirth = DateOfBirth;
                         employee.PlaceOfBirth = PlaceOfBirth;
                         employee.Passport = Passport;
+                        ApplyDefaults(employee);
                         context.Employees.Update(employee);
                     }
                 }

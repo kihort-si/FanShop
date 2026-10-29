@@ -13,6 +13,7 @@ public sealed class UpdateService : IDisposable
     private const string ReleaseUrl = "https://api.github.com/repos/kihort-si/FanShop/releases/latest";
     private readonly HttpClient _client;
     private ReleaseInfo? _release;
+    public string? AvailableVersion => _release?.Tag_Name.TrimStart('v', 'V');
     public UpdateService() : this(new HttpClient()) { }
     public UpdateService(HttpClient client)
     {

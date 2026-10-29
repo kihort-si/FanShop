@@ -13,6 +13,15 @@ public partial class SettingsViewModel : BaseViewModel
 {
     private readonly MainWindowViewModel _mainWindowViewModel;
     private readonly Settings _settings;
+    private readonly Func<AppDbContext> _createContext;
+    private readonly string? _settingsPath;
+
+    [ObservableProperty] private string _headPosition = string.Empty;
+    [ObservableProperty] private string _saveError = string.Empty;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanEditSettings))]
+    private bool _isSaving;
+    public bool CanEditSettings => !IsSaving;
 
     [ObservableProperty]
     private string _head = string.Empty;
@@ -32,13 +41,16 @@ public partial class SettingsViewModel : BaseViewModel
     [ObservableProperty]
     private ObservableCollection<ShopViewModel> _shops = new();
 
-    public SettingsViewModel(MainWindowViewModel mainWindowViewModel)
+    public SettingsViewModel(MainWindowViewModel mainWindowViewModel, Func<AppDbContext>? createContext = null, string? settingsPath = null)
     {
         _mainWindowViewModel = mainWindowViewModel;
-        _settings = Settings.Load();
+        _createContext = createContext ?? (() => new AppDbContext());
+        _settingsPath = settingsPath;
+        _settings = Settings.Load(settingsPath);
         LoadShops();
 
         Head = _settings.Head;
+        HeadPosition = _settings.HeadPosition;
         ResponsiblePerson = _settings.ResponsiblePerson;
         ResponsiblePhoneNumber = _settings.ResponsiblePhoneNumber;
         ResponsiblePosition = _settings.ResponsiblePosition;
@@ -46,18 +58,36 @@ public partial class SettingsViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private void Save()
+    private async Task Save()
     {
-        _settings.Head = Head;
-        _settings.ResponsiblePerson = ResponsiblePerson;
-        _settings.ResponsiblePhoneNumber = ResponsiblePhoneNumber;
-        _settings.ResponsiblePosition = ResponsiblePosition;
-        _settings.VisitGoal = VisitGoal;
-        _settings.Save();
-        SaveShops();
-
-        _mainWindowViewModel.RefreshStatistics();
-        _mainWindowViewModel.CloseTabRequest(this);
+        IsSaving = true;
+        SaveError = string.Empty;
+        try
+        {
+            _settings.Head = Head;
+            _settings.HeadPosition = HeadPosition;
+            _settings.ResponsiblePerson = ResponsiblePerson;
+            _settings.ResponsiblePhoneNumber = ResponsiblePhoneNumber;
+            _settings.ResponsiblePosition = ResponsiblePosition;
+            _settings.VisitGoal = VisitGoal;
+            var workplacesChanged = await Task.Run(() =>
+            {
+                if (!_settings.TrySave(out var error, _settingsPath))
+                    throw new IOException(error);
+                return SaveShops();
+            });
+            if (workplacesChanged)
+            {
+                WorkplaceCatalogNotifier.NotifyChanged();
+                _mainWindowViewModel.RefreshStatistics();
+            }
+            _mainWindowViewModel.CloseTabRequest(this);
+        }
+        catch (Exception ex)
+        {
+            SaveError = $"Не удалось сохранить все настройки: {ex.Message}";
+        }
+        finally { IsSaving = false; }
     }
 
     [RelayCommand]
@@ -68,7 +98,7 @@ public partial class SettingsViewModel : BaseViewModel
     
     private void LoadShops()
     {
-        using var context = new AppDbContext();
+        using var context = _createContext();
 
         var shops = context.Shops.OrderByDescending(shop => shop.IsDefault).ThenBy(shop => shop.ShopName).ToList();
 
@@ -114,9 +144,9 @@ public partial class SettingsViewModel : BaseViewModel
         }
     }
     
-    private void SaveShops()
+    private bool SaveShops()
     {
-        using var context = new AppDbContext();
+        using var context = _createContext();
 
         foreach (var shopVm in Shops)
         {
@@ -142,14 +172,15 @@ public partial class SettingsViewModel : BaseViewModel
             }
         }
 
-        context.SaveChanges();
-        WorkplaceCatalogNotifier.NotifyChanged();
+        var changed = context.ChangeTracker.HasChanges();
+        if (changed) context.SaveChanges();
+        return changed;
     }
     
     [RelayCommand]
     private void AddShop()
     {
-        using var context = new AppDbContext();
+        using var context = _createContext();
 
         var shop = new Shop
         {
@@ -176,7 +207,7 @@ public partial class SettingsViewModel : BaseViewModel
         if (selectedShop == null)
             return;
 
-        using var context = new AppDbContext();
+        using var context = _createContext();
         foreach (var shop in context.Shops)
             shop.IsDefault = shop.ShopID == selectedShop.ShopID;
         context.SaveChanges();
@@ -192,7 +223,7 @@ public partial class SettingsViewModel : BaseViewModel
         if (selectedPosition?.Shop == null)
             return;
 
-        using var context = new AppDbContext();
+        using var context = _createContext();
         var positions = context.Positions.Where(position => position.ShopID == selectedPosition.Shop.ShopID).ToList();
         foreach (var position in positions)
             position.IsDefault = position.PositionID == selectedPosition.PositionID;
@@ -229,7 +260,7 @@ public partial class SettingsViewModel : BaseViewModel
         if (!result)
             return;
 
-        using var context = new AppDbContext();
+        using var context = _createContext();
 
         var salaryService = new SalaryService(context);
 
@@ -274,7 +305,7 @@ public partial class SettingsViewModel : BaseViewModel
         if (!result)
             return;
 
-        using var context = new AppDbContext();
+        using var context = _createContext();
 
         var position = context.Positions
             .FirstOrDefault(x => x.PositionID == positionVm.PositionID);
@@ -296,7 +327,7 @@ public partial class SettingsViewModel : BaseViewModel
         if (positionVm == null)
             return;
 
-        using var context = new AppDbContext();
+        using var context = _createContext();
 
         bool hasShifts = context.WorkDayEmployee
             .Any(x => x.PositionID == positionVm.PositionID);
@@ -374,7 +405,7 @@ public partial class SettingsViewModel : BaseViewModel
         if (!result)
             return;
 
-        using var context = new AppDbContext();
+        using var context = _createContext();
 
         var shop = context.Shops
             .FirstOrDefault(x => x.ShopID == shopVm.ShopID);
@@ -396,7 +427,7 @@ public partial class SettingsViewModel : BaseViewModel
         if (shopVm == null)
             return;
 
-        using var context = new AppDbContext();
+        using var context = _createContext();
 
         var positionIds = context.Positions
             .Where(x => x.ShopID == shopVm.ShopID)
