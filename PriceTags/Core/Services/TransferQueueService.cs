@@ -54,6 +54,36 @@ public sealed class TransferQueueService(ScanSessionService session, LocalStorag
         }
         Changed?.Invoke();
     }
+    public void EnsureCanAcceptExternal()
+    {
+        lock (_gate)
+        {
+            if (_running || _items.Length > 0) throw new InvalidOperationException("В ценниках уже есть очередь. Завершите её или закройте перед новой партией.");
+            if (session.IsFrozen) throw new InvalidOperationException("Сначала восстановите или удалите сохранённую сессию в разделе ценников.");
+            if (!keyboard.IsSupported) throw new PlatformNotSupportedException("Автоматическая передача в 1С доступна только в Windows.");
+        }
+    }
+    public void PrepareExternal(IReadOnlyCollection<TransferItem> source)
+    {
+        lock (_gate)
+        {
+            EnsureCanAcceptExternal();
+            var items = source.ToArray();
+            if (items.Length == 0 || items.Any(i => i.Id == Guid.Empty || i.SourceBatchId is null || i.SourceDay is null
+                || i.Quantity <= 0 || i.Status != TransferStatus.Pending
+                || new[] { i.Article, i.Name, i.Characteristic }.Any(s => string.IsNullOrWhiteSpace(s) || s.Any(char.IsControl)))
+                || items.Select(i => i.Id).Distinct().Count() != items.Length)
+                throw new InvalidDataException("Некорректная партия ценников из довесов.");
+            session.SetFrozen(true);
+            try
+            {
+                storage.Write("transfer.json", items); _items = items;
+                Message = "Партия из довесов готова. Перейдите в 1С и нажмите F8. После фактической печати подтвердите её в разделе довесов.";
+            }
+            catch { session.SetFrozen(false); throw; }
+        }
+        Changed?.Invoke();
+    }
     public void Pause() { _pause = true; Message = "Пауза: текущая строка будет завершена. F8 — продолжить, Esc — остановить немедленно."; Changed?.Invoke(); }
     public void Stop()
     {

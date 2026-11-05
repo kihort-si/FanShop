@@ -1,0 +1,133 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="FanShop.View.ReplenishmentControl">
+ <Grid Margin="24" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="12">
+  <StackPanel Spacing="6">
+   <TextBlock Text="Довесы в зал" FontSize="28" FontWeight="Bold"/>
+   <TextBlock Text="Загрузите ведомость за один день. Отметки сохраняются автоматически и учитываются в следующих выгрузках." TextWrapping="Wrap"/>
+   <WrapPanel IsEnabled="{Binding CanEdit}">
+    <Button Content="Загрузить Excel" Command="{Binding ImportCommand}" Margin="0,0,12,0"/>
+    <DatePicker SelectedDate="{Binding SelectedDate}" Margin="0,0,12,0"/>
+    <Button Content="Итог за день в Excel" Command="{Binding ExportCommand}"/>
+   </WrapPanel>
+   <TextBlock Text="По умолчанию каждый отчёт — накопленный с начала дня. Приход не считается отметкой довеса." Foreground="#6E7E8F" TextWrapping="Wrap"/>
+  </StackPanel>
+  <TextBlock Grid.Row="1" Text="{Binding Summary}" FontWeight="Bold" TextWrapping="Wrap"/>
+  <StackPanel Grid.Row="2" Spacing="4">
+   <TextBlock Text="{Binding Message}" TextWrapping="Wrap"/>
+   <TextBlock IsVisible="{Binding IsError}" Text="Операция не завершена. Проверьте сообщение выше." Foreground="#D64545"/>
+   <ProgressBar IsVisible="{Binding IsBusy}" IsIndeterminate="True" Height="4"/>
+  </StackPanel>
+  <TabControl Grid.Row="3">
+   <TabItem Header="Товары за день">
+    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10" Margin="0,12,0,0">
+     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12" IsEnabled="{Binding CanEdit}">
+      <TextBox Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" Watermark="Поиск: артикул, товар, размер"/>
+      <CheckBox Grid.Column="1" Content="Только осталось довесить" IsChecked="{Binding PendingOnly}"/>
+     </Grid>
+     <DataGrid Grid.Row="1" x:Name="ReplenishmentGrid" SelectionMode="Extended" ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow}" AutoGenerateColumns="False" IsReadOnly="True">
+      <DataGrid.Columns>
+       <DataGridTextColumn Header="Артикул" Binding="{Binding Article}" Width="140"/>
+       <DataGridTextColumn Header="Номенклатура" Binding="{Binding Name}" Width="*" MinWidth="170"/>
+       <DataGridTextColumn Header="Характеристика" Binding="{Binding Characteristic}" Width="120"/>
+       <DataGridTextColumn Header="Нач. остаток" Binding="{Binding Opening}" Width="100"/>
+       <DataGridTextColumn Header="Приход" Binding="{Binding Incoming}" Width="80"/>
+       <DataGridTextColumn Header="Расход" Binding="{Binding Expense}" Width="80"/>
+       <DataGridTextColumn Header="Кон. остаток" Binding="{Binding Closing}" Width="100"/>
+       <DataGridTextColumn Header="Довешено" Binding="{Binding Completed}" Width="90"/>
+       <DataGridTextColumn Header="Осталось" Binding="{Binding Remaining}" Width="90"/>
+       <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="160"/>
+       <DataGridTextColumn Header="Исключение" Binding="{Binding Exclusion}" Width="200"/>
+      </DataGrid.Columns>
+     </DataGrid>
+     <WrapPanel Grid.Row="2" IsEnabled="{Binding CanEdit}">
+      <TextBlock Text="Довешено, шт.:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+      <NumericUpDown Value="{Binding Quantity}" Minimum="0" Increment="1" Width="110" Margin="0,0,8,0"/>
+      <Button Content="Сохранить количество" Command="{Binding CompleteCommand}" Margin="0,0,8,0"/>
+      <Button Content="Довешено всё оставшееся" Command="{Binding CompleteRemainingCommand}" Margin="0,0,8,0"/>
+      <Button Classes="ghost" Content="Исключить этот артикул" Command="{Binding ExcludeSelectedCommand}"/>
+     </WrapPanel>
+    </Grid>
+   </TabItem>
+   <TabItem Header="Ценники из довесов">
+    <Grid RowDefinitions="Auto,*,Auto,180,Auto" RowSpacing="10" Margin="0,12,0,0" IsEnabled="{Binding CanEdit}">
+     <StackPanel Spacing="5">
+      <TextBlock Text="{Binding LabelSummary}" FontWeight="Bold" TextWrapping="Wrap"/>
+      <TextBlock Text="Выберите товары и количество. После печати подтвердите партию ниже." TextWrapping="Wrap"/>
+     </StackPanel>
+     <DataGrid Grid.Row="1" x:Name="LabelChoicesGrid" ItemsSource="{Binding LabelChoices}" AutoGenerateColumns="False" IsReadOnly="False">
+      <DataGrid.Columns>
+       <DataGridCheckBoxColumn Header="Выбрать" Binding="{Binding IsSelected, Mode=TwoWay}" Width="80"/>
+       <DataGridTextColumn Header="Артикул" Binding="{Binding Article}" Width="150" IsReadOnly="True"/>
+       <DataGridTextColumn Header="Номенклатура" Binding="{Binding Name}" Width="*" IsReadOnly="True"/>
+       <DataGridTextColumn Header="Характеристика" Binding="{Binding Characteristic}" Width="130" IsReadOnly="True"/>
+       <DataGridTextColumn Header="Довешено" Binding="{Binding Completed}" Width="100" IsReadOnly="True"/>
+       <DataGridTextColumn Header="Напечатано" Binding="{Binding Printed}" Width="110" IsReadOnly="True"/>
+       <DataGridTextColumn Header="В партиях" Binding="{Binding Reserved}" Width="100" IsReadOnly="True"/>
+       <DataGridTextColumn Header="Доступно" Binding="{Binding Available}" Width="100" IsReadOnly="True"/>
+       <DataGridTemplateColumn Header="Передать, шт." Width="150">
+        <DataGridTemplateColumn.CellTemplate><DataTemplate><NumericUpDown Value="{Binding QuantityToPrint, Mode=TwoWay}" Minimum="0" Maximum="{Binding Available}" Increment="1" IsEnabled="{Binding CanChoose}"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+       </DataGridTemplateColumn>
+      </DataGrid.Columns>
+     </DataGrid>
+     <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10">
+      <Button Content="Выбрать всё доступное" Command="{Binding SelectLabelsCommand}"/>
+      <Button Content="Передать выбранное в Ценники 1С" Command="{Binding SendLabelsCommand}"/>
+     </StackPanel>
+     <DataGrid Grid.Row="3" ItemsSource="{Binding LabelBatches}" SelectedItem="{Binding SelectedBatch}" AutoGenerateColumns="False" IsReadOnly="True">
+      <DataGrid.Columns>
+       <DataGridTextColumn Header="Партия" Binding="{Binding Number}" Width="110"/>
+       <DataGridTextColumn Header="Создана" Binding="{Binding Created, StringFormat='{}{0:dd.MM.yyyy HH:mm:ss}'}" Width="190"/>
+       <DataGridTextColumn Header="Ценников" Binding="{Binding Quantity}" Width="100"/>
+       <DataGridTextColumn Header="Состояние" Binding="{Binding Status}" Width="*"/>
+       <DataGridTextColumn Header="Печать подтверждена" Binding="{Binding PrintedText}" Width="190"/>
+      </DataGrid.Columns>
+     </DataGrid>
+     <WrapPanel Grid.Row="4">
+      <Button Content="Подтвердить фактическую печать партии" Command="{Binding ConfirmPrintedCommand}" Margin="0,0,12,0"/>
+      <Button Classes="ghost" Content="Отменить непечатавшуюся партию" Command="{Binding CancelBatchCommand}"/>
+     </WrapPanel>
+    </Grid>
+   </TabItem>
+   <TabItem Header="Журнал довесов">
+    <Grid RowDefinitions="*,Auto" Margin="0,12,0,0" RowSpacing="10">
+     <DataGrid ItemsSource="{Binding Events}" SelectedItem="{Binding SelectedEvent}" AutoGenerateColumns="False" IsReadOnly="True">
+      <DataGrid.Columns>
+       <DataGridTextColumn Header="Время отметки" Binding="{Binding Time, StringFormat='{}{0:dd.MM.yyyy HH:mm:ss}'}" Width="180"/>
+       <DataGridTextColumn Header="Действие" Binding="{Binding Action}" Width="150"/>
+       <DataGridTextColumn Header="Артикул" Binding="{Binding Item.Article}" Width="140"/>
+       <DataGridTextColumn Header="Товар и характеристика" Binding="{Binding Item.Description}" Width="*"/>
+       <DataGridTextColumn Header="Количество" Binding="{Binding Quantity}" Width="110"/>
+      </DataGrid.Columns>
+     </DataGrid>
+     <Button Grid.Row="1" Content="Отменить выбранную отметку" Command="{Binding UndoCommand}" IsEnabled="{Binding CanEdit}" HorizontalAlignment="Left"/>
+    </Grid>
+   </TabItem>
+   <TabItem Header="Постоянные исключения">
+    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12" Margin="0,12,0,0" IsEnabled="{Binding CanEdit}">
+     <StackPanel Spacing="8">
+      <TextBlock Text="Артикул исключает все его размеры. Слова в названии исключают совпадающие товары, например «шарф». Исключения действуют для всех дней; история довесов сохраняется." TextWrapping="Wrap"/>
+      <Grid ColumnDefinitions="190,*,Auto" ColumnSpacing="12">
+       <ComboBox SelectedIndex="{Binding RuleType}" HorizontalAlignment="Stretch"><ComboBoxItem Content="Артикул"/><ComboBoxItem Content="Слова в названии"/></ComboBox>
+       <TextBox Grid.Column="1" Text="{Binding RuleValue}" Watermark="Артикул или фраза: шарф, значок, сувенир…"/>
+       <Button Grid.Column="2" Content="Добавить исключение" Command="{Binding AddExclusionCommand}"/>
+      </Grid>
+     </StackPanel>
+     <DataGrid Grid.Row="1" ItemsSource="{Binding Exclusions}" SelectedItem="{Binding SelectedExclusion}" AutoGenerateColumns="False" IsReadOnly="True">
+      <DataGrid.Columns><DataGridTextColumn Header="Правило" Binding="{Binding KindName}" Width="220"/><DataGridTextColumn Header="Значение" Binding="{Binding Value}" Width="*"/></DataGrid.Columns>
+     </DataGrid>
+     <Button Grid.Row="2" Content="Удалить выбранное исключение" Command="{Binding RemoveExclusionCommand}" HorizontalAlignment="Left"/>
+    </Grid>
+   </TabItem>
+   <TabItem Header="История отчётов">
+    <DataGrid Margin="0,12,0,0" ItemsSource="{Binding Reports}" AutoGenerateColumns="False" IsReadOnly="True">
+     <DataGrid.Columns>
+      <DataGridTextColumn Header="Загружен" Binding="{Binding Time, StringFormat='{}{0:dd.MM.yyyy HH:mm:ss}'}" Width="180"/>
+      <DataGridTextColumn Header="Файл" Binding="{Binding FileName}" Width="*"/>
+      <DataGridTextColumn Header="Режим" Binding="{Binding Mode}" Width="190"/>
+      <DataGridTextColumn Header="Строк" Binding="{Binding ItemCount}" Width="90"/>
+      <DataGridTextColumn Header="Расход в отчёте" Binding="{Binding Expense}" Width="150"/>
+     </DataGrid.Columns>
+    </DataGrid>
+   </TabItem>
+  </TabControl>
+ </Grid>
+</UserControl>

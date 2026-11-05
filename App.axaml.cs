@@ -95,6 +95,7 @@ public partial class App : Application
             if (updateAvailable && await updateService.UpdateAsync(updateProgress))
             {
                 _splashScreen?.ViewModel.ShowUpdateStatus("Передаём управление установщику…", "FanShop откроется автоматически после установки обновления.");
+                await FanShop.Services.Replenishment.ReplenishmentModule.ShutdownAsync();
                 await FanShop.Services.ReportAdjustment.ReportAdjustmentModule.ShutdownAsync();
                 await FanShop.Services.PriceTags.PriceTagModule.ShutdownAsync();
                 if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime updatingDesktop)

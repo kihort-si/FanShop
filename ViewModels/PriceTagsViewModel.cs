@@ -228,6 +228,29 @@ public partial class PriceTagsViewModel : ObservableObject
     {
         try { await Task.Run(() => _settings.Save(GetSettings())); Success("Настройки сохранены."); } catch (Exception ex) { Report(ex); }
     }
+    public async Task EnsureCanAcceptReplenishmentAsync()
+    {
+        await InitializeAsync();
+        if (Busy || RecoveryAvailable || !CanEdit) throw new InvalidOperationException("Сначала завершите текущую операцию или восстановите сохранённую сессию в разделе ценников.");
+        _transfer.EnsureCanAcceptExternal();
+    }
+    public async Task AcceptReplenishmentAsync(FanShop.Replenishment.ReplenishmentLabelBatch batch, DateOnly day)
+    {
+        await EnsureCanAcceptReplenishmentAsync();
+        Busy = true;
+        try
+        {
+            await _hotkeys.ArmAsync();
+            var items = batch.Lines.Select(l => new TransferItem(l.TransferId, l.Article, l.Name, l.Characteristic,
+                l.Quantity, SourceBatchId: batch.Id, SourceDay: day)).ToArray();
+            await Task.Run(() => _transfer.PrepareExternal(items));
+            Success("Партия из довесов сформирована. Проверьте первую ячейку 1С и нажмите F8. Печать подтверждается отдельно в довесах.");
+        }
+        catch { _hotkeys.Disarm(); throw; }
+        finally { Busy = false; Refresh(); }
+    }
+    [ObservableProperty] private string _queueOrigin = string.Empty;
+
     [RelayCommand]
     private async Task PrepareTransfer()
     {
@@ -276,6 +299,8 @@ public partial class PriceTagsViewModel : ObservableObject
         Replace(Products, aggregates); Replace(History, records.Reverse().Where(r => !UnknownOnly || !r.Found)); Replace(Queue, items);
         SelectedScan = History.FirstOrDefault(r => r.Id == selectedId);
         Statistics = $"Сканирований: {records.Length} · Позиций: {aggregates.Length} · Найдено: {records.Count(r => r.Found)} · Неизвестных: {records.Count(r => !r.Found)}";
+        var origin = items.FirstOrDefault(i => i.SourceBatchId is not null);
+        QueueOrigin = origin is null ? "" : $"Из довесов за {origin.SourceDay:dd.MM.yyyy}, партия {origin.SourceBatchId?.ToString("N")[..8]}. После фактической печати подтвердите партию в разделе довесов.";
         HasQueue = items.Length > 0; NeedsReview = items.Any(i => i.Status is TransferStatus.Interrupted or TransferStatus.Failed);
         CanConfigure = !Busy && !_transfer.Running && !RecoveryAvailable;
         CanResolveRecovery = RecoveryAvailable && !Busy;

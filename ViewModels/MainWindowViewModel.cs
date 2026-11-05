@@ -118,18 +118,13 @@ public partial class MainWindowViewModel : BaseViewModel
             {
                 new WhatsNewSection
                 {
-                    Title = "Личные настройки сотрудников",
-                    Description = "Постоянный пропуск, исключение из ЗП, магазин и должность по умолчанию настраиваются в карточке. Уже созданные смены сохраняют свои настройки."
+                    Title = "Довесы в зал",
+                    Description = "Новый раздел загружает товарную ведомость, учитывает расход и уже довешенное количество. Добавлен выбор довешенных товаров для ценников 1С"
                 },
                 new WhatsNewSection
                 {
-                    Title = "Поиск и удобное добавление сотрудников",
-                    Description = "Добавлен поиск по ФИО на странице сотрудников и в окне выбора. После добавления сотрудник исчезает из списка, а окно остаётся открытым."
-                },
-                new WhatsNewSection
-                {
-                    Title = "Пропуска на несколько дней для группы",
-                    Description = "Выбирайте нескольких сотрудников для назначения на выбранные дни. Будни и выходные оформляются раздельно. В выходной пропуск объединяются сотрудники с постоянным пропуском и без него. Даты и индивидуальные отметки смен учитываются без дублирования."
+                    Title = "Исправление даты в пропусках",
+                    Description = "При печати пропуска дата теперь корректно отображается в формате ДД.ММ.ГГГГ с двумя цифрами в дне в независимости от числа"
                 }
             }
         };
@@ -163,6 +158,21 @@ public partial class MainWindowViewModel : BaseViewModel
             });
         }
         catch (Exception ex) { await DialogService.ShowInfo($"Не удалось открыть раздел ценников. {ex.Message}"); }
+    }
+
+    [RelayCommand]
+    private async Task OpenReplenishmentTab()
+    {
+        try
+        {
+            OpenTab(new FanTabItem
+            {
+                Title = "Довесы в зал",
+                Content = new ReplenishmentControl { DataContext = FanShop.Services.Replenishment.ReplenishmentModule.ViewModel },
+                IsClosable = true
+            });
+        }
+        catch (Exception ex) { await DialogService.ShowInfo($"Не удалось открыть учёт довесов. {ex.Message}"); }
     }
 
     [RelayCommand]

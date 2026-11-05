@@ -38,6 +38,16 @@ public static class PriceTagModule
         services.AddSingleton<PriceTagsViewModel>();
         return services.BuildServiceProvider();
     }
+    public static bool HasBatchInQueue(Guid batchId)
+    {
+        var items = _provider?.GetRequiredService<TransferQueueService>().Snapshot();
+        if (items is null)
+        {
+            var path = Path.Combine(DataDirectory, "transfer.json");
+            items = File.Exists(path) ? JsonSerializer.Deserialize<TransferItem[]>(File.ReadAllText(path)) : [];
+        }
+        return items?.Any(i => i.SourceBatchId == batchId) == true;
+    }
     public static async Task ShutdownAsync()
     {
         if (_provider is null) return;

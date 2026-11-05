@@ -128,11 +128,11 @@ namespace FanShop.Services
         private static string FormatDates(DateTime[] dates)
         {
             var culture = CultureInfo.GetCultureInfo("ru-RU");
-            if (dates.Length == 1) return dates[0].ToString("d MMMM yyyy", culture);
+            if (dates.Length == 1) return dates[0].ToString("dd MMMM yyyy", culture);
             var consecutive = dates.Zip(dates.Skip(1), (a, b) => b == a.AddDays(1)).All(x => x);
-            if (!consecutive) return string.Join(", ", dates.Select(d => d.ToString("d MMMM yyyy", culture)));
-            var startFormat = dates[0].Year == dates[^1].Year ? "d MMMM" : "d MMMM yyyy";
-            return $"с {dates[0].ToString(startFormat, culture)} по {dates[^1].ToString("d MMMM yyyy", culture)}";
+            if (!consecutive) return string.Join(", ", dates.Select(d => d.ToString("dd MMMM yyyy", culture)));
+            var startFormat = dates[0].Year == dates[^1].Year ? "dd MMMM" : "dd MMMM yyyy";
+            return $"с {dates[0].ToString(startFormat, culture)} по {dates[^1].ToString("dd MMMM yyyy", culture)}";
         }
 
         private static void WritePassDocument(string outputPath, PassPlan plan,

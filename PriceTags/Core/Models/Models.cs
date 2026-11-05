@@ -10,7 +10,7 @@ public sealed record ScanRecord(Guid Id, string Barcode, DateTimeOffset Time, Sc
 }
 public sealed record AggregatedProduct(string Article, string Name, string Characteristic, int Quantity);
 public enum TransferStatus { Pending, Sending, Completed, Interrupted, Failed }
-public sealed record TransferItem(Guid Id, string Article, string Name, string Characteristic, int Quantity, TransferStatus Status = TransferStatus.Pending)
+public sealed record TransferItem(Guid Id, string Article, string Name, string Characteristic, int Quantity, TransferStatus Status = TransferStatus.Pending, Guid? SourceBatchId = null, DateOnly? SourceDay = null)
 {
     public string StatusName => Status switch { TransferStatus.Pending => "Ожидает", TransferStatus.Sending => "Вводится", TransferStatus.Completed => "Передано", TransferStatus.Interrupted => "Проверить строку 1С", _ => "Ошибка — проверить строку 1С" };
 }

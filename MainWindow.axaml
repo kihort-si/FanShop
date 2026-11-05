@@ -155,6 +155,12 @@
                                     <TextBlock Text="Заработная плата и матчи" FontSize="12" Foreground="{StaticResource BrandTextSubtle}" />
                                 </StackPanel>
                             </Button>
+                            <Button Classes="menu-item" Command="{Binding OpenReplenishmentTabCommand}">
+                                <StackPanel>
+                                    <TextBlock Text="Довесы в зал" FontWeight="SemiBold" />
+                                    <TextBlock Text="Продажи, исключения и учёт довешенного" FontSize="12" Foreground="{StaticResource BrandTextSubtle}" />
+                                </StackPanel>
+                            </Button>
                             <Button Classes="menu-item" Command="{Binding OpenReportAdjustmentTabCommand}">
                                 <StackPanel>
                                     <TextBlock Text="Корректировка отчёта" FontWeight="SemiBold" />

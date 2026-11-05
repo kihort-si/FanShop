@@ -66,6 +66,7 @@ public partial class MainWindow : Window
             _priceTagsShutdownStarted = true;
             try
             {
+                await FanShop.Services.Replenishment.ReplenishmentModule.ShutdownAsync();
                 await FanShop.Services.ReportAdjustment.ReportAdjustmentModule.ShutdownAsync();
                 await FanShop.Services.PriceTags.PriceTagModule.ShutdownAsync();
             }
