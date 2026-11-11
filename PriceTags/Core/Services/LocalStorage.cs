@@ -51,6 +51,7 @@ public sealed class SettingsService(LocalStorage storage)
     public void Save(PriceTagSettings settings)
     {
         if (settings.Port < 1024 || settings.Port > 65535) throw new InvalidOperationException("Порт должен быть от 1024 до 65535.");
+        if (!Enum.IsDefined(settings.Order)) throw new InvalidOperationException("Неизвестный порядок передачи ценников.");
         (settings.Delays ?? new()).Validate();
         storage.Write("settings.json", settings);
     }

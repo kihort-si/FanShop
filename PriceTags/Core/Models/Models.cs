@@ -22,6 +22,7 @@ public sealed record TransferDelays(int ArticleText = 600, int ArticleEnter = 40
             throw new InvalidOperationException("Задержки должны быть от 100 до 10000 мс.");
     }
 }
-public sealed record PriceTagSettings(string? ExcelPath = null, int Port = 8765, TransferDelays? Delays = null);
+public enum TransferOrder { ScanOrder, Alphabetical }
+public sealed record PriceTagSettings(string? ExcelPath = null, int Port = 8765, TransferDelays? Delays = null, TransferOrder Order = TransferOrder.ScanOrder);
 public sealed record CatalogLoadResult(IReadOnlyList<ProductInfo> Products, IReadOnlyList<string> Warnings);
 public sealed record NetworkAddress(string Interface, string Url);

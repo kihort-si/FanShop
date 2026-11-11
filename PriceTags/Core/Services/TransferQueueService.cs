@@ -38,13 +38,13 @@ public sealed class TransferQueueService(ScanSessionService session, LocalStorag
         }
         session.SetFrozen(true); Changed?.Invoke();
     }
-    public void Prepare()
+    public void Prepare(TransferOrder order = TransferOrder.ScanOrder)
     {
         lock (_gate)
         {
             if (_running || _items.Length > 0) throw new InvalidOperationException("Уже существует очередь. Продолжите её или закройте.");
             if (!keyboard.IsSupported) throw new PlatformNotSupportedException("Передача в 1С доступна только в Windows.");
-            var aggregates = session.FreezeForTransfer();
+            var aggregates = session.FreezeForTransfer(order);
             try
             {
                 _items = aggregates.Select(p => new TransferItem(Guid.NewGuid(), p.Article, p.Name, p.Characteristic, p.Quantity)).ToArray();

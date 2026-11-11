@@ -15,6 +15,26 @@ public sealed class WorkflowTests : IDisposable
     private readonly ProductInfo[] _products = [new("001", "ЦБ-00008440", "Футболка Jogel", "L"), new("002", "ЦБ-00008440", "Футболка Jogel", "M"), new("003", "ЦБ-00009123", "Кружка Зенит", "MISC")];
     public WorkflowTests() { _storage = new(_root); _catalog.Replace(_products); _session = new(_catalog, _storage, NullLogger<ScanSessionService>.Instance); }
     public void Dispose() { _storage.Dispose(); Directory.Delete(_root, true); }
+    [Fact] public void TransferOrderPreservesInterleavedScansAndAlphabeticalModeSortsByName()
+    {
+        foreach(var barcode in new[]{"003","001","001","003"}) _session.ProcessBarcode(barcode,ScanSource.File);
+        var queue=CreateTransfer(new FakeKeyboard());queue.Prepare(TransferOrder.ScanOrder);
+        Assert.Equal(new[]{"Кружка Зенит","Футболка Jogel","Кружка Зенит"},queue.Snapshot().Select(i=>i.Name));
+        Assert.Equal(new[]{1,2,1},queue.Snapshot().Select(i=>i.Quantity));
+        var restored=CreateTransfer(new FakeKeyboard());restored.Restore();
+        Assert.Equal(queue.Snapshot(),restored.Snapshot());
+        queue.CloseQueue();queue.Prepare(TransferOrder.Alphabetical);
+        Assert.Equal(new[]{"Кружка Зенит","Футболка Jogel"},queue.Snapshot().Select(i=>i.Name));
+        Assert.All(queue.Snapshot(),i=>Assert.Equal(2,i.Quantity));
+    }
+    [Fact] public void TransferOrderSettingPersistsAndOldSettingsDefaultToScanOrder()
+    {
+        File.WriteAllText(Path.Combine(_root,"settings.json"),"{\"Port\":8765}");
+        var settings=new SettingsService(_storage);
+        Assert.Equal(TransferOrder.ScanOrder,settings.Load().Order);
+        settings.Save(settings.Load() with{Order=TransferOrder.Alphabetical});
+        Assert.Equal(TransferOrder.Alphabetical,settings.Load().Order);
+    }
     [Fact] public void CatalogNormalizesAndFindsExactBarcode()
     {
         _catalog.Replace([new(" 0000123 ", " ЦБ-1 ", " Название ", " MISC ")]);

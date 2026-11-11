@@ -101,7 +101,23 @@ public sealed class ScanSessionService(ProductCatalogService catalog, LocalStora
         .GroupBy(r => (r.Product!.Article, r.Product.Characteristic, r.Product.Name))
         .Select(g => new AggregatedProduct(g.Key.Article, g.Key.Name, g.Key.Characteristic, g.Count()))
         .OrderBy(p => p.Article, StringComparer.Ordinal).ThenBy(p => p.Characteristic, StringComparer.Ordinal).ToArray();
-    public AggregatedProduct[] FreezeForTransfer()
+    public static AggregatedProduct[] OrderForTransfer(IEnumerable<ScanRecord> records, TransferOrder order)
+    {
+        if (!Enum.IsDefined(order)) throw new ArgumentOutOfRangeException(nameof(order));
+        if (order == TransferOrder.Alphabetical)
+            return Aggregate(records).OrderBy(p => p.Name, StringComparer.Create(System.Globalization.CultureInfo.GetCultureInfo("ru-RU"), true))
+                .ThenBy(p => p.Characteristic, StringComparer.OrdinalIgnoreCase).ThenBy(p => p.Article, StringComparer.Ordinal).ToArray();
+        var result = new List<AggregatedProduct>();
+        foreach (var record in records.Where(r => r.Product is not null))
+        {
+            var p = record.Product!;
+            if (result.LastOrDefault() is { } last && last.Article == p.Article && last.Name == p.Name && last.Characteristic == p.Characteristic)
+                result[^1] = last with { Quantity = last.Quantity + 1 };
+            else result.Add(new(p.Article, p.Name, p.Characteristic, 1));
+        }
+        return result.ToArray();
+    }
+    public AggregatedProduct[] FreezeForTransfer(TransferOrder order = TransferOrder.ScanOrder)
     {
         lock (_gate)
         {
@@ -109,7 +125,7 @@ public sealed class ScanSessionService(ProductCatalogService catalog, LocalStora
             if (catalog.Count == 0) throw new InvalidOperationException("Не загружен справочник.");
             if (_records.Count == 0) throw new InvalidOperationException("Сессия пуста.");
             if (_records.Any(r => !r.Found)) throw new InvalidOperationException("Удалите неизвестные штрихкоды из истории перед передачей.");
-            var items = Aggregate(_records);
+            var items = OrderForTransfer(_records, order);
             if (items.GroupBy(i => (i.Article, i.Characteristic)).Any(g => g.Select(i => i.Name).Distinct().Count() > 1))
                 throw new InvalidOperationException("Один артикул и характеристика имеют разные названия. Очистите сессию и загрузите согласованный справочник.");
             _frozen = true; return items;

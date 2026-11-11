@@ -16,6 +16,11 @@
    <TextBlock Text="{Binding LocalUrl}" FontSize="12" Foreground="{StaticResource BrandTextSubtle}"/>
   </StackPanel></Border>
   <Border Classes="card"><StackPanel Spacing="10"><TextBlock Text="Текущая сессия" Classes="heading"/><TextBlock Text="{Binding Statistics}" TextWrapping="Wrap"/><Border Background="#FFF1F2" Padding="12" CornerRadius="8" IsVisible="{Binding HasUnknown}"><TextBlock Text="{Binding UnknownMessage}" Foreground="{StaticResource BrandDanger}" TextWrapping="Wrap"/></Border>
+   <StackPanel Orientation="Horizontal" Spacing="12" IsEnabled="{Binding CanEdit}">
+    <TextBlock Text="Порядок передачи в 1С:" VerticalAlignment="Center"/>
+    <ComboBox SelectedIndex="{Binding TransferOrderIndex}"><ComboBoxItem Content="В порядке сканирования"/><ComboBoxItem Content="По алфавиту (номенклатура)"/></ComboBox>
+   </StackPanel>
+   <TextBlock Text="По порядку сканирования: соседние одинаковые сканы объединяются; повтор после другого товара остаётся отдельной строкой. Выбор сохраняется для следующих запусков." TextWrapping="Wrap" FontSize="12" Foreground="{StaticResource BrandTextSubtle}"/>
    <DataGrid ClipboardCopyMode="ExcludeHeader" SelectionMode="Extended" x:Name="ProductsGrid" ItemsSource="{Binding Products}" AutoGenerateColumns="False" IsReadOnly="True" Height="250" GridLinesVisibility="Horizontal"><DataGrid.Columns><DataGridTextColumn Header="Артикул" Binding="{Binding Article}" Width="180"/><DataGridTextColumn Header="Номенклатура" Binding="{Binding Name}" Width="*"/><DataGridTextColumn Header="Характеристика" Binding="{Binding Characteristic}" Width="150"/><DataGridTextColumn Header="Количество" Binding="{Binding Quantity}" Width="120"/></DataGrid.Columns></DataGrid>
    <TextBlock Text="Щёлкните нужную ячейку и нажмите Ctrl+C, чтобы скопировать её значение. Для нескольких строк используйте Ctrl или Shift."
               TextWrapping="Wrap" Foreground="{StaticResource BrandTextSubtle}" FontSize="12"/>

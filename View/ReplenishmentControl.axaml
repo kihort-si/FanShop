@@ -23,7 +23,7 @@
       <TextBox Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" Watermark="Поиск: артикул, товар, размер"/>
       <CheckBox Grid.Column="1" Content="Только осталось довесить" IsChecked="{Binding PendingOnly}"/>
      </Grid>
-     <DataGrid Grid.Row="1" x:Name="ReplenishmentGrid" SelectionMode="Extended" ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow}" AutoGenerateColumns="False" IsReadOnly="True">
+     <DataGrid CanUserResizeColumns="True" Grid.Row="1" x:Name="ReplenishmentGrid" SelectionMode="Extended" ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow}" AutoGenerateColumns="False" IsReadOnly="True">
       <DataGrid.Columns>
        <DataGridTextColumn Header="Артикул" Binding="{Binding Article}" Width="140"/>
        <DataGridTextColumn Header="Номенклатура" Binding="{Binding Name}" Width="*" MinWidth="170"/>
@@ -53,7 +53,7 @@
       <TextBlock Text="{Binding LabelSummary}" FontWeight="Bold" TextWrapping="Wrap"/>
       <TextBlock Text="Выберите товары и количество. После печати подтвердите партию ниже." TextWrapping="Wrap"/>
      </StackPanel>
-     <DataGrid Grid.Row="1" x:Name="LabelChoicesGrid" ItemsSource="{Binding LabelChoices}" AutoGenerateColumns="False" IsReadOnly="False">
+     <DataGrid CanUserResizeColumns="True" Grid.Row="1" x:Name="LabelChoicesGrid" ItemsSource="{Binding LabelChoices}" AutoGenerateColumns="False" IsReadOnly="False">
       <DataGrid.Columns>
        <DataGridCheckBoxColumn Header="Выбрать" Binding="{Binding IsSelected, Mode=TwoWay}" Width="80"/>
        <DataGridTextColumn Header="Артикул" Binding="{Binding Article}" Width="150" IsReadOnly="True"/>
@@ -72,7 +72,7 @@
       <Button Content="Выбрать всё доступное" Command="{Binding SelectLabelsCommand}"/>
       <Button Content="Передать выбранное в Ценники 1С" Command="{Binding SendLabelsCommand}"/>
      </StackPanel>
-     <DataGrid Grid.Row="3" ItemsSource="{Binding LabelBatches}" SelectedItem="{Binding SelectedBatch}" AutoGenerateColumns="False" IsReadOnly="True">
+     <DataGrid CanUserResizeColumns="True" Grid.Row="3" ItemsSource="{Binding LabelBatches}" SelectedItem="{Binding SelectedBatch}" AutoGenerateColumns="False" IsReadOnly="True">
       <DataGrid.Columns>
        <DataGridTextColumn Header="Партия" Binding="{Binding Number}" Width="110"/>
        <DataGridTextColumn Header="Создана" Binding="{Binding Created, StringFormat='{}{0:dd.MM.yyyy HH:mm:ss}'}" Width="190"/>
@@ -89,7 +89,7 @@
    </TabItem>
    <TabItem Header="Журнал довесов">
     <Grid RowDefinitions="*,Auto" Margin="0,12,0,0" RowSpacing="10">
-     <DataGrid ItemsSource="{Binding Events}" SelectedItem="{Binding SelectedEvent}" AutoGenerateColumns="False" IsReadOnly="True">
+     <DataGrid CanUserResizeColumns="True" ItemsSource="{Binding Events}" SelectedItem="{Binding SelectedEvent}" AutoGenerateColumns="False" IsReadOnly="True">
       <DataGrid.Columns>
        <DataGridTextColumn Header="Время отметки" Binding="{Binding Time, StringFormat='{}{0:dd.MM.yyyy HH:mm:ss}'}" Width="180"/>
        <DataGridTextColumn Header="Действие" Binding="{Binding Action}" Width="150"/>
@@ -111,14 +111,14 @@
        <Button Grid.Column="2" Content="Добавить исключение" Command="{Binding AddExclusionCommand}"/>
       </Grid>
      </StackPanel>
-     <DataGrid Grid.Row="1" ItemsSource="{Binding Exclusions}" SelectedItem="{Binding SelectedExclusion}" AutoGenerateColumns="False" IsReadOnly="True">
+     <DataGrid CanUserResizeColumns="True" Grid.Row="1" ItemsSource="{Binding Exclusions}" SelectedItem="{Binding SelectedExclusion}" AutoGenerateColumns="False" IsReadOnly="True">
       <DataGrid.Columns><DataGridTextColumn Header="Правило" Binding="{Binding KindName}" Width="220"/><DataGridTextColumn Header="Значение" Binding="{Binding Value}" Width="*"/></DataGrid.Columns>
      </DataGrid>
      <Button Grid.Row="2" Content="Удалить выбранное исключение" Command="{Binding RemoveExclusionCommand}" HorizontalAlignment="Left"/>
     </Grid>
    </TabItem>
    <TabItem Header="История отчётов">
-    <DataGrid Margin="0,12,0,0" ItemsSource="{Binding Reports}" AutoGenerateColumns="False" IsReadOnly="True">
+    <DataGrid CanUserResizeColumns="True" Margin="0,12,0,0" ItemsSource="{Binding Reports}" AutoGenerateColumns="False" IsReadOnly="True">
      <DataGrid.Columns>
       <DataGridTextColumn Header="Загружен" Binding="{Binding Time, StringFormat='{}{0:dd.MM.yyyy HH:mm:ss}'}" Width="180"/>
       <DataGridTextColumn Header="Файл" Binding="{Binding FileName}" Width="*"/>

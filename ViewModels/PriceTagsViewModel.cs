@@ -79,6 +79,20 @@ public partial class PriceTagsViewModel : ObservableObject
         _hotkeys.PauseRequested += _transfer.Pause;
         _hotkeys.StopRequested += _transfer.Stop;
     }
+    [ObservableProperty] private int _transferOrderIndex;
+    private bool _transferOrderLoaded;
+    private Task _orderSaveTask = Task.CompletedTask;
+    private TransferOrder CurrentTransferOrder => TransferOrderIndex == 1 ? TransferOrder.Alphabetical : TransferOrder.ScanOrder;
+    partial void OnTransferOrderIndexChanged(int value)
+    {
+        Refresh();
+        if (_transferOrderLoaded && !Busy) _orderSaveTask = SaveTransferOrderAsync(_orderSaveTask, GetSettings());
+    }
+    private async Task SaveTransferOrderAsync(Task previous, PriceTagSettings settings)
+    {
+        try { await previous; await Task.Run(() => _settings.Save(settings)); }
+        catch (Exception ex) { Report(ex, "Не удалось сохранить порядок передачи."); }
+    }
     public Task InitializeAsync() => _initializationTask ??= InitializeCoreAsync();
     private async Task InitializeCoreAsync()
     {
@@ -87,6 +101,7 @@ public partial class PriceTagsViewModel : ObservableObject
         {
             var settings = await Task.Run(_settings.Load);
             Port = settings.Port; _excelPath = settings.ExcelPath;
+            TransferOrderIndex = settings.Order == TransferOrder.Alphabetical ? 1 : 0; _transferOrderLoaded = true;
             var delays = settings.Delays ?? new(); ArticleTextDelay = delays.ArticleText; ArticleEnterDelay = delays.ArticleEnter;
             CharacteristicTextDelay = delays.CharacteristicText; CharacteristicEnterDelay = delays.CharacteristicEnter; QuantityDelay = delays.QuantityEnter;
             _saved = await Task.Run(_session.ReadSaved);
@@ -113,7 +128,7 @@ public partial class PriceTagsViewModel : ObservableObject
         catch (Exception ex) { await Dispatcher.UIThread.InvokeAsync(() => Report(ex)); }
     }
     private TransferDelays GetDelays() => new(ArticleTextDelay, ArticleEnterDelay, CharacteristicTextDelay, CharacteristicEnterDelay, QuantityDelay);
-    private PriceTagSettings GetSettings() => new(_excelPath, Port, GetDelays());
+    private PriceTagSettings GetSettings() => new(_excelPath, Port, GetDelays(), CurrentTransferOrder);
     [RelayCommand]
     private async Task LoadExcel()
     {
@@ -256,7 +271,7 @@ public partial class PriceTagsViewModel : ObservableObject
     {
         if (!CanPrepare) return;
         Busy = true;
-        try { GetDelays().Validate(); await _hotkeys.ArmAsync(); await Task.Run(_transfer.Prepare); Success("Очередь сформирована. Выполните инструкцию и нажмите F8 в 1С."); }
+        try { GetDelays().Validate(); await _hotkeys.ArmAsync(); await Task.Run(() => _transfer.Prepare(CurrentTransferOrder)); Success("Очередь сформирована. Выполните инструкцию и нажмите F8 в 1С."); }
         catch (Exception ex) { _hotkeys.Disarm(); Report(ex); }
         finally { Busy = false; Refresh(); }
     }
@@ -294,7 +309,7 @@ public partial class PriceTagsViewModel : ObservableObject
     }
     private void Refresh()
     {
-        var records = _session.Snapshot(); var aggregates = ScanSessionService.Aggregate(records); var items = _transfer.Snapshot();
+        var records = _session.Snapshot(); var aggregates = ScanSessionService.OrderForTransfer(records, CurrentTransferOrder); var items = _transfer.Snapshot();
         var selectedId = SelectedScan?.Id;
         Replace(Products, aggregates); Replace(History, records.Reverse().Where(r => !UnknownOnly || !r.Found)); Replace(Queue, items);
         SelectedScan = History.FirstOrDefault(r => r.Id == selectedId);
@@ -337,6 +352,7 @@ public partial class PriceTagsViewModel : ObservableObject
     public async Task ShutdownAsync()
     {
         _lifetime.Cancel(); _transfer.Stop();
+        await _orderSaveTask;
         if (_initializationTask is not null) await _initializationTask;
         for (var i = 0; i < 100 && _transfer.Running; i++) await Task.Delay(20);
         _hotkeys.Disarm(); await _server.StopAsync();
